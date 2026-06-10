@@ -85,6 +85,25 @@ app.use((req, res, next) => {
   next();
 });
 
+// DEMO MODE: while no database is configured, camp pages render seeded demo
+// content and writes flash a notice. Bypassed once Mongo connects.
+const demoCamps = require("./seeds/demoData");
+app.use((req, res, next) => {
+  if (mongoose.connection.readyState === 1) return next();
+  if (req.method === "GET" && req.path === "/camps")
+    return res.render("camps/index", { camps: demoCamps });
+  const m = req.path.match(/^\/camps\/([a-z0-9]+)$/);
+  if (req.method === "GET" && m && m[1] !== "new") {
+    const camp = demoCamps.find((c) => c._id === m[1]);
+    if (camp) return res.render("camps/show", { camp });
+  }
+  if (req.method !== "GET") {
+    req.flash("error", "Demo mode: the live database is being provisioned - browsing only for now.");
+    return res.redirect("/camps");
+  }
+  return next();
+});
+
 app.use("/", userRoutes);
 app.use("/camps", campsRoutes);
 app.use("/camps/:id/reviews", reviewRoutes);

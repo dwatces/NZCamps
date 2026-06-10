@@ -1,0 +1,21 @@
+/* Demo campgrounds served while no database is configured. */
+module.exports = [
+  { _id: "demo1", title: "Milford Sound Basecamp", price: 18,
+    description: "Demo campground: fiord views, kea patrols, sandfly negotiations mandatory.",
+    location: "Fiordland National Park",
+    images: [{ url: "https://picsum.photos/seed/nzcamp1/900/600" }],
+    geometry: { type: "Point", coordinates: [167.9256, -44.6717] }, reviews: [],
+    author: { username: "demo-ranger" } },
+  { _id: "demo2", title: "Tekapo Lakeside Pitch", price: 22,
+    description: "Demo campground: dark-sky reserve overhead, lupins at the door.",
+    location: "Lake Tekapo, Canterbury",
+    images: [{ url: "https://picsum.photos/seed/nzcamp2/900/600" }],
+    geometry: { type: "Point", coordinates: [170.4771, -44.0046] }, reviews: [],
+    author: { username: "demo-ranger" } },
+  { _id: "demo3", title: "Coromandel Cove Camp", price: 15,
+    description: "Demo campground: kayak to the arch before the tour boats wake up.",
+    location: "Hahei, Coromandel",
+    images: [{ url: "https://picsum.photos/seed/nzcamp3/900/600" }],
+    geometry: { type: "Point", coordinates: [175.7917, -36.8277] }, reviews: [],
+    author: { username: "demo-ranger" } },
+];
