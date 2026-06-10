@@ -20,12 +20,13 @@ const mongoSanitize = require("express-mongo-sanitize");
 const MongoStore = require("connect-mongo");
 const dbUrl = process.env.DB_URL;
 
-mongoose.connect(dbUrl, {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-});
+if (dbUrl) {
+  mongoose
+    .connect(dbUrl)
+    .catch((e) => console.error("mongo connect failed:", e.message));
+} else {
+  console.warn("DB_URL not set - running without database");
+}
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
@@ -44,18 +45,20 @@ app.use(mongoSanitize());
 
 const secret = process.env.SECRET || "badsecret";
 
-const store = new MongoStore({
-  mongoUrl: dbUrl,
-  secret,
-  touchAfter: 24 * 60 * 60,
-});
-
-store.on("error", function (e) {
-  console.log("Error", e);
-});
+let store;
+if (dbUrl) {
+  store = MongoStore.create({
+    mongoUrl: dbUrl,
+    secret,
+    touchAfter: 24 * 60 * 60,
+  });
+  store.on("error", function (e) {
+    console.log("Error", e);
+  });
+}
 
 const sessionConfig = {
-  store,
+  ...(store ? { store } : {}),
   secret,
   resave: false,
   saveUninitialized: true,
@@ -102,6 +105,10 @@ app.use((err, req, res, next) => {
 
 const port = process.env.PORT || 3000;
 
-app.listen(port, () => {
-  console.log(`Serving on port ${port}`);
-});
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`Serving on port ${port}`);
+  });
+}
+
+module.exports = app;
