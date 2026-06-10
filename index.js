@@ -20,8 +20,9 @@ const mongoSanitize = require("express-mongo-sanitize");
 const MongoStore = require("connect-mongo");
 const dbUrl = process.env.DB_URL;
 
+let connecting = Promise.resolve();
 if (dbUrl) {
-  mongoose
+  connecting = mongoose
     .connect(dbUrl)
     .catch((e) => console.error("mongo connect failed:", e.message));
 } else {
@@ -87,8 +88,17 @@ app.use((req, res, next) => {
 
 // DEMO MODE: while no database is configured, camp pages render seeded demo
 // content and writes flash a notice. Bypassed once Mongo connects.
+// Serverless note: the function freezes between requests, so the boot-time
+// connect may still be in flight on the first request — wait for it (bounded)
+// before falling back to demo content.
 const demoCamps = require("./seeds/demoData");
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1 && dbUrl) {
+    await Promise.race([
+      connecting,
+      new Promise((resolve) => setTimeout(resolve, 8000)),
+    ]);
+  }
   if (mongoose.connection.readyState === 1) return next();
   if (req.method === "GET" && req.path === "/camps")
     return res.render("camps/index", { camps: demoCamps });
