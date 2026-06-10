@@ -1,6 +1,6 @@
 const Camp = require("../models/camp");
-const opencage = require('opencage-api-client');
-const { cloudinary } = require("../cloudinary");
+const { fileToImage, destroyImage } = require("../cloudinary");
+const geocodeNZ = require("../utils/geocode");
 
 module.exports.index = async (req, res) => {
   try {
@@ -20,28 +20,21 @@ module.exports.newForm = (req, res) => {
 
 module.exports.createCamp = async (req, res, next) => {
   try {
-    // Geocoding request to OpenCage API
-    const locationQuery = req.body.camp.location + ", New Zealand";  // Append New Zealand to ensure accurate results
+    const coords = await geocodeNZ(req.body.camp.location);
 
-    const geoData = await opencage.geocode({ q: locationQuery, key: process.env.OPENCAGE_ACCESS_TOKEN });
-
-    if (!geoData || geoData.status.code !== 200 || geoData.results.length === 0) {
+    if (!coords) {
       req.flash("error", "Location not found. Please try again.");
       return res.redirect("back");
     }
 
     const camp = new Camp(req.body.camp);
-    // Assign coordinates from OpenCage geocode
     camp.geometry = {
       type: "Point",
-      coordinates: [geoData.results[0].geometry.lng, geoData.results[0].geometry.lat],  // Extracting correct coordinates
+      coordinates: [coords.lng, coords.lat],
     };
 
     camp.author = req.user._id;
-    camp.images = req.files.map((file) => ({
-      url: file.path,
-      filename: file.filename,
-    }));
+    camp.images = req.files.map(fileToImage);
 
     await camp.save();
     req.flash("success", "Successfully made a new camp!");
@@ -105,18 +98,14 @@ module.exports.updateCamp = async (req, res) => {
     Object.assign(camp, req.body.camp);
 
     // Add new images if any
-    const imgs = req.files.map((file) => ({
-      url: file.path,
-      filename: file.filename,
-    }));
-    camp.images.push(...imgs);
+    camp.images.push(...req.files.map(fileToImage));
 
     await camp.save();
 
     // Handle deleting images if requested
     if (req.body.deleteImages) {
       for (let filename of req.body.deleteImages) {
-        await cloudinary.uploader.destroy(filename); // Delete image from Cloudinary
+        await destroyImage(filename);
       }
       await camp.updateOne({
         $pull: { images: { filename: { $in: req.body.deleteImages } } },
@@ -141,9 +130,9 @@ module.exports.deleteCamp = async (req, res) => {
       return res.redirect("/camps");
     }
 
-    // Delete associated images from Cloudinary
+    // Delete associated stored images
     for (let image of camp.images) {
-      await cloudinary.uploader.destroy(image.filename);
+      await destroyImage(image.filename);
     }
 
     await Camp.findByIdAndDelete(id);

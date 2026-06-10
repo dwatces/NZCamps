@@ -5,7 +5,7 @@ const catchAsync = require("../utils/catchAsync");
 const { isLoggedIn, isAuthor, validateCamp } = require("../middleware");
 const { storage } = require("../cloudinary");
 const multer = require("multer");
-const upload = multer({ storage });
+const upload = multer({ storage, limits: { fileSize: 3 * 1024 * 1024 } });
 
 router
   .route("/")
