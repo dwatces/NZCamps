@@ -84,10 +84,11 @@ app.use((req, res, next) => {
   res.locals.success = [];
   res.locals.error = [];
   res.locals.demoBanner = "";
-  // BASE_URL only builds absolute URLs (the canonical link). Navigation links
+  // BASE_URL only builds absolute URLs (canonical, og:url, og:image). Navigation links
   // stay relative so a preview deployment never sends people to production.
   const base = (process.env.BASE_URL || "").replace(/\/+$/, "");
-  res.locals.canonicalUrl = (base || `${req.protocol}://${req.get("host")}`) + req.path;
+  res.locals.siteOrigin = base || `${req.protocol}://${req.get("host")}`;
+  res.locals.canonicalUrl = res.locals.siteOrigin + req.path;
   next();
 });
 

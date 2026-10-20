@@ -1,4 +1,6 @@
 <% layout('layouts/boilerplate')%>
+<% block('title', camp.title) %>
+<% block('description', excerpt(camp.description, 155)) %>
 <% block('styles', '<link rel="stylesheet" href="/stylesheets/stars.css" />') %>
 <% block('styles', '<link rel="stylesheet" href="/vendor/leaflet-1.9.4/leaflet.css" />') %>
 <% block('scripts', '<script defer src="/vendor/leaflet-1.9.4/leaflet.js"></script>') %>

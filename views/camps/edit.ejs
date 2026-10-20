@@ -1,4 +1,6 @@
 <% layout('layouts/boilerplate')%>
+<% block('title', `Edit ${camp.title}`) %>
+<% block('description', `Change the details or photos of ${camp.title} on NZ Camps.`) %>
 <% block('scripts', '<script defer src="/js/upload.js"></script>') %>
 <div class="row mt-5">
   <h1 class="text-center text-white">Edit camp</h1>

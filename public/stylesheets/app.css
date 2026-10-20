@@ -29,6 +29,27 @@ a {
   text-underline-offset: 0.15em;
 }
 
+/* "Skip to content": hidden until it has keyboard focus. */
+.skip-link {
+  position: absolute;
+  top: -10rem;
+  left: 1rem;
+  z-index: 2000;
+  padding: 0.75rem 1rem;
+  border-radius: var(--nzc-radius-sm);
+  background: var(--nzc-sample);
+  color: var(--nzc-ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 0.5rem;
+}
+/* main takes focus from the skip link; it is not a control, so no ring. */
+#main:focus {
+  outline: none;
+}
+
 /* ---------- Page background ----------
    The bush photo sits behind every page except home, on a dark fallback
    colour so nothing is ever grey while it loads. Phones get a tall crop that

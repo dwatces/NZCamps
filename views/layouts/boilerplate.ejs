@@ -3,9 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NZ Camps</title>
+    <%
+      // Each view sets its title and description with block('title', ...) and
+      // block('description', ...). Block text is stored as written and escaped here.
+      const pageTitle = block('title').toString().trim();
+      const pageDescription = block('description').toString().trim() ||
+        "Find and review campgrounds around Aotearoa New Zealand, with a map, prices, ratings and reviews.";
+      const fullTitle = pageTitle ? `${pageTitle} · NZ Camps` : "NZ Camps · Find and review campgrounds in New Zealand";
+    %>
+    <title><%= fullTitle %></title>
+    <meta name="description" content="<%= pageDescription %>" />
     <link rel="canonical" href="<%= canonicalUrl %>" />
-    <link rel="icon" href="/stylesheets/favicon.ico" type="image/x-icon" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="NZ Camps" />
+    <meta property="og:locale" content="en_NZ" />
+    <meta property="og:title" content="<%= pageTitle || 'New Zealand Camps' %>" />
+    <meta property="og:description" content="<%= pageDescription %>" />
+    <meta property="og:url" content="<%= canonicalUrl %>" />
+    <meta property="og:image" content="<%= siteOrigin %>/images/og-nzcamps.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="A gravel path through native bush, with the title New Zealand Camps" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0b1510" />
+    <link rel="icon" href="/stylesheets/favicon.ico" sizes="any" />
+    <link rel="icon" href="/images/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
     <%- block('preload').toString() %>
     <link rel="stylesheet" href="/vendor/bootstrap-5.3.8/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/stylesheets/tokens.css" />
@@ -15,11 +38,14 @@
   <% const bodyClass = block('bodyClass').toString().trim(); %>
   <% const mainClass = block('mainClass').toString().trim(); %>
   <body class="<%= bodyClass || 'has-backdrop' %>">
-    <%- include('../partials/navbar') %>
-    <% if (typeof demoBanner !== "undefined" && demoBanner) { %>
-    <p class="demo-banner mb-0"><%= demoBanner %></p>
-    <% } %>
-    <main id="main" class="site-main <%= mainClass || 'container mt-5' %>">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <%- include('../partials/navbar') %>
+    </header>
+    <main id="main" class="site-main <%= mainClass || 'container mt-5' %>" tabindex="-1">
+      <% if (typeof demoBanner !== "undefined" && demoBanner) { %>
+      <p class="demo-banner mb-0"><%= demoBanner %></p>
+      <% } %>
       <%- include('../partials/flash') %>
       <%- body %>
     </main>

@@ -1,4 +1,9 @@
 <% layout('layouts/boilerplate') %>
+<%
+  const listTitle = params.q ? `Camps matching “${params.q}”` : "Explore camps";
+  block('title', params.page > 1 ? `${listTitle}, page ${params.page}` : listTitle);
+  block('description', "Browse campgrounds around New Zealand on a map, with prices, ratings and reviews.");
+%>
 <% block('styles', '<link rel="stylesheet" href="/vendor/leaflet-1.9.4/leaflet.css" />') %>
 <% block('styles', '<link rel="stylesheet" href="/vendor/leaflet.markercluster-1.5.3/MarkerCluster.css" />') %>
 <% block('styles', '<link rel="stylesheet" href="/vendor/leaflet.markercluster-1.5.3/MarkerCluster.Default.css" />') %>

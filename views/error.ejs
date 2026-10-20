@@ -6,6 +6,8 @@
   const detail = typeof message === "string" && message ? message
     : code === 404 ? "There's no page at this address. The link may be wrong, or the page may have been removed."
     : "We couldn't load this page. Please try again in a minute.";
+  block('title', heading);
+  block('description', detail);
 %>
 <div class="row">
   <div class="col-md-8 offset-md-2 col-lg-6 offset-lg-3">
