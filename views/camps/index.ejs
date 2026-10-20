@@ -13,14 +13,14 @@
 <div class="mt-4 text-center">
   <p class="text-white mb-2">Sign up or log in to add camps and leave reviews.</p>
   <div class="mb-3 d-flex justify-content-center gap-4">
-    <a class="btn btn-success btn-fixed" href="/register">Sign up</a>
-    <a class="btn btn-light btn-fixed" href="/login">Log in</a>
+    <a class="btn btn-primary btn-fixed" href="/register">Sign up</a>
+    <a class="btn btn-outline-primary btn-fixed" href="/login">Log in</a>
   </div>
 </div>
 <% } else { %>
 <div class="mt-4 text-center">
   <div class="mb-3 d-flex justify-content-center">
-    <a class="btn btn-success" href="/camps/new">Add a camp</a>
+    <a class="btn btn-primary" href="/camps/new">Add a camp</a>
   </div>
 </div>
 <% } %>
@@ -39,7 +39,7 @@
     </select>
   </div>
   <div class="col-5 col-md-2">
-    <button class="btn btn-success w-100" type="submit">Search</button>
+    <button class="btn btn-primary w-100" type="submit">Search</button>
   </div>
 </form>
 
@@ -94,7 +94,7 @@
           </p>
           <p class="card-text"><%= excerpt(camp.description, 140) %></p>
           <div class="mt-auto">
-            <a class="btn btn-success" href="/camps/<%= camp._id %>">View camp<span class="visually-hidden">: <%= camp.title %></span></a>
+            <a class="btn btn-primary" href="/camps/<%= camp._id %>">View camp<span class="visually-hidden">: <%= camp.title %></span></a>
           </div>
         </div>
       </div>

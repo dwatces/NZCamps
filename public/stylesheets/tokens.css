@@ -1,0 +1,66 @@
+/* NZ Camps design tokens. Loaded after Bootstrap, so the --bs-* mappings at
+   the end win. Contrast ratios in the comments are WCAG ratios against the
+   named background. */
+:root {
+  /* Greens: the two original NZ Camps greens plus a darker shade for hover. */
+  --nzc-green-900: #0a3d1c;
+  --nzc-green-800: #0d4f25;
+  --nzc-green-700: #116530; /* primary actions: white text 7.2:1 */
+  --nzc-green-500: #18a558; /* accent on dark: 5.8:1 against --nzc-night */
+  --nzc-green-100: #e4f3ea;
+
+  /* Neutrals, slightly green so they sit with the bush photos. */
+  --nzc-ink: #15211a; /* body text: 16.6:1 on white */
+  --nzc-ink-muted: #4b5a51; /* secondary text: 7.3:1 on white */
+  --nzc-line: #d3dcd6; /* borders */
+  --nzc-surface: #ffffff;
+  --nzc-surface-alt: #f3f6f4;
+  --nzc-night: #0b1510; /* header, footer and dark panels */
+  --nzc-night-2: #13231a;
+  --nzc-on-night: #ffffff;
+  --nzc-on-night-muted: #c9d6ce; /* 12:1 on --nzc-night */
+
+  /* Photo overlays and dark panels (text on them stays at least 4.5:1
+     whatever the photo underneath). */
+  --nzc-overlay: rgba(5, 12, 8, 0.55);
+  --nzc-overlay-strong: rgba(5, 12, 8, 0.78);
+  --nzc-panel-dark: rgba(11, 21, 16, 0.92);
+
+  /* Status colours. */
+  --nzc-sample: #ffd166; /* Sample listing badge, with --nzc-ink text 11.5:1 */
+  --nzc-danger: #a4161a; /* white text 7.7:1 */
+  --nzc-star: #c25e00; /* filled stars: 4.3:1 on white */
+  --nzc-star-empty: #6b766f; /* empty star outline: 4.7:1 on white */
+
+  /* Focus: a yellow ring with a dark halo, visible on white, green and photos. */
+  --nzc-focus: #ffd166;
+  --nzc-focus-halo: #0b1510;
+
+  /* Shape and rhythm. */
+  --nzc-radius: 0.75rem;
+  --nzc-radius-sm: 0.5rem;
+  --nzc-shadow: 0 1px 2px rgba(5, 12, 8, 0.12), 0 6px 20px rgba(5, 12, 8, 0.18);
+  --nzc-header-h: 3.5rem;
+  --nzc-tap: 2.75rem; /* 44 px minimum target */
+  --nzc-font:
+    system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+
+  /* Bootstrap 5.3 globals mapped onto the tokens. */
+  --bs-body-font-family: var(--nzc-font);
+  --bs-body-color: var(--nzc-ink);
+  --bs-body-color-rgb: 21, 33, 26;
+  --bs-secondary-color: var(--nzc-ink-muted);
+  --bs-emphasis-color: var(--nzc-ink);
+  --bs-primary: var(--nzc-green-700);
+  --bs-primary-rgb: 17, 101, 48;
+  --bs-success: var(--nzc-green-700);
+  --bs-success-rgb: 17, 101, 48;
+  --bs-link-color: var(--nzc-green-700);
+  --bs-link-color-rgb: 17, 101, 48;
+  --bs-link-hover-color: var(--nzc-green-900);
+  --bs-link-hover-color-rgb: 10, 61, 28;
+  --bs-border-color: var(--nzc-line);
+  --bs-border-radius: var(--nzc-radius-sm);
+  --bs-border-radius-lg: var(--nzc-radius);
+  --bs-focus-ring-color: rgba(255, 209, 102, 0.6);
+}

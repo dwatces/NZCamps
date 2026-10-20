@@ -1,8 +1,7 @@
 <% layout('layouts/boilerplate') %>
-<% block('bodyClass', 'd-flex flex-column text-center text-white bg-dark home-page') %>
+<% block('bodyClass', 'd-flex flex-column text-center text-white home-page') %>
 <% block('mainClass', 'd-flex flex-column flex-grow-1') %>
 <% block('preload', '<link rel="preload" as="image" href="/stylesheets/robert-koorenny-Py2ULdPgHac-unsplash.jpg" />') %>
-<% block('styles', '<link rel="stylesheet" href="/stylesheets/home.css" />') %>
 <div class="cover-container d-flex w-100 p-3 mx-auto flex-column flex-grow-1 justify-content-center">
   <h1 class="home__title">New Zealand Camps</h1>
   <p class="lead home__subheader">
@@ -10,6 +9,6 @@
     Jump right in and explore camps across beautiful Aotearoa.
   </p>
   <div>
-    <a href="/camps" class="btn btn-secondary btn-lg home__button">View Camps</a>
+    <a href="/camps" class="btn btn-primary btn-lg home__button">View Camps</a>
   </div>
 </div>

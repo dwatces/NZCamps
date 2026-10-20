@@ -68,7 +68,7 @@
       </ul>
       <% if(user && sameId(camp.author, user)) { %>
       <div class="card-body d-flex justify-content-between">
-        <a class="card-link btn btn-light" href="/camps/<%=camp._id%>/edit">Edit camp</a>
+        <a class="card-link btn btn-outline-primary" href="/camps/<%=camp._id%>/edit">Edit camp</a>
         <form
           class="d-inline"
           action="/camps/<%=camp._id%>?_method=DELETE"
@@ -129,13 +129,13 @@
         ><%= typed.body || "" %></textarea>
         <%- include('../partials/fieldError', { name: 'body' }) %>
       </div>
-      <button class="btn btn-success">Post review</button>
+      <button class="btn btn-primary">Post review</button>
     </form>
     <% } %>
     <h2 class="h4 text-white" id="reviews">Reviews</h2>
     <% if (!user) { %>
     <p class="reviews-prompt">
-      <a class="btn btn-success" href="/login?returnTo=<%= encodeURIComponent('/camps/' + camp._id) %>">Log in to leave a review</a>
+      <a class="btn btn-primary" href="/login?returnTo=<%= encodeURIComponent('/camps/' + camp._id) %>">Log in to leave a review</a>
     </p>
     <% } %>
     <% if (!camp.reviews.length) { %>
