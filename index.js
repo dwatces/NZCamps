@@ -62,6 +62,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(require("./utils/securityHeaders"));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));

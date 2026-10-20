@@ -1,6 +1,8 @@
 <% layout('layouts/boilerplate')%>
-<link rel="stylesheet" href="/stylesheets/stars.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<% block('styles', '<link rel="stylesheet" href="/stylesheets/stars.css" />') %>
+<% block('styles', '<link rel="stylesheet" href="/vendor/leaflet-1.9.4/leaflet.css" />') %>
+<% block('scripts', '<script src="/vendor/leaflet-1.9.4/leaflet.js"></script>') %>
+<% block('scripts', '<script src="/js/campMap.js"></script>') %>
 
 <div class="responsive__column row mt-5">
   <div class="col-lg-6 col-sm-10">
@@ -54,20 +56,16 @@
           class="d-inline"
           action="/camps/<%=camp._id%>?_method=DELETE"
           method="POST"
+          data-confirm="Are you sure you want to delete this camp?"
         >
-          <button
-            onclick="return confirm('Are you sure you want to delete this camp?')"
-            class="btn btn-danger"
-          >
-            Delete
-          </button>
+          <button class="btn btn-danger">Delete</button>
         </form>
       </div>
       <% } %>
     </div>
   </div>
   <div class="col-lg-6 col-sm-10">
-    <div class="mb-5 card" id="map" style="height: 400px;"></div>
+    <div class="mb-5 card" id="map"></div>
     <% if(user) { %>
     <h2 class="text-white">Leave a Review</h2>
     <form
@@ -170,5 +168,3 @@
 </div>
 
 <script type="application/json" id="camp-data"><%- safeJson(mapPoint(camp)) %></script>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="/js/campMap.js"></script>

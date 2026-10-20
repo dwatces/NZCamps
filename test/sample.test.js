@@ -78,7 +78,7 @@ test("seed usernames cannot be registered", async () => {
   }
 });
 
-test("the seeder labels camps, is idempotent and refuses a remote database", () => {
+test("the seeder labels camps, is idempotent and refuses a remote database", h.notInBundle, () => {
   const seeder = path.join(__dirname, "..", "seeds", "seedAtlas.js");
   const guard = path.join(__dirname, "helpers", "guard.js");
   const run = (env) =>
@@ -102,7 +102,7 @@ test("the seeder labels camps, is idempotent and refuses a remote database", () 
   assert.match(second.stdout, /0 camps created/);
 });
 
-test("the seeded camps keep their label and isDemo flag", async () => {
+test("the seeded camps keep their label and isDemo flag", h.notInBundle, async () => {
   const mongoose = require("mongoose");
   const conn = await mongoose.createConnection(db.server.getUri("nzcamps-seed")).asPromise();
   try {
@@ -119,7 +119,7 @@ test("the seeded camps keep their label and isDemo flag", async () => {
   }
 });
 
-test("isLoopbackDbUrl only accepts this machine", () => {
+test("isLoopbackDbUrl only accepts this machine", h.notInBundle, () => {
   const { isLoopbackDbUrl } = require("../seeds/seedAtlas");
   assert.equal(isLoopbackDbUrl("mongodb://127.0.0.1:27017/x"), true);
   assert.equal(isLoopbackDbUrl("mongodb://user:pw@localhost/x"), true);

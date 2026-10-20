@@ -2,46 +2,31 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="/stylesheets/favicon.ico" type="image/x-icon" />
-    <link
-      rel="preload"
-      as="image"
-      href="/stylesheets/mitchell-luo-CEowgw6VXbE-unsplash.jpg"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="/stylesheets/casey-horner-_aVKjJhFdn0-unsplash.jpg"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="/stylesheets/harry-knight-mqpY5vyNrKE-unsplash.jpg"
-    />
-
-    <link rel="stylesheet" href="/stylesheets/app.css" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-      crossorigin="anonymous"
-    />
-
     <title>NZ Camps</title>
+    <link rel="icon" href="/stylesheets/favicon.ico" type="image/x-icon" />
+    <% const preload = block('preload').toString(); %>
+    <% if (preload) { %><%- preload %><% } else { %>
+    <link rel="preload" as="image" href="/stylesheets/mitchell-luo-CEowgw6VXbE-unsplash.jpg" />
+    <link rel="preload" as="image" href="/stylesheets/casey-horner-_aVKjJhFdn0-unsplash.jpg" />
+    <% } %>
+    <link rel="stylesheet" href="/stylesheets/app.css" />
+    <link rel="stylesheet" href="/vendor/bootstrap-5.3.8/css/bootstrap.min.css" />
+    <%- block('styles').toString() %>
+    <link rel="stylesheet" href="/stylesheets/navbar.css" />
   </head>
-  <body class="d-flex flex-column background__color__auth">
-    <%- include('../partials/navbar'); %>
-    <main class="container mt-5">
-      <%- include('../partials/flash'); %> <%- body %>
+  <% const bodyClass = block('bodyClass').toString().trim(); %>
+  <% const mainClass = block('mainClass').toString().trim(); %>
+  <body class="<%= bodyClass || 'd-flex flex-column background__color__auth' %>">
+    <%- include('../partials/navbar') %>
+    <main id="main" class="<%= mainClass || 'container mt-5' %>">
+      <%- include('../partials/flash') %>
+      <%- body %>
     </main>
     <%- include('../partials/footer') %>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-      crossorigin="anonymous"
-    ></script>
+    <script src="/vendor/bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
     <script src="/js/validateForms.js"></script>
+    <script src="/js/confirm.js"></script>
+    <%- block('scripts').toString() %>
   </body>
 </html>
