@@ -1,6 +1,5 @@
 <% layout('layouts/boilerplate') %>
 <% block('bodyClass', 'd-flex flex-column background__color') %>
-<% block('styles', '<link rel="stylesheet" href="/stylesheets/stars.css" />') %>
 <% block('styles', '<link rel="stylesheet" href="/vendor/leaflet-1.9.4/leaflet.css" />') %>
 <% block('styles', '<link rel="stylesheet" href="/vendor/leaflet.markercluster-1.5.3/MarkerCluster.css" />') %>
 <% block('styles', '<link rel="stylesheet" href="/vendor/leaflet.markercluster-1.5.3/MarkerCluster.Default.css" />') %>
@@ -25,45 +24,109 @@
   </div>
 </div>
 <% } %>
-<div id="cluster-map"></div>
-<div class="mb-5"></div>
-<% for (let camp of camps) { %>
-<div class="card mb-3">
-  <div class="row">
-    <div class="col-md-4">
-      <% if(camp.images.length) { %>
-      <img class="img-fluid" src="<%= imageUrl(camp, camp.images[0], 800) %>" alt="<%= photoAlt(camp.images[0], camp) %>" />
-      <% } else { %>
-      <%- include('../partials/noPhoto') %>
+
+<form class="camp-search row g-2 align-items-end mb-2" action="/camps" method="get" role="search" aria-label="Camps">
+  <div class="col-12 col-md-6">
+    <label class="form-label text-white" for="q">Search by name or place</label>
+    <input class="form-control" type="search" id="q" name="q" maxlength="60" value="<%= params.q %>" autocomplete="off" />
+  </div>
+  <div class="col-7 col-md-4">
+    <label class="form-label text-white" for="sort">Sort by</label>
+    <select class="form-select" id="sort" name="sort">
+      <% for (const [value, label] of sortOptions) { %>
+      <option value="<%= value %>"<%= params.sort === value ? ' selected' : '' %>><%= label %></option>
       <% } %>
-    </div>
-    <div class="col-md-8">
-      <div class="card-body d-flex flex-column h-100">
-        <h5 class="card-title"><%= camp.title %></h5>
-        <% if (isSample(camp)) { %>
-        <p class="mb-2"><span class="badge badge-sample">Sample listing</span></p>
+    </select>
+  </div>
+  <div class="col-5 col-md-2">
+    <button class="btn btn-success w-100" type="submit">Search</button>
+  </div>
+</form>
+
+<p class="results-count text-white mb-3">
+  <%= countText %>
+  <% if (params.q) { %>
+  <a class="link-light ms-2" href="<%= listUrl({ q: '', sort: params.sort }) %>">Clear search</a>
+  <% } %>
+</p>
+
+<div id="cluster-map"></div>
+<div class="mb-4"></div>
+
+<% if (!camps.length) { %>
+<div class="list-empty mb-4">
+  <% if (total > 0) { %>
+  <p class="mb-0">Page <%= params.page %> is past the end of the list. <a href="<%= listUrl(params, 1) %>">Go to page 1</a>.</p>
+  <% } else if (params.q) { %>
+  <p class="mb-0">Try a shorter name, or a nearby town, lake or park. <a href="<%= listUrl({ q: '', sort: params.sort }) %>">See all camps</a>.</p>
+  <% } else if (user) { %>
+  <p class="mb-0">Nobody has added a camp yet. <a href="/camps/new">Add the first one</a>.</p>
+  <% } else { %>
+  <p class="mb-0">Nobody has added a camp yet. <a href="/register">Sign up</a> to add the first one.</p>
+  <% } %>
+</div>
+<% } %>
+
+<% if (camps.length) { %>
+<ul class="list-unstyled camp-list">
+  <% for (const camp of camps) { %>
+  <li class="card mb-3">
+    <div class="row g-0">
+      <div class="col-md-4">
+        <% if (camp.images && camp.images.length) { %>
+        <img class="img-fluid camp-card__img" src="<%= imageUrl(camp, camp.images[0], 800) %>" alt="<%= photoAlt(camp.images[0], camp) %>" />
+        <% } else { %>
+        <%- include('../partials/noPhoto') %>
         <% } %>
-        <p class="card-text">
-          <small class="text-muted"><%= camp.location %></small>
-        </p>
-        <p class="card-text"><%= camp.description %></p>
-        <div class="mt-auto">
-          <% const latest = camp.reviews[camp.reviews.length - 1]; %>
-          <% if (!latest) { %>
-          <h6 class="card-title">No Reviews Yet</h6>
-          <% } else { %>
-          <h6 class="card-title">Latest Review:</h6>
-          <p class="starability-result" data-rating="<%= latest.rating %>"></p>
+      </div>
+      <div class="col-md-8">
+        <div class="card-body d-flex flex-column h-100">
+          <h2 class="h5 card-title"><a class="camp-card__title" href="/camps/<%= camp._id %>"><%= camp.title %></a></h2>
+          <% if (isSample(camp)) { %>
+          <p class="mb-2"><span class="badge badge-sample">Sample listing</span></p>
           <% } %>
-          <div class="mt-4">
-            <a class="btn btn-info text-white" href="/camps/<%=camp._id%>"
-              >View <%=camp.title%></a
-            >
+          <p class="card-text camp-meta mb-2">
+            <span><%= camp.location %></span>
+            <span aria-hidden="true">&middot;</span>
+            <span><%= formatPrice(camp.price) %></span>
+            <span aria-hidden="true">&middot;</span>
+            <%- include('../partials/rating', { camp }) %>
+          </p>
+          <p class="card-text"><%= excerpt(camp.description, 140) %></p>
+          <div class="mt-auto">
+            <a class="btn btn-success" href="/camps/<%= camp._id %>">View camp<span class="visually-hidden">: <%= camp.title %></span></a>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
-<%}%>
-<script type="application/json" id="camps-data"><%- safeJson(mapPoints(camps)) %></script>
+  </li>
+  <% } %>
+</ul>
+<% } %>
+
+<% if (pages > 1) { %>
+<nav aria-label="Pagination" class="mb-5">
+  <ul class="pagination justify-content-center flex-wrap">
+    <li class="page-item<%= params.page <= 1 ? ' disabled' : '' %>">
+      <% if (params.page > 1) { %>
+      <a class="page-link" href="<%= listUrl(params, Math.min(params.page - 1, pages)) %>">Previous</a>
+      <% } else { %>
+      <span class="page-link">Previous</span>
+      <% } %>
+    </li>
+    <% for (let n = 1; n <= pages; n++) { %>
+    <li class="page-item<%= n === params.page ? ' active' : '' %>">
+      <a class="page-link" href="<%= listUrl(params, n) %>"<% if (n === params.page) { %> aria-current="page"<% } %>><span class="visually-hidden">Page </span><%= n %></a>
+    </li>
+    <% } %>
+    <li class="page-item<%= params.page >= pages ? ' disabled' : '' %>">
+      <% if (params.page < pages) { %>
+      <a class="page-link" href="<%= listUrl(params, params.page + 1) %>">Next</a>
+      <% } else { %>
+      <span class="page-link">Next</span>
+      <% } %>
+    </li>
+  </ul>
+</nav>
+<% } %>
+<script type="application/json" id="camps-data"><%- safeJson(mapPoints(mapCamps)) %></script>

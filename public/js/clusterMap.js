@@ -15,6 +15,21 @@
     referrerPolicy: "strict-origin-when-cross-origin",
   }).addTo(map);
 
+  // "Free", "$18 a night", "$18.50 a night" (as on the cards).
+  function priceText(price) {
+    var n = Number(price);
+    if (price === null || price === "" || !isFinite(n)) return "";
+    if (n === 0) return "Free";
+    var digits = n % 1 === 0 ? 0 : 2;
+    var money = new Intl.NumberFormat("en-NZ", {
+      style: "currency",
+      currency: "NZD",
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    });
+    return money.format(n) + " a night";
+  }
+
   function line(text, tag) {
     var el = document.createElement(tag || "div");
     el.textContent = text;
@@ -35,7 +50,7 @@
       box.appendChild(badge);
     }
     box.appendChild(line(camp.location));
-    box.appendChild(line("$" + camp.price + "/night"));
+    box.appendChild(line(priceText(camp.price)));
     return box;
   }
 

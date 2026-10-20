@@ -118,3 +118,26 @@
   border-radius: 0.375rem;
   margin-bottom: 1rem;
 }
+
+/* Camps list: result count, empty state and card meta row. */
+.results-count {
+  font-weight: 600;
+}
+.list-empty {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+}
+.list-empty a {
+  color: #fff;
+}
+.camp-meta > span {
+  margin-right: 0.25rem;
+}
+.camp-card__title {
+  color: inherit;
+}
+.rating-star {
+  color: #8a5a00;
+}

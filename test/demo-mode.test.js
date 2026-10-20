@@ -50,3 +50,16 @@ test("without DB_URL, every sample camp carries the Sample listing badge", async
   assert.equal(badges.length, demo.length);
   assert.match((await h.agentFor(app).get("/camps/demo2")).text, /Sample listing/);
 });
+
+test("without DB_URL, search, sort and pages work on the sample camps", async () => {
+  const tekapo = await h.agentFor(app).get("/camps?q=tekapo");
+  assert.match(tekapo.text, /1 camp matches “tekapo”/);
+  assert.match(tekapo.text, /Tekapo Lakeside Pitch/);
+  assert.doesNotMatch(tekapo.text, /Milford Sound Basecamp/);
+  const cheap = await h.agentFor(app).get("/camps?sort=price");
+  assert.ok(
+    cheap.text.indexOf("Hokitika Gorge sample site") < cheap.text.indexOf("Kaikōura coast"),
+  );
+  assert.match(cheap.text, /Free/);
+  assert.equal((await h.agentFor(app).get("/camps/?page=abc")).status, 200);
+});

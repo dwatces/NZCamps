@@ -1,6 +1,7 @@
 // Helpers available in every template (app.locals). Templates receive three
-// data shapes: Mongoose documents, .lean() objects and demo-mode objects, so
-// none of these rely on Mongoose methods.
+// data shapes: Mongoose documents, plain objects from queries (.lean() and
+// aggregation rows) and demo-mode objects with string ids, so none of these
+// rely on Mongoose methods or virtuals.
 
 const { isSample } = require("./sample");
 const { samplePhoto } = require("./samplePhotos");
@@ -90,6 +91,82 @@ function photoCredit(img) {
   return p ? { name: p.credit, page: p.page } : null;
 }
 
+// Prices: "Free", "$18 a night", "$18.50 a night".
+const WHOLE_DOLLARS = new Intl.NumberFormat("en-NZ", {
+  style: "currency",
+  currency: "NZD",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+const WITH_CENTS = new Intl.NumberFormat("en-NZ", {
+  style: "currency",
+  currency: "NZD",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+function formatPrice(price) {
+  const n = Number(price);
+  if (price === null || price === undefined || price === "" || !Number.isFinite(n)) return "";
+  if (n === 0) return "Free";
+  return `${(Number.isInteger(n) ? WHOLE_DOLLARS : WITH_CENTS).format(n)} a night`;
+}
+
+// { avg, count } for a camp: from the list query's ratingAvg and reviewCount,
+// or from its populated reviews on the camp page.
+function ratingSummary(camp) {
+  if (camp && typeof camp.reviewCount === "number") {
+    const count = camp.reviewCount;
+    return { count, avg: count && Number.isFinite(camp.ratingAvg) ? camp.ratingAvg : null };
+  }
+  const ratings = ((camp && camp.reviews) || [])
+    .map((r) => r && r.rating)
+    .filter((r) => Number.isFinite(r));
+  if (!ratings.length) return { count: 0, avg: null };
+  return { count: ratings.length, avg: ratings.reduce((a, b) => a + b, 0) / ratings.length };
+}
+
+const formatRating = (avg) => (Math.round(avg * 10) / 10).toFixed(1);
+const reviewCountText = (n) => `${n} review${n === 1 ? "" : "s"}`;
+const ratingText = ({ avg, count }) =>
+  count ? `Rated ${formatRating(avg)} out of 5 from ${reviewCountText(count)}` : "No reviews yet";
+
+// When a camp or review was added: createdAt, or for documents saved before
+// timestamps were turned on, the time in their ObjectId. Demo objects have
+// string ids and a createdAt.
+function createdDate(doc) {
+  if (!doc) return null;
+  if (doc.createdAt) {
+    const d = new Date(doc.createdAt);
+    if (!Number.isNaN(d.getTime())) return d;
+  }
+  if (doc._id && typeof doc._id.getTimestamp === "function") return doc._id.getTimestamp();
+  return null;
+}
+
+const NZ_DATE = new Intl.DateTimeFormat("en-NZ", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "Pacific/Auckland",
+});
+const ISO_DATE = new Intl.DateTimeFormat("en-CA", { timeZone: "Pacific/Auckland" });
+const formatDate = (d) => (d ? NZ_DATE.format(d) : ""); // "12 October 2026"
+const isoDate = (d) => (d ? ISO_DATE.format(d) : ""); // "2026-10-12", for <time datetime>
+
+// The start of a long text, cut at a word, for cards.
+function excerpt(text, max = 140) {
+  const chars = Array.from(
+    String(text || "")
+      .replace(/\s+/g, " ")
+      .trim(),
+  );
+  if (chars.length <= max) return chars.join("");
+  const cut = chars.slice(0, max + 1).join("");
+  const space = cut.lastIndexOf(" ");
+  const head = space > max * 0.6 ? cut.slice(0, space) : chars.slice(0, max).join("");
+  return `${head.replace(/[\s,.;:\u2013-]+$/, "")}\u2026`;
+}
+
 module.exports = {
   safeJson,
   sameId,
@@ -100,4 +177,13 @@ module.exports = {
   photoAlt,
   photoCredit,
   imageUrl,
+  formatPrice,
+  ratingSummary,
+  formatRating,
+  reviewCountText,
+  ratingText,
+  createdDate,
+  formatDate,
+  isoDate,
+  excerpt,
 };

@@ -2,7 +2,12 @@ const Camp = require("../models/camp");
 const ExpressError = require("../utils/expressError");
 const { storeImage, destroyImage, STORE_FAILED_MSG } = require("../cloudinary");
 const { renderCampForm, campFormValues } = require("../middleware");
-const { AUTHOR, findCampForShow } = require("../utils/campQueries");
+const {
+  findCampForShow,
+  parseListQuery,
+  listCamps,
+  renderCampList,
+} = require("../utils/campQueries");
 
 const NOT_FOUND_MSG =
   "We couldn't find that location in New Zealand. Try a nearby town, lake or park.";
@@ -35,14 +40,8 @@ async function geocodeOrMessage(req, location) {
 }
 
 module.exports.index = async (req, res) => {
-  const camps = await Camp.find(
-    {},
-    "title location description price images geometry reviews author isDemo",
-  )
-    .populate({ path: "reviews", select: "rating" })
-    .populate(AUTHOR)
-    .lean();
-  res.render("camps/index", { camps });
+  const params = parseListQuery(req.query);
+  renderCampList(res, params, await listCamps(params));
 };
 
 module.exports.newForm = (req, res) => {

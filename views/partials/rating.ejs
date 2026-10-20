@@ -1,0 +1,6 @@
+<% const rating = ratingSummary(camp); %>
+<% if (rating.count) { %>
+<span class="rating-summary"><span aria-hidden="true"><span class="rating-star">&#9733;</span> <%= formatRating(rating.avg) %> (<%= reviewCountText(rating.count) %>)</span><span class="visually-hidden"><%= ratingText(rating) %></span></span>
+<% } else { %>
+<span class="rating-summary">No reviews yet</span>
+<% } %>

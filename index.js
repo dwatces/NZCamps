@@ -28,6 +28,7 @@ const runtimeConfig = require("./utils/runtimeConfig");
 const { sessionSecret, createSessionHolder } = require("./utils/sessions");
 const sameOriginWrites = require("./utils/sameOrigin");
 const demoCamps = require("./seeds/demoData");
+const { parseListQuery, listDemoCamps, renderCampList } = require("./utils/campQueries");
 const dbUrl = process.env.DB_URL;
 
 // One connection per serverless instance, started at module load and reused.
@@ -136,8 +137,10 @@ const OUTAGE_MSG =
   "The database isn't reachable right now, so you can browse sample camps but not save changes.";
 app.use((req, res, next) => {
   if (mongoose.connection.readyState === 1) return next();
-  if (req.method === "GET" && req.path === "/camps")
-    return res.render("camps/index", { camps: demoCamps });
+  if (req.method === "GET" && /^\/camps\/?$/.test(req.path)) {
+    const params = parseListQuery(req.query);
+    return renderCampList(res, params, listDemoCamps(demoCamps, params));
+  }
   const m = req.path.match(/^\/camps\/([a-z0-9]+)$/);
   if (req.method === "GET" && m && m[1] !== "new") {
     const camp = demoCamps.find((c) => c._id === m[1]);
