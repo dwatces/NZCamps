@@ -490,3 +490,54 @@ test("the price field is named by its label, with the $ hidden from screen reade
   assert.equal(tags(html, /id="price"/g).length, 1);
   assert.match(html, /<input\s+type="text"\s+id="price"[^>]*inputmode="decimal"/);
 });
+
+// ---------- D9: focus, motion and targets ----------
+
+const css = (file) => fs.readFileSync(path.join(h.ROOT, "public", "stylesheets", file), "utf8");
+
+test("one visible focus style for every control", h.notInBundle, () => {
+  const app = css("app.css");
+  assert.match(app, /:focus-visible \{\s*outline: 3px solid var\(--nzc-focus\) !important;/);
+  assert.match(css("tokens.css"), /--nzc-focus: #ffd166;/);
+  assert.match(
+    css("stars.css"),
+    /input:focus-visible \+ label \{\s*outline: 3px solid var\(--nzc-focus\);/,
+  );
+});
+
+test(
+  "reduced motion turns off animation, map animation and the fixed background",
+  h.notInBundle,
+  () => {
+    const app = css("app.css");
+    assert.match(app, /@media \(prefers-reduced-motion: reduce\) \{\s*\*,/);
+    assert.match(
+      app,
+      /@media \(min-width: 992px\) and \(prefers-reduced-motion: no-preference\) \{\s*\.has-backdrop::before \{\s*position: fixed;/,
+    );
+    for (const file of ["clusterMap.js", "campMap.js"]) {
+      const src = fs.readFileSync(path.join(h.ROOT, "public", "js", file), "utf8");
+      assert.match(src, /matchMedia\("\(prefers-reduced-motion: reduce\)"\)/, file);
+      for (const option of ["zoomAnimation", "fadeAnimation", "markerZoomAnimation"]) {
+        assert.match(src, new RegExp(`${option}: !reduceMotion`), `${file} ${option}`);
+      }
+    }
+  },
+);
+
+test("map controls, markers and popup close buttons are 44 px", h.notInBundle, () => {
+  const app = css("app.css");
+  assert.match(
+    app,
+    /\.leaflet-bar a,\s*\.leaflet-touch \.leaflet-bar a \{\s*width: var\(--nzc-tap\);\s*height: var\(--nzc-tap\);/,
+  );
+  assert.match(
+    app,
+    /a\.leaflet-popup-close-button \{\s*width: var\(--nzc-tap\);\s*height: var\(--nzc-tap\);/,
+  );
+  assert.match(css("tokens.css"), /--nzc-tap: 2\.75rem;/);
+  for (const file of ["clusterMap.js", "campMap.js"]) {
+    const src = fs.readFileSync(path.join(h.ROOT, "public", "js", file), "utf8");
+    assert.match(src, /iconSize: \[44, 44\]/, file);
+  }
+});

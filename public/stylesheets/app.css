@@ -1,5 +1,6 @@
-/* NZ Camps styles. Load order: Bootstrap, tokens.css, this file, then
-   page extras (stars.css on camp pages). Colours come from tokens.css. */
+/* NZ Camps styles. Load order: Bootstrap, a page's extras (Leaflet,
+   stars.css), tokens.css, then this file, so these rules win over the
+   libraries. Colours come from tokens.css. */
 
 /* ---------- Base ---------- */
 body {
@@ -29,6 +30,32 @@ a {
   text-underline-offset: 0.15em;
 }
 
+/* ---------- Focus and motion ----------
+   One focus style everywhere: a 3 px yellow outline outside a 2 px dark
+   ring, so it shows on white panels, green buttons, the dark header and
+   map tiles alike. !important because Bootstrap and Leaflet replace the
+   outline with their own fainter rings on many components. */
+:focus-visible {
+  outline: 3px solid var(--nzc-focus) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 2px var(--nzc-focus-halo) !important;
+}
+/* main only takes focus from the skip link; it is not a control. */
+#main:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* "Skip to content": hidden until it has keyboard focus. */
 .skip-link {
   position: absolute;
@@ -44,10 +71,6 @@ a {
 }
 .skip-link:focus {
   top: 0.5rem;
-}
-/* main takes focus from the skip link; it is not a control, so no ring. */
-#main:focus {
-  outline: none;
 }
 
 /* ---------- Page background ----------
@@ -240,6 +263,7 @@ body {
 .error-summary:focus {
   outline: 3px solid var(--nzc-focus);
   outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--nzc-focus-halo);
 }
 
 /* ---------- Badges and notes ---------- */
@@ -562,6 +586,26 @@ body {
   color: #fff;
   font-weight: 700;
   font-size: 0.875rem;
+}
+/* Leaflet controls at 44 px: zoom buttons and the popup's close button. */
+.leaflet-bar a,
+.leaflet-touch .leaflet-bar a {
+  width: var(--nzc-tap);
+  height: var(--nzc-tap);
+  line-height: var(--nzc-tap);
+  font-size: 1.375rem;
+}
+.leaflet-container a.leaflet-popup-close-button {
+  width: var(--nzc-tap);
+  height: var(--nzc-tap);
+  font: 1.5rem/var(--nzc-tap) var(--nzc-font);
+  color: var(--nzc-ink-muted);
+}
+.leaflet-popup-content {
+  margin: 0.875rem 2.75rem 0.875rem 1rem;
+}
+.leaflet-popup-content-wrapper {
+  border-radius: var(--nzc-radius-sm);
 }
 .map-popup {
   font-family: var(--nzc-font);

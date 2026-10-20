@@ -29,10 +29,11 @@
     <link rel="icon" href="/stylesheets/favicon.ico" sizes="any" />
     <link rel="icon" href="/images/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+    <%# Libraries first (Bootstrap, then a page's own: Leaflet, stars.css), so the site's styles win. %>
     <link rel="stylesheet" href="/vendor/bootstrap-5.3.8/css/bootstrap.min.css" />
+    <%- block('styles').toString() %>
     <link rel="stylesheet" href="/stylesheets/tokens.css" />
     <link rel="stylesheet" href="/stylesheets/app.css" />
-    <%- block('styles').toString() %>
   </head>
   <% const bodyClass = block('bodyClass').toString().trim(); %>
   <% const mainClass = block('mainClass').toString().trim(); %>
