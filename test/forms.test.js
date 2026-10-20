@@ -188,6 +188,6 @@ test("every client-checked field carries its plain-English message", async () =>
     );
   }
   assert.match(tagWithId(html, "textarea", "description"), /data-error="Enter a description\."/);
-  assert.match(html, /<script src="\/js\/forms\.js"><\/script>/);
+  assert.match(html, /<script defer src="\/js\/forms\.js"><\/script>/);
   assert.doesNotMatch(html, /validateForms/);
 });

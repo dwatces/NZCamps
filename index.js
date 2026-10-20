@@ -94,6 +94,9 @@ app.use((req, res, next) => {
 app.use(require("./utils/securityHeaders"));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
+// Express 4's mime table predates AVIF (Vercel's CDN serves public/ itself
+// and already knows the type; this keeps local runs correct).
+express.static.mime.define({ "image/avif": ["avif"] });
 app.use(express.static(path.join(__dirname, "public")));
 app.use(mongoSanitize());
 

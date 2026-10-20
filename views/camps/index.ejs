@@ -1,11 +1,10 @@
 <% layout('layouts/boilerplate') %>
-<% block('bodyClass', 'd-flex flex-column background__color') %>
 <% block('styles', '<link rel="stylesheet" href="/vendor/leaflet-1.9.4/leaflet.css" />') %>
 <% block('styles', '<link rel="stylesheet" href="/vendor/leaflet.markercluster-1.5.3/MarkerCluster.css" />') %>
 <% block('styles', '<link rel="stylesheet" href="/vendor/leaflet.markercluster-1.5.3/MarkerCluster.Default.css" />') %>
-<% block('scripts', '<script src="/vendor/leaflet-1.9.4/leaflet.js"></script>') %>
-<% block('scripts', '<script src="/vendor/leaflet.markercluster-1.5.3/leaflet.markercluster.js"></script>') %>
-<% block('scripts', '<script src="/js/clusterMap.js"></script>') %>
+<% block('scripts', '<script defer src="/vendor/leaflet-1.9.4/leaflet.js"></script>') %>
+<% block('scripts', '<script defer src="/vendor/leaflet.markercluster-1.5.3/leaflet.markercluster.js"></script>') %>
+<% block('scripts', '<script defer src="/js/clusterMap.js"></script>') %>
 <div class="mt-5">
   <h1 class="text-center text-white">Explore camps</h1>
 </div>

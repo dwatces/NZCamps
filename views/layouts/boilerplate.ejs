@@ -6,11 +6,7 @@
     <title>NZ Camps</title>
     <link rel="canonical" href="<%= canonicalUrl %>" />
     <link rel="icon" href="/stylesheets/favicon.ico" type="image/x-icon" />
-    <% const preload = block('preload').toString(); %>
-    <% if (preload) { %><%- preload %><% } else { %>
-    <link rel="preload" as="image" href="/stylesheets/mitchell-luo-CEowgw6VXbE-unsplash.jpg" />
-    <link rel="preload" as="image" href="/stylesheets/casey-horner-_aVKjJhFdn0-unsplash.jpg" />
-    <% } %>
+    <%- block('preload').toString() %>
     <link rel="stylesheet" href="/vendor/bootstrap-5.3.8/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/stylesheets/tokens.css" />
     <link rel="stylesheet" href="/stylesheets/app.css" />
@@ -18,19 +14,19 @@
   </head>
   <% const bodyClass = block('bodyClass').toString().trim(); %>
   <% const mainClass = block('mainClass').toString().trim(); %>
-  <body class="<%= bodyClass || 'd-flex flex-column background__color__auth' %>">
+  <body class="<%= bodyClass || 'has-backdrop' %>">
     <%- include('../partials/navbar') %>
     <% if (typeof demoBanner !== "undefined" && demoBanner) { %>
     <p class="demo-banner mb-0"><%= demoBanner %></p>
     <% } %>
-    <main id="main" class="<%= mainClass || 'container mt-5' %>">
+    <main id="main" class="site-main <%= mainClass || 'container mt-5' %>">
       <%- include('../partials/flash') %>
       <%- body %>
     </main>
     <%- include('../partials/footer') %>
-    <script src="/vendor/bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/forms.js"></script>
-    <script src="/js/confirm.js"></script>
+    <script defer src="/vendor/bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
+    <script defer src="/js/forms.js"></script>
+    <script defer src="/js/confirm.js"></script>
     <%- block('scripts').toString() %>
   </body>
 </html>

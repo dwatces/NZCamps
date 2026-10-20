@@ -5,6 +5,9 @@
 
 const { isSample } = require("./sample");
 const { samplePhoto } = require("./samplePhotos");
+// Responsive variants made by scripts/images.js. Loaded with require so the
+// Vercel function bundle traces it.
+const IMAGES = require("./images.json");
 
 // JSON for a <script type="application/json"> block. Escaping <, > and &
 // means a "</script>" or "<!--" in user text cannot end the block early.
@@ -84,6 +87,47 @@ function imageUrl(camp, img, width = 800) {
   if (cloud) return `https:${cloud[1]}f_auto,q_auto,w_${Math.round(width)}/${cloud[2]}`;
   return url || PLACEHOLDER;
 }
+
+// srcset strings for one variant set from utils/images.json, limited to
+// widths up to maxWidth (cards never need more than 800 px).
+function variantSources(set, maxWidth = Infinity) {
+  const pick = (widths) => {
+    const fit = widths.filter((w) => w <= maxWidth);
+    return fit.length ? fit : widths.slice(0, 1);
+  };
+  const srcset = (widths, ext) => widths.map((w) => `${set.name}-${w}.${ext} ${w}w`).join(", ");
+  const avif = pick(set.avif);
+  const jpeg = pick(set.jpeg);
+  return {
+    avif: srcset(avif, "avif"),
+    jpeg: srcset(jpeg, "jpg"),
+    src: `${set.name}-${jpeg[jpeg.length - 1]}.jpg`,
+    width: set.width,
+    height: set.height,
+  };
+}
+
+// How a template shows a camp photo at several widths:
+// - repo photos with variants: { avif, jpeg, src } for a <picture>;
+// - Cloudinary uploads: { srcset, src } with Cloudinary resizing each width;
+// - embedded uploads and anything else: { src } only.
+// `widths` are the widths the slot can use, largest last.
+function responsivePhoto(camp, img, widths = [480, 800, 1200]) {
+  const largest = widths[widths.length - 1];
+  const set = img && typeof img.url === "string" && IMAGES.photos[img.url];
+  if (set) return variantSources(set, largest);
+  const src = imageUrl(camp, img, largest);
+  if (CLOUDINARY_UPLOAD.test((img && img.url) || "")) {
+    return { src, srcset: widths.map((w) => `${imageUrl(camp, img, w)} ${w}w`).join(", ") };
+  }
+  return { src };
+}
+
+// Variant sets that are not camp photos: the home hero and the log in card.
+const imageSet = (name) => {
+  const [group, key] = name.split(".");
+  return variantSources(key ? IMAGES[group][key] : IMAGES[group]);
+};
 
 // { name, page } for a credited sample photo, or null.
 function photoCredit(img) {
@@ -193,6 +237,8 @@ module.exports = {
   photoAlt,
   photoCredit,
   imageUrl,
+  responsivePhoto,
+  imageSet,
   formatPrice,
   ratingSummary,
   formatRating,

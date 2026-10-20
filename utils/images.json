@@ -1,0 +1,111 @@
+{
+  "photos": {
+    "/stylesheets/anderson-aguirre-bjTQqa6o_cM-unsplash.jpg": {
+      "name": "/images/anderson-aguirre",
+      "width": 1920,
+      "height": 1272,
+      "avif": [480, 800, 1200, 1920],
+      "jpeg": [800, 1200]
+    },
+    "/stylesheets/mitchell-luo-CEowgw6VXbE-unsplash.jpg": {
+      "name": "/images/mitchell-luo",
+      "width": 1920,
+      "height": 1280,
+      "avif": [480, 800, 1200, 1920],
+      "jpeg": [800, 1200]
+    },
+    "/stylesheets/casey-horner-_aVKjJhFdn0-unsplash.jpg": {
+      "name": "/images/casey-horner",
+      "width": 1920,
+      "height": 1282,
+      "avif": [480, 800, 1200, 1920],
+      "jpeg": [800, 1200]
+    },
+    "/stylesheets/tyler-lastovich-MfRNe40ihls-unsplash.jpg": {
+      "name": "/images/tyler-lastovich",
+      "width": 1920,
+      "height": 1320,
+      "avif": [480, 800, 1200, 1920],
+      "jpeg": [800, 1200]
+    },
+    "/images/samples/tekapo-look-up-look-down-JUx3hPMNXLg.jpg": {
+      "name": "/images/tekapo-look-up-look-down",
+      "width": 1600,
+      "height": 900,
+      "avif": [480, 800, 1200, 1600],
+      "jpeg": [800, 1200]
+    },
+    "/images/samples/hahei-kura-tregenza-U3LZJBdTRnU.jpg": {
+      "name": "/images/hahei-kura-tregenza",
+      "width": 1600,
+      "height": 1200,
+      "avif": [480, 800, 1200, 1600],
+      "jpeg": [800, 1200]
+    },
+    "/images/samples/abel-tasman-colin-watts-dXBFFJvPDbQ.jpg": {
+      "name": "/images/abel-tasman-colin-watts",
+      "width": 1600,
+      "height": 1067,
+      "avif": [480, 800, 1200, 1600],
+      "jpeg": [800, 1200]
+    },
+    "/images/samples/taupo-adriel-kloppenburg-1ivyLJo-9NU.jpg": {
+      "name": "/images/taupo-adriel-kloppenburg",
+      "width": 1600,
+      "height": 900,
+      "avif": [480, 800, 1200, 1600],
+      "jpeg": [800, 1200]
+    },
+    "/images/samples/kaikoura-rodrigo-kammer-v4NNY7IMAas.jpg": {
+      "name": "/images/kaikoura-rodrigo-kammer",
+      "width": 1600,
+      "height": 900,
+      "avif": [480, 800, 1200, 1600],
+      "jpeg": [800, 1200]
+    }
+  },
+  "hero": {
+    "portrait": {
+      "name": "/images/home-hero",
+      "width": 3648,
+      "height": 5472,
+      "avif": [480, 800, 1200],
+      "jpeg": [800]
+    },
+    "wide": {
+      "name": "/images/home-hero-wide",
+      "width": 3648,
+      "height": 2280,
+      "avif": [1200, 1920],
+      "jpeg": [1200]
+    }
+  },
+  "backdrop": {
+    "tall": {
+      "name": "/images/backdrop-tall",
+      "width": 720,
+      "height": 1280,
+      "avif": [720],
+      "jpeg": [720]
+    },
+    "wide": {
+      "name": "/images/mitchell-luo",
+      "width": 1920,
+      "height": 1280,
+      "avif": [480, 800, 1200, 1920],
+      "jpeg": [800, 1200]
+    }
+  },
+  "auth": {
+    "name": "/images/auth-ferns",
+    "width": 960,
+    "height": 640,
+    "avif": [480, 960],
+    "jpeg": [480, 960]
+  },
+  "og": {
+    "url": "/images/og-nzcamps.jpg",
+    "width": 1200,
+    "height": 630
+  }
+}

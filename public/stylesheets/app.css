@@ -29,30 +29,87 @@ a {
   text-underline-offset: 0.15em;
 }
 
-/* ---------- Page backgrounds ---------- */
-.background__color {
+/* ---------- Page background ----------
+   The bush photo sits behind every page except home, on a dark fallback
+   colour so nothing is ever grey while it loads. Phones get a tall crop that
+   covers the first screen and fades into the solid colour, so a long page
+   has no seam and no stretched photo. Wide screens without reduced motion
+   keep the original fixed background. Variants: scripts/images.js. */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--nzc-night);
+}
+.site-main {
+  flex: 1 0 auto;
+}
+.has-backdrop {
+  position: relative;
+}
+.has-backdrop::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
   background-color: var(--nzc-night);
   background-image:
-    linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
-    url("./mitchell-luo-CEowgw6VXbE-unsplash.jpg");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  min-height: 100vh;
-}
-.background__color__auth {
-  min-height: 100vh;
-  background-color: var(--nzc-night);
+    linear-gradient(rgba(5, 12, 8, 0.4), rgba(5, 12, 8, 0.6) 70%, var(--nzc-night)),
+    url("/images/backdrop-tall-720.jpg");
   background-image:
-    linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
-    url("./mitchell-luo-CEowgw6VXbE-unsplash.jpg");
+    linear-gradient(rgba(5, 12, 8, 0.4), rgba(5, 12, 8, 0.6) 70%, var(--nzc-night)),
+    image-set(
+      url("/images/backdrop-tall-720.avif") type("image/avif"),
+      url("/images/backdrop-tall-720.jpg") type("image/jpeg")
+    );
   background-repeat: no-repeat;
   background-size: cover;
+  background-position: center top;
 }
-@media (max-width: 991.98px) {
-  .background__color {
-    background-attachment: scroll;
+@media (min-width: 768px) {
+  .has-backdrop::before {
+    background-image:
+      linear-gradient(rgba(5, 12, 8, 0.4), rgba(5, 12, 8, 0.6) 70%, var(--nzc-night)),
+      url("/images/mitchell-luo-1200.jpg");
+    background-image:
+      linear-gradient(rgba(5, 12, 8, 0.4), rgba(5, 12, 8, 0.6) 70%, var(--nzc-night)),
+      image-set(
+        url("/images/mitchell-luo-1200.avif") type("image/avif"),
+        url("/images/mitchell-luo-1200.jpg") type("image/jpeg")
+      );
+  }
+}
+@media (min-width: 992px) and (prefers-reduced-motion: no-preference) {
+  .has-backdrop::before {
+    position: fixed;
+    bottom: 0;
+    height: auto;
+    background-image:
+      linear-gradient(rgba(5, 12, 8, 0.45), rgba(5, 12, 8, 0.6)),
+      url("/images/mitchell-luo-1200.jpg");
+    background-image:
+      linear-gradient(rgba(5, 12, 8, 0.45), rgba(5, 12, 8, 0.6)),
+      image-set(
+        url("/images/mitchell-luo-1200.avif") type("image/avif"),
+        url("/images/mitchell-luo-1200.jpg") type("image/jpeg")
+      );
+    background-position: center;
+  }
+}
+@media (min-width: 1280px) and (prefers-reduced-motion: no-preference) {
+  .has-backdrop::before {
+    background-image:
+      linear-gradient(rgba(5, 12, 8, 0.45), rgba(5, 12, 8, 0.6)),
+      url("/images/mitchell-luo-1200.jpg");
+    background-image:
+      linear-gradient(rgba(5, 12, 8, 0.45), rgba(5, 12, 8, 0.6)),
+      image-set(
+        url("/images/mitchell-luo-1920.avif") type("image/avif"),
+        url("/images/mitchell-luo-1200.jpg") type("image/jpeg")
+      );
   }
 }
 

@@ -4,15 +4,19 @@
   <div class="row">
     <div class="col-sm-6 offset-sm-3 col-md-6 offset-md-3 col-xl-5 offset-xl-4">
       <div class="card shadow mt-5">
-        <img
-          src="/images/auth-ferns-480.jpg"
-          srcset="/images/auth-ferns-480.jpg 480w, /images/auth-ferns-960.jpg 960w"
-          sizes="(min-width: 1200px) 520px, (min-width: 576px) 50vw, 100vw"
-          width="480"
-          height="320"
-          alt=""
-          class="card-img-top"
-        />
+        <% const ferns = imageSet("auth"); %>
+        <picture>
+          <source type="image/avif" srcset="<%= ferns.avif %>" sizes="(min-width: 576px) 30rem, 100vw" />
+          <img
+            src="/images/auth-ferns-480.jpg"
+            srcset="<%= ferns.jpeg %>"
+            sizes="(min-width: 576px) 30rem, 100vw"
+            width="480"
+            height="320"
+            alt=""
+            class="card-img-top"
+          />
+        </picture>
         <div class="card-body">
           <h1 class="h4 card-title text-center">Log in</h1>
           <% const back = typeof returnTo === "string" && returnTo ? returnTo : ""; %>
