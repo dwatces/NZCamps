@@ -10,3 +10,5 @@ views/**/*.ejs
 *.ico
 *.svg
 *.md
+test-results/
+playwright-report/

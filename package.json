@@ -10,6 +10,7 @@
     "start": "node index.js",
     "test": "node --test --test-concurrency=1 test/*.test.js",
     "test:coverage": "node --test --experimental-test-coverage --test-concurrency=1 test/*.test.js",
+    "test:e2e": "playwright test",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -56,7 +57,9 @@
     "passport-local-mongoose": "^8.0.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "1.64.1",
     "@vercel/nft": "^1.11.0",
     "bootstrap": "5.3.8",
     "eslint": "^10.13.0",
