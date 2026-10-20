@@ -57,7 +57,15 @@ for (const page of ["/camps", "/camps/:id"]) {
     const data = JSON.parse(blocks[0]);
     const camp = Array.isArray(data) ? data.find((c) => c.id === campId) : data;
     assert.equal(camp.title, HOSTILE_TITLE, "the text survives as data");
-    assert.deepEqual(Object.keys(camp).sort(), ["id", "lat", "lng", "location", "price", "title"]);
+    assert.deepEqual(Object.keys(camp).sort(), [
+      "id",
+      "lat",
+      "lng",
+      "location",
+      "price",
+      "sample",
+      "title",
+    ]);
     assert.ok(!res.text.includes("<script>window.__y=1"), "no script breakout");
     assert.ok(!res.text.includes("<img src=x onerror"), "the title is escaped in HTML");
     assert.ok(!res.text.includes("<b>bold</b>"), "review text is escaped");

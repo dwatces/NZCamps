@@ -29,6 +29,11 @@
     link.textContent = camp.title;
     title.appendChild(link);
     box.appendChild(title);
+    if (camp.sample) {
+      var badge = line("Sample listing", "span");
+      badge.className = "badge badge-sample";
+      box.appendChild(badge);
+    }
     box.appendChild(line(camp.location));
     box.appendChild(line("$" + camp.price + "/night"));
     return box;

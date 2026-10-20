@@ -2,6 +2,8 @@
 // data shapes: Mongoose documents, .lean() objects and demo-mode objects, so
 // none of these rely on Mongoose methods.
 
+const { isSample } = require("./sample");
+
 // JSON for a <script type="application/json"> block. Escaping <, > and &
 // means a "</script>" or "<!--" in user text cannot end the block early.
 function safeJson(value) {
@@ -44,9 +46,10 @@ function mapPoint(camp) {
     price: camp.price,
     lng: Number(lng),
     lat: Number(lat),
+    sample: isSample(camp),
   };
 }
 
 const mapPoints = (camps) => (camps || []).map(mapPoint);
 
-module.exports = { safeJson, sameId, displayName, mapPoint, mapPoints };
+module.exports = { safeJson, sameId, displayName, mapPoint, mapPoints, isSample };

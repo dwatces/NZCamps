@@ -36,6 +36,9 @@
     <div class="card mt-3 mb-3">
       <div class="card-body">
         <h5 class="card-title"><%= camp.title%></h5>
+        <% if (isSample(camp)) { %>
+        <p class="mb-2"><span class="badge badge-sample">Sample listing</span></p>
+        <% } %>
         <p class="card-text"><%= camp.description%></p>
       </div>
       <ul class="list-group list-group-flush">
@@ -134,6 +137,9 @@
       </div>
       <button class="btn btn-success">Submit</button>
     </form>
+    <% } %>
+    <% if (isSample(camp) && camp.reviews.length) { %>
+    <p class="sample-note">Reviews on sample listings are test entries.</p>
     <% } %>
     <% for(let review of camp.reviews) { %>
     <div class="card mb-3">

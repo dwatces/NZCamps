@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const { RESERVED_USERNAMES } = require("./utils/sample");
 
 const PRICE_MSG = "Enter a price per night, like 18 or 18.50. Use 0 for free.";
 const PRICE_MAX = 1000;
@@ -67,7 +68,11 @@ module.exports.registerSchema = Joi.object({
     .max(30)
     .pattern(/^[A-Za-z0-9_.-]+$/)
     .required()
+    .custom((value, helpers) =>
+      RESERVED_USERNAMES.includes(value.toLowerCase()) ? helpers.error("username.reserved") : value,
+    )
     .messages({
+      "username.reserved": "That username is taken. Try another.",
       "string.empty": "Choose a username.",
       "any.required": "Choose a username.",
       "string.min": "Usernames are 3 to 30 characters.",

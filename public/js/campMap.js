@@ -23,6 +23,12 @@
   var place = document.createElement("div");
   place.textContent = camp.location;
   box.appendChild(title);
+  if (camp.sample) {
+    var badge = document.createElement("span");
+    badge.className = "badge badge-sample";
+    badge.textContent = "Sample listing";
+    box.appendChild(badge);
+  }
   box.appendChild(place);
 
   L.marker([camp.lat, camp.lng]).addTo(map).bindPopup(box).openPopup();

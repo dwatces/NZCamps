@@ -27,8 +27,12 @@ async function geocodeOrMessage(req, location) {
 const AUTHOR = { path: "author", select: "username" };
 
 module.exports.index = async (req, res) => {
-  const camps = await Camp.find({}, "title location description price images geometry reviews")
+  const camps = await Camp.find(
+    {},
+    "title location description price images geometry reviews author isDemo",
+  )
     .populate({ path: "reviews", select: "rating" })
+    .populate(AUTHOR)
     .lean();
   res.render("camps/index", { camps });
 };

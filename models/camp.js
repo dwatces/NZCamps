@@ -32,6 +32,8 @@ const CampSchema = new Schema({
   price: { type: Number, required: true, min: 0, max: 1000 },
   description: { type: String, required: true, trim: true, maxlength: 2000 },
   location: { type: String, required: true, trim: true, maxlength: 120 },
+  // Sample listings (seeded, invented). Never settable from a form.
+  isDemo: { type: Boolean, default: false },
   author: {
     type: Schema.Types.ObjectId,
     ref: "User",

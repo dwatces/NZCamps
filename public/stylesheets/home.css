@@ -47,3 +47,10 @@ body {
     height: 100vh;
   }
 }
+
+.home__footnote {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 0.375rem;
+}

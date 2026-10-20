@@ -30,3 +30,11 @@ test("without DB_URL, writes are refused", async () => {
   assert.equal(res.status, 302);
   assert.equal(res.headers.location, "/camps");
 });
+
+test("without DB_URL, every sample camp carries the Sample listing badge", async () => {
+  const res = await h.agentFor(app).get("/camps");
+  const demo = require("../seeds/demoData");
+  const badges = res.text.match(/Sample listing<\/span>/g) || [];
+  assert.equal(badges.length, demo.length);
+  assert.match((await h.agentFor(app).get("/camps/demo2")).text, /Sample listing/);
+});
