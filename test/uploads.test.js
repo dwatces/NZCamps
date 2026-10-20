@@ -1,4 +1,5 @@
-// F5: upload limits, type checks and image ownership (data-URI mode).
+// F5: upload limits, type checks and photo removal (data-URI mode). The
+// byte-level type check and photo ownership are also in security.test.js.
 const h = require("./helpers");
 const f = require("./helpers/files");
 const { test, before, after, describe } = require("node:test");
@@ -28,16 +29,6 @@ async function signedIn() {
 }
 
 describe("refused uploads keep the form", () => {
-  test("an HTML file declared as image/png is refused and nothing is stored", async () => {
-    const { agent } = await signedIn();
-    const res = await agent.createCamp({ title: "Evil Upload" }, [
-      f.file(f.HTML, "evil.html", "image/png"),
-    ]);
-    assert.equal(res.status, 422);
-    assert.match(res.text, RULES);
-    assert.equal(await Camp.countDocuments({ title: "Evil Upload" }), 0);
-  });
-
   test("a file declared as text/html is refused", async () => {
     const { agent } = await signedIn();
     const res = await agent.createCamp({ title: "Html Type" }, [
@@ -107,32 +98,6 @@ describe("accepted uploads", () => {
 });
 
 describe("removing photos", () => {
-  test("another camp's image id is ignored; your own is removed", async () => {
-    const bob = await signedIn();
-    const bobCamp = h.campIdFrom(
-      await bob.agent.createCamp({ title: "Bob Camp" }, [f.file(f.PNG, "b.png", "image/png")]),
-    );
-    const bobImageId = String((await Camp.findById(bobCamp).lean()).images[0]._id);
-
-    const alice = await signedIn();
-    const aliceCamp = h.campIdFrom(
-      await alice.agent.createCamp({ title: "Alice Camp" }, [f.file(f.PNG, "a.png", "image/png")]),
-    );
-    const aliceImageId = String((await Camp.findById(aliceCamp).lean()).images[0]._id);
-
-    const res = await alice.agent
-      .post(`/camps/${aliceCamp}?_method=PUT`)
-      .field("camp[title]", "Alice Camp")
-      .field("camp[location]", "Wellington")
-      .field("camp[price]", "10")
-      .field("camp[description]", "Edited.")
-      .field("deleteImages[]", bobImageId)
-      .field("deleteImages[]", aliceImageId);
-    assert.equal(res.status, 302);
-    assert.equal((await Camp.findById(bobCamp).lean()).images.length, 1, "Bob's image stays");
-    assert.equal((await Camp.findById(aliceCamp).lean()).images.length, 0, "Alice's is gone");
-  });
-
   test("a seeded image with no filename can be removed", async () => {
     const User = require("../models/user");
     const { agent, user } = await signedIn();

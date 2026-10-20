@@ -1,5 +1,5 @@
-// X4: camp page rating summary, prices, dates, authorship, the review prompt
-// and a returnTo that cannot redirect off the site.
+// X4: camp page rating summary, prices, dates, authorship and the review
+// prompt. (returnTo values that point off the site: security.test.js.)
 const h = require("./helpers");
 const { test, before, after } = require("node:test");
 const assert = require("node:assert/strict");
@@ -164,28 +164,6 @@ test("signing up from the prompt also returns to the camp", async () => {
       returnTo: `/camps/${campId}`,
     });
   assert.equal(res.headers.location, `/camps/${campId}`);
-});
-
-test("returnTo cannot send anyone to another site", async () => {
-  for (const bad of [
-    "https://evil.example",
-    "//evil.example",
-    "/\\evil.example",
-    "/camps/../logout",
-    "/camps/x?y=https://evil.example",
-    "javascript:alert(1)",
-  ]) {
-    const form = await request(app).get(`/login?returnTo=${encodeURIComponent(bad)}`);
-    assert.doesNotMatch(form.text, /name="returnTo"/, bad);
-    const agent = h.agentFor(app);
-    const { user } = await agent.signUp();
-    await agent.logOut();
-    const res = await agent
-      .post("/login")
-      .type("form")
-      .send({ username: user.username, password: user.password, returnTo: bad });
-    assert.equal(res.headers.location, "/camps", bad);
-  }
 });
 
 test("opening the log in form with a returnTo stores no session", async () => {
