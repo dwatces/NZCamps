@@ -14,7 +14,7 @@
         <% camp.images.forEach((img, i) => { %>
         <% const credit = photoCredit(img); %>
         <figure class="carousel-item mb-0 <%= i === 0 ? 'active': ''%>">
-          <img src="<%= img.url%>" class="d-block w-100" alt="<%= photoAlt(img, camp, i, camp.images.length) %>" />
+          <img src="<%= imageUrl(camp, img, 1200) %>" class="d-block w-100" alt="<%= photoAlt(img, camp, i, camp.images.length) %>" />
           <% if (credit) { %>
           <figcaption class="photo-credit">
             Photo: <a href="<%= credit.page %>" rel="noopener"><%= credit.name %></a> on Unsplash

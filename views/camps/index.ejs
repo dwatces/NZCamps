@@ -32,7 +32,7 @@
   <div class="row">
     <div class="col-md-4">
       <% if(camp.images.length) { %>
-      <img class="img-fluid" src="<%= camp.images[0].url %>" alt="<%= photoAlt(camp.images[0], camp) %>" />
+      <img class="img-fluid" src="<%= imageUrl(camp, camp.images[0], 800) %>" alt="<%= photoAlt(camp.images[0], camp) %>" />
       <% } else { %>
       <%- include('../partials/noPhoto') %>
       <% } %>

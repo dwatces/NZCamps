@@ -75,7 +75,7 @@
             value="<%= img._id %>"
           />
           <label class="form-check-label" for="delete-<%= img._id %>">
-            <img src="<%= img.thumbnail %>" class="img-thumbnail" alt="Photo <%= i + 1 %>" />
+            <img src="<%= imageUrl(camp, img, 200) %>" class="img-thumbnail" alt="Photo <%= i + 1 %>" />
             <span class="visually-hidden">Delete photo <%= i + 1 %></span>
           </label>
         </div>

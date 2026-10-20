@@ -86,21 +86,28 @@ test("a review whose author was deleted still renders (Former member)", async ()
   assert.match(res.text, /Former member/);
 });
 
-test("the thumbnail virtual only rewrites Cloudinary URLs", () => {
-  const Camp = require("../models/camp");
-  const camp = new Camp({
-    images: [
-      { url: "https://res.cloudinary.com/demo/image/upload/v1/NZCamps/a.jpg" },
-      { url: "data:image/png;base64,AAAA/upload/BBBB" },
-      { url: "/stylesheets/x.jpg" },
-    ],
-  });
+test("imageUrl only rewrites Cloudinary URLs and never inlines a data URI", () => {
+  const { imageUrl } = require("../utils/viewHelpers");
+  const camp = { _id: "6650f0c2a1b2c3d4e5f60718" };
   assert.equal(
-    camp.images[0].thumbnail,
-    "https://res.cloudinary.com/demo/image/upload/w_200/v1/NZCamps/a.jpg",
+    imageUrl(camp, { url: "http://res.cloudinary.com/demo/image/upload/v1/NZCamps/a.jpg" }, 400),
+    "https://res.cloudinary.com/demo/image/upload/f_auto,q_auto,w_400/v1/NZCamps/a.jpg",
   );
-  assert.equal(camp.images[1].thumbnail, "data:image/png;base64,AAAA/upload/BBBB");
-  assert.equal(camp.images[2].thumbnail, "/stylesheets/x.jpg");
+  assert.equal(
+    imageUrl(camp, { _id: "6650f0c2a1b2c3d4e5f60719", url: "data:image/png;base64,AAAA/upload/" }),
+    "/camps/6650f0c2a1b2c3d4e5f60718/images/6650f0c2a1b2c3d4e5f60719",
+  );
+  assert.equal(
+    imageUrl(camp, { _id: "6650f0c2a1b2c3d4e5f60719", embedded: true, url: null }),
+    "/camps/6650f0c2a1b2c3d4e5f60718/images/6650f0c2a1b2c3d4e5f60719",
+  );
+  assert.equal(imageUrl(camp, { url: "/stylesheets/x.jpg" }), "/stylesheets/x.jpg");
+  assert.equal(imageUrl(camp, null), "/images/no-photo.svg");
+  assert.equal(
+    imageUrl(camp, { url: "https://res.cloudinary.com.evil.example/image/upload/a.jpg" }),
+    "https://res.cloudinary.com.evil.example/image/upload/a.jpg",
+    "only the real host is rewritten",
+  );
 });
 
 test("safeJson escapes everything that could end a script block", () => {

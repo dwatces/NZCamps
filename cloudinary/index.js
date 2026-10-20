@@ -6,6 +6,7 @@ const crypto = require("crypto");
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 const { detectImageType } = require("../utils/imageType");
+const { stripJpegMetadata } = require("../utils/jpegMetadata");
 
 const configured = !!(
   process.env.CLOUDINARY_NAME &&
@@ -74,12 +75,15 @@ function uploadToCloudinary(buffer) {
 }
 
 // Stores one checked photo and returns the camp image shape { url, filename }.
+// JPEG metadata (GPS position, camera, time) is removed first: a photo sent
+// straight from a phone, without the browser-side resize, would carry it.
 async function storeImage(file) {
   const type = detectImageType(file.buffer);
   if (!type) throw new Error("storeImage called with an unchecked file");
-  if (configured) return uploadToCloudinary(file.buffer);
+  const buffer = type === "image/jpeg" ? stripJpegMetadata(file.buffer) : file.buffer;
+  if (configured) return uploadToCloudinary(buffer);
   return {
-    url: `data:${type};base64,${file.buffer.toString("base64")}`,
+    url: `data:${type};base64,${buffer.toString("base64")}`,
     filename: `embedded-${crypto.randomUUID()}`,
   };
 }

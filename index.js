@@ -15,6 +15,8 @@ const ejsMate = require("ejs-mate");
 const methodOverride = require("method-override");
 const flash = require("connect-flash");
 const ExpressError = require("./utils/expressError");
+const catchAsync = require("./utils/catchAsync");
+const { validateObjectId } = require("./middleware");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user");
@@ -93,6 +95,14 @@ app.use(async (req, res, next) => {
   }
   next();
 });
+
+// Embedded photos are served before sessions: an image response never
+// looks up or sets a session cookie.
+app.get(
+  "/camps/:id/images/:imageId",
+  validateObjectId("id", "imageId"),
+  catchAsync(require("./controllers/images").serveImage),
+);
 
 app.use(sameOriginWrites);
 

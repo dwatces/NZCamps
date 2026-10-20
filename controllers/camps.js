@@ -2,6 +2,7 @@ const Camp = require("../models/camp");
 const ExpressError = require("../utils/expressError");
 const { storeImage, destroyImage, STORE_FAILED_MSG } = require("../cloudinary");
 const { renderCampForm, campFormValues } = require("../middleware");
+const { AUTHOR, findCampForShow } = require("../utils/campQueries");
 
 const NOT_FOUND_MSG =
   "We couldn't find that location in New Zealand. Try a nearby town, lake or park.";
@@ -32,9 +33,6 @@ async function geocodeOrMessage(req, location) {
     return { message: GEOCODER_DOWN_MSG, status: 503 };
   }
 }
-
-// Authors are populated with their username only: never email, hash or salt.
-const AUTHOR = { path: "author", select: "username" };
 
 module.exports.index = async (req, res) => {
   const camps = await Camp.find(
@@ -86,9 +84,7 @@ module.exports.createCamp = async (req, res) => {
 };
 
 module.exports.showCamps = async (req, res) => {
-  const camp = await Camp.findById(req.params.id)
-    .populate({ path: "reviews", populate: AUTHOR })
-    .populate(AUTHOR);
+  const camp = await findCampForShow(req.params.id);
   if (!camp) throw new ExpressError("Page not found", 404);
   res.render("camps/show", { camp });
 };

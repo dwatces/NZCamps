@@ -62,6 +62,28 @@ function photoAlt(img, camp, index = 0, total = 1) {
   return total > 1 ? `Photo ${index + 1} of ${total} of ${title}` : `Photo of ${title}`;
 }
 
+// Where a page loads a camp photo from, at about `width` pixels wide:
+// - photos stored in the camp document (data URIs) come from their own route,
+//   so the page never carries the bytes;
+// - Cloudinary photos get an automatic format, quality and width;
+// - the sample photos in public/ are used as they are;
+// - no photo at all gives the "No photo yet" placeholder.
+const PLACEHOLDER = "/images/no-photo.svg";
+const CLOUDINARY_UPLOAD = /^https?:(\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(.*)$/;
+
+function isEmbedded(img) {
+  return img.embedded === true || (typeof img.url === "string" && img.url.startsWith("data:"));
+}
+
+function imageUrl(camp, img, width = 800) {
+  if (!img) return PLACEHOLDER;
+  if (isEmbedded(img)) return `/camps/${camp._id}/images/${img._id}`;
+  const url = typeof img.url === "string" ? img.url : "";
+  const cloud = CLOUDINARY_UPLOAD.exec(url);
+  if (cloud) return `https:${cloud[1]}f_auto,q_auto,w_${Math.round(width)}/${cloud[2]}`;
+  return url || PLACEHOLDER;
+}
+
 // { name, page } for a credited sample photo, or null.
 function photoCredit(img) {
   const p = img && samplePhoto(img.url);
@@ -77,4 +99,5 @@ module.exports = {
   isSample,
   photoAlt,
   photoCredit,
+  imageUrl,
 };

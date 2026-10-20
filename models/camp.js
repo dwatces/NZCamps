@@ -9,14 +9,6 @@ const ImageSchema = new Schema({
   alt: { type: String, trim: true, maxlength: 200 },
 });
 
-// A 200px-wide Cloudinary rendition. Other URLs (local files, data URIs) are
-// returned unchanged: rewriting "/upload" inside base64 would corrupt them.
-const CLOUDINARY_UPLOAD = /^https?:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\//;
-ImageSchema.virtual("thumbnail").get(function () {
-  const url = this.url || "";
-  return CLOUDINARY_UPLOAD.test(url) ? url.replace("/image/upload/", "/image/upload/w_200/") : url;
-});
-
 const CampSchema = new Schema({
   title: { type: String, required: true, trim: true, maxlength: 100 },
   images: [ImageSchema],
