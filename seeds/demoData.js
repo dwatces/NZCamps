@@ -40,7 +40,7 @@ module.exports = [
       photo("/stylesheets/anderson-aguirre-bjTQqa6o_cM-unsplash.jpg"),
       photo("/stylesheets/mitchell-luo-CEowgw6VXbE-unsplash.jpg"),
     ],
-    geometry: { type: "Point", coordinates: [167.8688, -44.619] },
+    geometry: { type: "Point", coordinates: [167.9256, -44.6717] },
   }),
   sample(2, {
     title: "Tekapo Lakeside Pitch",
