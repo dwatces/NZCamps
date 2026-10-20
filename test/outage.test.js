@@ -58,6 +58,15 @@ test("writes are refused with a 503 page and no cookie", async () => {
   assert.equal(res.headers["set-cookie"], undefined);
 });
 
+test("an embedded photo answers 503 with no-store, so no CDN keeps the error", async () => {
+  const res = await request(app).get(
+    "/camps/0123456789abcdef01234567/images/0123456789abcdef01234568",
+  );
+  assert.equal(res.status, 503);
+  assert.equal(res.headers["cache-control"], "no-store");
+  assert.equal(res.headers["set-cookie"], undefined);
+});
+
 test("the server is still answering afterwards", async () => {
   await new Promise((resolve) => setTimeout(resolve, 500));
   assert.equal((await request(app).get("/")).status, 200);

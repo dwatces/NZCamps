@@ -113,4 +113,73 @@ describe("camps and reviews", () => {
     await other.post(`/camps/${id}?_method=DELETE`);
     assert.equal(await Camp.countDocuments({ _id: id }), 1);
   });
+
+  test("another user cannot open the edit form or change someone else's camp", async () => {
+    const Camp = require("../models/camp");
+    const owner = h.agentFor(app);
+    await owner.signUp();
+    const id = h.campIdFrom(await owner.createCamp({ title: "Owner's Camp", price: "12" }));
+
+    const other = h.agentFor(app);
+    await other.signUp();
+    const form = await other.get(`/camps/${id}/edit`);
+    assert.equal(form.status, 302);
+    assert.equal(form.headers.location, `/camps/${id}`);
+
+    const update = await other
+      .post(`/camps/${id}?_method=PUT`)
+      .field("camp[title]", "Taken over")
+      .field("camp[location]", "Wellington")
+      .field("camp[price]", "99")
+      .field("camp[description]", "Not yours to change.");
+    assert.equal(update.status, 302);
+    assert.equal(update.headers.location, `/camps/${id}`);
+    const camp = await Camp.findById(id).lean();
+    assert.equal(camp.title, "Owner's Camp");
+    assert.equal(camp.price, 12);
+  });
+
+  test("the author can delete their own review, and the camp page updates", async () => {
+    const Camp = require("../models/camp");
+    const Review = require("../models/review");
+    const agent = h.agentFor(app);
+    await agent.signUp();
+    const id = h.campIdFrom(await agent.createCamp({ title: "Review Removal Flat" }));
+    await agent
+      .post(`/camps/${id}/reviews`)
+      .type("form")
+      .send({ "review[rating]": "2", "review[body]": "Changed my mind about this." });
+    const [reviewId] = (await Camp.findById(id).lean()).reviews;
+    assert.match((await agent.get(`/camps/${id}`)).text, /Changed my mind about this\./);
+
+    const del = await agent.post(`/camps/${id}/reviews/${reviewId}?_method=DELETE`);
+    assert.equal(del.status, 302);
+    assert.equal(del.headers.location, `/camps/${id}`);
+    assert.equal(await Review.countDocuments({ _id: reviewId }), 0);
+    assert.deepEqual((await Camp.findById(id).lean()).reviews, []);
+    const page = (await agent.get(`/camps/${id}`)).text;
+    assert.match(page, /Review deleted\./);
+    assert.match(page, /No reviews yet/);
+    assert.doesNotMatch(page, /Changed my mind about this/);
+  });
+
+  test("another user cannot delete someone else's review", async () => {
+    const Camp = require("../models/camp");
+    const Review = require("../models/review");
+    const author = h.agentFor(app);
+    await author.signUp();
+    const id = h.campIdFrom(await author.createCamp({ title: "Kept Review Flat" }));
+    await author
+      .post(`/camps/${id}/reviews`)
+      .type("form")
+      .send({ "review[rating]": "5", "review[body]": "Staying put." });
+    const [reviewId] = (await Camp.findById(id).lean()).reviews;
+
+    const other = h.agentFor(app);
+    await other.signUp();
+    const res = await other.post(`/camps/${id}/reviews/${reviewId}?_method=DELETE`);
+    assert.equal(res.status, 302);
+    assert.equal(await Review.countDocuments({ _id: reviewId }), 1);
+    assert.equal((await Camp.findById(id).lean()).reviews.length, 1);
+  });
 });
