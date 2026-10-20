@@ -29,7 +29,7 @@ before(async () => {
 });
 
 after(async () => {
-  await h.closeApp(app);
+  await h.closeApp();
   await db.stop();
   assert.deepEqual(h.crashes, [], "no unhandled rejections or uncaught exceptions");
 });

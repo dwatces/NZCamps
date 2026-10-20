@@ -55,6 +55,10 @@ module.exports.login = (req, res) => {
   res.redirect(redirectUrl);
 };
 
+module.exports.renderLogout = (req, res) => {
+  res.set("Allow", "POST").status(405).render("users/logout");
+};
+
 module.exports.logout = (req, res) => {
   req.logout();
   req.flash("success", "Logged out!");

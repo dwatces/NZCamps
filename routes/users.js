@@ -17,6 +17,8 @@ router
     users.login,
   );
 
-router.get("/logout", users.logout);
+// Logging out changes state, so it is a POST (a link or image elsewhere
+// cannot log anyone out). An old GET bookmark gets a page with the button.
+router.route("/logout").post(users.logout).get(users.renderLogout);
 
 module.exports = router;

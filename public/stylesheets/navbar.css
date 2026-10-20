@@ -48,3 +48,13 @@
   color: white;
   border-bottom-color: white;
 }
+
+.nav-logout {
+  display: inline;
+  margin: 0;
+}
+
+.nav-logout .btn-link {
+  border: 0;
+  text-decoration: none;
+}

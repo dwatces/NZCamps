@@ -12,7 +12,7 @@ async function stubGeocode(location) {
 // Builds the app for one test file. Environment is set before the app is
 // required so a developer's .env (never loaded under NODE_ENV=test) and any
 // real service credentials cannot leak in.
-async function makeApp({ dbUri, env = {} } = {}) {
+async function makeApp({ dbUri, env = {}, waitForDb = true } = {}) {
   process.env.NODE_ENV = "test";
   process.env.SECRET = "test-only-session-secret";
   for (const name of [
@@ -30,13 +30,12 @@ async function makeApp({ dbUri, env = {} } = {}) {
 
   const app = require(path.join(ROOT, "index"));
   app.locals.geocode = stubGeocode;
-  if (dbUri) await mongoose.connection.asPromise();
+  if (dbUri && waitForDb) await mongoose.connection.asPromise();
   return app;
 }
 
-async function closeApp(app) {
-  const store = app && app.locals.sessionStore;
-  if (store && typeof store.close === "function") await store.close();
+// The session store shares mongoose's client, so one disconnect closes both.
+async function closeApp() {
   await mongoose.disconnect();
 }
 

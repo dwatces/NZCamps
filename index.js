@@ -8,7 +8,6 @@ const path = require("path");
 const mongoose = require("mongoose");
 const ejsMate = require("ejs-mate");
 const methodOverride = require("method-override");
-const session = require("express-session");
 const flash = require("connect-flash");
 const ExpressError = require("./utils/expressError");
 const passport = require("passport");
@@ -18,20 +17,27 @@ const userRoutes = require("./routes/users");
 const campsRoutes = require("./routes/camps");
 const reviewRoutes = require("./routes/review");
 const mongoSanitize = require("express-mongo-sanitize");
-const MongoStore = require("connect-mongo");
+const runtimeConfig = require("./utils/runtimeConfig");
+const { sessionSecret, createSessionHolder } = require("./utils/sessions");
+const sameOriginWrites = require("./utils/sameOrigin");
+const demoCamps = require("./seeds/demoData");
 const dbUrl = process.env.DB_URL;
 
+// One connection per serverless instance, started at module load and reused.
 let connecting = Promise.resolve();
 if (dbUrl) {
   connecting = mongoose
-    .connect(dbUrl)
+    .connect(dbUrl, {
+      serverSelectionTimeoutMS: runtimeConfig.serverSelectionTimeoutMS,
+      maxPoolSize: 5,
+    })
     .catch((e) => console.error("mongo connect failed:", e.message));
 } else {
   console.warn("DB_URL not set - running without database");
 }
 
 const db = mongoose.connection;
-db.on("error", console.error.bind(console, "connection error:"));
+db.on("error", (e) => console.error("connection error:", e && e.message));
 db.once("open", () => {
   console.log("mongodb connected");
 });
@@ -43,6 +49,9 @@ Object.assign(app.locals, require("./utils/viewHelpers"));
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+// Vercel terminates HTTPS in front of the function; this lets secure cookies work.
+app.set("trust proxy", 1);
+app.disable("x-powered-by");
 
 // Defaults for the layout, so an error raised before the session middleware
 // still renders the normal error page.
@@ -58,34 +67,28 @@ app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(mongoSanitize());
 
-const secret = process.env.SECRET || "badsecret";
+// Serverless: the function freezes between requests, so the boot-time connect
+// may still be in flight on the first request. Wait for it (bounded) before
+// sessions are read, so a cold start finds the session store ready.
+app.use(async (req, res, next) => {
+  if (dbUrl && mongoose.connection.readyState !== 1) {
+    let timer;
+    await Promise.race([
+      connecting,
+      new Promise((resolve) => {
+        timer = setTimeout(resolve, runtimeConfig.dbWaitMs);
+      }),
+    ]);
+    clearTimeout(timer);
+  }
+  next();
+});
 
-let store;
-if (dbUrl) {
-  store = MongoStore.create({
-    mongoUrl: dbUrl,
-    secret,
-    touchAfter: 24 * 60 * 60,
-  });
-  store.on("error", function (e) {
-    console.log("Error", e);
-  });
-  app.locals.sessionStore = store;
-}
+app.use(sameOriginWrites);
 
-const sessionConfig = {
-  ...(store ? { store } : {}),
-  secret,
-  resave: false,
-  saveUninitialized: true,
-  cookie: {
-    httpOnly: true,
-    sameSite: "lax",
-    expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-  },
-};
-app.use(session(sessionConfig));
+const sessions = createSessionHolder({ dbUrl, secret: sessionSecret() });
+app.locals.sessionState = sessions.state;
+app.use(sessions.middleware);
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
@@ -94,23 +97,24 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+// Flash messages are read only when there are some: reading creates an empty
+// flash object, which would save a session (and set a cookie) for every visit.
 app.use((req, res, next) => {
-  res.locals.user = req.user;
-  res.locals.success = req.flash("success");
-  res.locals.error = req.flash("error");
+  res.locals.user = req.user || null;
+  if (req.session && req.session.flash) {
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+  }
   next();
 });
 
-// DEMO MODE: while no database is configured, camp pages render seeded demo
-// content and writes flash a notice. Bypassed once Mongo connects.
-// Serverless note: the function freezes between requests, so the boot-time
-// connect may still be in flight on the first request — wait for it (bounded)
-// before falling back to demo content.
-const demoCamps = require("./seeds/demoData");
-app.use(async (req, res, next) => {
-  if (mongoose.connection.readyState !== 1 && dbUrl) {
-    await Promise.race([connecting, new Promise((resolve) => setTimeout(resolve, 8000))]);
-  }
+// DEMO MODE: without a database connection, camp pages render the sample
+// camps. Without DB_URL (local demo) writes flash a notice. With DB_URL set
+// but unreachable (an outage) writes get a 503 page directly: no flash and no
+// session write, so a returning visitor's real cookie is left alone.
+const OUTAGE_MSG =
+  "The database isn't reachable right now, so you can browse sample camps but not save changes";
+app.use((req, res, next) => {
   if (mongoose.connection.readyState === 1) return next();
   if (req.method === "GET" && req.path === "/camps")
     return res.render("camps/index", { camps: demoCamps });
@@ -120,6 +124,9 @@ app.use(async (req, res, next) => {
     if (camp) return res.render("camps/show", { camp });
   }
   if (req.method !== "GET") {
+    if (dbUrl) {
+      return res.status(503).render("error", { status: 503, message: OUTAGE_MSG, err: {} });
+    }
     req.flash(
       "error",
       "Demo mode: the live database is being provisioned - browsing only for now.",

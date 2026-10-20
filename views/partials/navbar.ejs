@@ -32,7 +32,9 @@
           <a href="/login" class="nav-link">Login</a>
           <a href="/register" class="nav-link">Register</a>
           <% } else { %>
-          <a href="/Logout" class="nav-link">Logout</a>
+          <form action="/logout" method="post" class="nav-logout">
+            <button type="submit" class="nav-link btn btn-link">Log out</button>
+          </form>
           <% } %>
         </div>
       </div>

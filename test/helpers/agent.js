@@ -22,8 +22,7 @@ function agentFor(app) {
   agent.logIn = (username, password) =>
     agent.post("/login").type("form").send({ username, password });
 
-  // Logout is GET /logout today; F4 makes it a POST.
-  agent.logOut = () => agent.get("/logout");
+  agent.logOut = () => agent.post("/logout");
 
   agent.createCamp = (fields = {}, files = []) => {
     const camp = {
