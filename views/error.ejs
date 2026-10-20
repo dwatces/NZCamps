@@ -9,20 +9,14 @@
   block('title', heading);
   block('description', detail);
 %>
-<div class="row">
-  <div class="col-md-8 offset-md-2 col-lg-6 offset-lg-3">
-    <div class="card error-panel">
-      <div class="card-body">
-        <h1 class="h3 card-title"><%= heading %></h1>
-        <p><%= detail %></p>
-        <ul class="list-inline mb-0">
-          <li class="list-inline-item"><a class="btn btn-primary" href="/camps">All camps</a></li>
-          <li class="list-inline-item"><a class="btn btn-outline-primary" href="/">Home</a></li>
-        </ul>
-        <% if (typeof stack === "string" && stack) { %>
-        <pre class="error-stack mt-3 small" tabindex="0"><%= stack %></pre>
-        <% } %>
-      </div>
-    </div>
-  </div>
+<div class="panel panel--narrow message-panel error-panel">
+  <h1 class="h2"><%= heading %></h1>
+  <p><%= detail %></p>
+  <ul class="message-panel__actions list-unstyled mb-0">
+    <li><a class="btn btn-primary" href="/camps">All camps</a></li>
+    <li><a class="btn btn-outline-primary" href="/">Home</a></li>
+  </ul>
+  <% if (typeof stack === "string" && stack) { %>
+  <pre class="error-stack mt-3 small" tabindex="0"><%= stack %></pre>
+  <% } %>
 </div>

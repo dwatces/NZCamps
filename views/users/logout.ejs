@@ -1,20 +1,14 @@
 <% layout('layouts/boilerplate')%>
 <% block('title', 'Log out') %>
 <% block('description', 'Log out of your NZ Camps account on this device.') %>
-<div class="row">
-  <div class="col-md-6 offset-md-3">
-    <div class="card">
-      <div class="card-body">
-        <h1 class="h4 card-title">Log out</h1>
-        <% if (user) { %>
-        <p>Use this button to log out of NZ Camps.</p>
-        <form action="/logout" method="post">
-          <button type="submit" class="btn btn-primary">Log out</button>
-        </form>
-        <% } else { %>
-        <p class="mb-0">You're not logged in. <a href="/camps">See all camps</a>.</p>
-        <% } %>
-      </div>
-    </div>
-  </div>
+<div class="panel panel--narrow message-panel">
+  <h1 class="h2">Log out</h1>
+  <% if (user) { %>
+  <p>Use this button to log out of NZ Camps.</p>
+  <form action="/logout" method="post">
+    <button type="submit" class="btn btn-primary">Log out</button>
+  </form>
+  <% } else { %>
+  <p class="mb-0">You're not logged in. <a href="/camps">See all camps</a>.</p>
+  <% } %>
 </div>

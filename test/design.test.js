@@ -444,3 +444,49 @@ test("the camp map starts with its popup closed and lets the page scroll", h.not
   assert.match(src, /dragging: !L\.Browser\.mobile/);
   assert.match(src, /scrollWheelZoom: false/);
 });
+
+// ---------- D8: form pages ----------
+
+test("form pages put the heading and the form on a solid panel", async () => {
+  const agent = h.agentFor(app);
+  await agent.signUp();
+  const own = h.campIdFrom(await agent.createCamp({ title: "Panel Camp" }));
+  const pagesToCheck = {
+    add: [
+      (await agent.get("/camps/new")).text,
+      /<div class="panel form-panel">\s*<h1 class="form-panel__title">Add a camp<\/h1>/,
+    ],
+    edit: [
+      (await agent.get(`/camps/${own}/edit`)).text,
+      /<div class="panel form-panel">\s*<h1 class="form-panel__title">Edit camp<\/h1>/,
+    ],
+    login: [
+      (await request(app).get("/login")).text,
+      /<div class="panel auth-card">[\s\S]*?<h1 class="auth-card__title">Log in<\/h1>/,
+    ],
+    register: [
+      (await request(app).get("/register")).text,
+      /<div class="panel auth-card">[\s\S]*?<h1 class="auth-card__title">Sign up<\/h1>/,
+    ],
+  };
+  for (const [name, [html, re]] of Object.entries(pagesToCheck)) {
+    assert.match(html, re, name);
+    assert.doesNotMatch(html, /text-white|form-labe\b|btn-success|btn-light/, name);
+    const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
+    assert.equal(
+      tags(main, /<div[\s>]/g).length,
+      tags(main, /<\/div>/g).length,
+      `${name} divs balance`,
+    );
+  }
+});
+
+test("the price field is named by its label, with the $ hidden from screen readers", async () => {
+  const agent = h.agentFor(app);
+  await agent.signUp();
+  const html = (await agent.get("/camps/new")).text;
+  assert.match(html, /<label class="form-label" for="price">Price per night<\/label>/);
+  assert.match(html, /<span class="input-group-text" aria-hidden="true">\$<\/span>/);
+  assert.equal(tags(html, /id="price"/g).length, 1);
+  assert.match(html, /<input\s+type="text"\s+id="price"[^>]*inputmode="decimal"/);
+});

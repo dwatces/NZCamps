@@ -1,93 +1,87 @@
 <% layout('layouts/boilerplate')%>
 <% block('title', 'Sign up') %>
 <% block('description', 'Create an NZ Camps account to add campgrounds and review the places you have stayed.') %>
-<div class="container d-flex justify-content-center align-items-center">
-  <div class="row">
-    <div class="col-sm-6 offset-sm-3 col-md-6 offset-md-3 col-xl-5 offset-xl-4">
-      <div class="card shadow">
-        <% const ferns = imageSet("auth"); %>
-        <picture>
-          <source type="image/avif" srcset="<%= ferns.avif %>" sizes="(min-width: 576px) 30rem, 100vw" />
-          <img
-            src="/images/auth-ferns-480.jpg"
-            srcset="<%= ferns.jpeg %>"
-            sizes="(min-width: 576px) 30rem, 100vw"
-            width="480"
-            height="320"
-            alt=""
-            class="card-img-top"
-          />
-        </picture>
-        <div class="card-body">
-          <h1 class="h4 card-title text-center">Sign up</h1>
-          <%- include('../partials/formErrors') %>
-          <% const back = typeof returnTo === "string" && returnTo ? returnTo : ""; %>
-          <form action="/register" method="post" class="validForm" novalidate>
-            <% if (back) { %>
-            <input type="hidden" name="returnTo" value="<%= back %>" />
-            <% } %>
-            <div class="mb-3">
-              <label for="username" class="form-label">Username</label>
-              <input
-                type="text"
-                class="form-control<%= invalidClass('username', fieldErrors) %>"
-                id="username"
-                name="username"
-                value="<%= values.username %>"
-                minlength="3"
-                maxlength="30"
-                pattern="[A-Za-z0-9_.\-]+"
-                autocomplete="username"
-                autocapitalize="none"
-                spellcheck="false"
-                required
-                data-field="username"
-                data-error="Usernames are 3 to 30 characters: letters, numbers, dots, dashes and underscores."<%- fieldAria('username', fieldErrors, 'username-help') %>
-              />
-              <div id="username-help" class="form-text">
-                3 to 30 characters: letters, numbers, dots, dashes and underscores. Other people see it on your reviews.
-              </div>
-              <%- include('../partials/fieldError', { name: 'username' }) %>
-            </div>
-            <div class="mb-3">
-              <label for="email" class="form-label">Email</label>
-              <input
-                type="email"
-                class="form-control<%= invalidClass('email', fieldErrors) %>"
-                id="email"
-                name="email"
-                value="<%= values.email %>"
-                maxlength="254"
-                autocomplete="email"
-                required
-                data-field="email"
-                data-error="Enter a valid email address, like name@example.com."<%- fieldAria('email', fieldErrors, 'email-help') %>
-              />
-              <div id="email-help" class="form-text">Never shown on the site.</div>
-              <%- include('../partials/fieldError', { name: 'email' }) %>
-            </div>
-            <div class="mb-4">
-              <label for="password" class="form-label">Password</label>
-              <input
-                type="password"
-                class="form-control<%= invalidClass('password', fieldErrors) %>"
-                id="password"
-                name="password"
-                minlength="8"
-                maxlength="200"
-                autocomplete="new-password"
-                required
-                data-field="password"
-                data-error="Choose a password of at least 8 characters."<%- fieldAria('password', fieldErrors, 'password-help') %>
-              />
-              <div id="password-help" class="form-text">At least 8 characters.</div>
-              <%- include('../partials/fieldError', { name: 'password' }) %>
-            </div>
-            <button class="btn btn-primary w-100">Sign up</button>
-          </form>
-          <p class="mt-3 mb-0 text-center">Already have an account? <a href="/login<%= back ? '?returnTo=' + encodeURIComponent(back) : '' %>">Log in</a></p>
+<div class="panel auth-card">
+  <% const ferns = imageSet("auth"); %>
+  <picture class="auth-card__photo">
+    <source type="image/avif" srcset="<%= ferns.avif %>" sizes="(min-width: 576px) 30rem, 100vw" />
+    <img
+      src="/images/auth-ferns-480.jpg"
+      srcset="<%= ferns.jpeg %>"
+      sizes="(min-width: 576px) 30rem, 100vw"
+      width="480"
+      height="320"
+      alt=""
+      decoding="async"
+    />
+  </picture>
+  <div class="auth-card__body">
+    <h1 class="auth-card__title">Sign up</h1>
+    <%- include('../partials/formErrors') %>
+    <% const back = typeof returnTo === "string" && returnTo ? returnTo : ""; %>
+    <form action="/register" method="post" class="validForm" novalidate>
+      <% if (back) { %>
+      <input type="hidden" name="returnTo" value="<%= back %>" />
+      <% } %>
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input
+          type="text"
+          class="form-control<%= invalidClass('username', fieldErrors) %>"
+          id="username"
+          name="username"
+          value="<%= values.username %>"
+          minlength="3"
+          maxlength="30"
+          pattern="[A-Za-z0-9_.\-]+"
+          autocomplete="username"
+          autocapitalize="none"
+          spellcheck="false"
+          required
+          data-field="username"
+          data-error="Usernames are 3 to 30 characters: letters, numbers, dots, dashes and underscores."<%- fieldAria('username', fieldErrors, 'username-help') %>
+        />
+        <div id="username-help" class="form-help">
+          3 to 30 characters: letters, numbers, dots, dashes and underscores. Other people see it on your reviews.
         </div>
+        <%- include('../partials/fieldError', { name: 'username' }) %>
       </div>
-    </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="email"
+          class="form-control<%= invalidClass('email', fieldErrors) %>"
+          id="email"
+          name="email"
+          value="<%= values.email %>"
+          maxlength="254"
+          autocomplete="email"
+          required
+          data-field="email"
+          data-error="Enter a valid email address, like name@example.com."<%- fieldAria('email', fieldErrors, 'email-help') %>
+        />
+        <div id="email-help" class="form-help">Never shown on the site.</div>
+        <%- include('../partials/fieldError', { name: 'email' }) %>
+      </div>
+      <div class="mb-4">
+        <label for="password" class="form-label">Password</label>
+        <input
+          type="password"
+          class="form-control<%= invalidClass('password', fieldErrors) %>"
+          id="password"
+          name="password"
+          minlength="8"
+          maxlength="200"
+          autocomplete="new-password"
+          required
+          data-field="password"
+          data-error="Choose a password of at least 8 characters."<%- fieldAria('password', fieldErrors, 'password-help') %>
+        />
+        <div id="password-help" class="form-help">At least 8 characters.</div>
+        <%- include('../partials/fieldError', { name: 'password' }) %>
+      </div>
+      <button class="btn btn-primary w-100">Sign up</button>
+    </form>
+    <p class="mt-3 mb-0 text-center">Already have an account? <a href="/login<%= back ? '?returnTo=' + encodeURIComponent(back) : '' %>">Log in</a></p>
   </div>
 </div>

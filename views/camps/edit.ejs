@@ -2,57 +2,68 @@
 <% block('title', `Edit ${camp.title}`) %>
 <% block('description', `Change the details or photos of ${camp.title} on NZ Camps.`) %>
 <% block('scripts', '<script defer src="/js/upload.js"></script>') %>
-<div class="row">
-  <h1 class="text-center text-white">Edit camp</h1>
-  <div class="col-md-8 offset-md-2 col-lg-6 offset-lg-3">
-    <%- include('../partials/formErrors') %>
-    <form
-      action="/camps/<%=camp._id%>?_method=PUT"
-      method="post"
-      novalidate
-      class="validForm"
-      enctype="multipart/form-data"
-    >
-      <%- include('../partials/campFields') %>
-      <% if (camp.images.length) { %>
-      <% const ticked = new Set(values.deleteImages || []); %>
-      <fieldset class="mb-4 photo-remove" id="remove-photos"<%- fieldAria('deleteImages', fieldErrors, 'remove-photos-help') %>>
-        <legend class="h6 text-white mb-1">Remove photos</legend>
-        <p class="form-help" id="remove-photos-help">Tick the photos to remove when you save.</p>
-        <ul class="list-unstyled photo-remove__list">
-          <% camp.images.forEach(function(img, i) { %>
-          <li>
-            <label class="photo-remove__label">
-              <img src="<%= imageUrl(camp, img, 200) %>" alt="" width="150" height="100" />
-              <span class="photo-remove__text">
-                <input
-                  type="checkbox"
-                  class="form-check-input"
-                  name="deleteImages[]"
-                  value="<%= img._id %>"<%= ticked.has(String(img._id)) ? " checked" : "" %>
-                />
-                Remove photo <%= i + 1 %> of <%= camp.images.length %>
-              </span>
-            </label>
-          </li>
-          <% }); %>
-        </ul>
-        <%- include('../partials/fieldError', { name: 'deleteImages' }) %>
-      </fieldset>
-      <% } %>
-      <%- include('../partials/photoInput') %>
-      <div class="mb-3 d-flex justify-content-between">
-        <button class="btn btn-primary">Save changes</button>
-        <a class="btn btn-outline-primary" href="/camps/<%= camp._id %>">Back to camp</a>
-      </div>
-    </form>
-    <form
-      class="mb-5 text-end"
-      action="/camps/<%= camp._id %>?_method=DELETE"
-      method="POST"
-      data-confirm="Delete this camp and its reviews? This can't be undone."
-    >
-      <button class="btn btn-outline-danger btn-delete-camp">Delete camp</button>
-    </form>
-  </div>
+<p class="back-link-row form-width"><a class="back-link" href="/camps/<%= camp._id %>"><span aria-hidden="true">&larr;</span> Back to camp</a></p>
+<div class="panel form-panel">
+  <h1 class="form-panel__title">Edit camp</h1>
+  <p class="form-panel__intro"><%= camp.title %></p>
+  <%- include('../partials/formErrors') %>
+  <form
+    action="/camps/<%=camp._id%>?_method=PUT"
+    method="post"
+    novalidate
+    class="validForm"
+    enctype="multipart/form-data"
+  >
+    <%- include('../partials/campFields') %>
+    <% if (camp.images.length) { %>
+    <% const ticked = new Set(values.deleteImages || []); %>
+    <fieldset class="mb-4 photo-remove" id="remove-photos"<%- fieldAria('deleteImages', fieldErrors, 'remove-photos-help') %>>
+      <legend class="form-label fs-6 mb-1">Remove photos</legend>
+      <p class="form-help" id="remove-photos-help">Tick the photos to remove when you save.</p>
+      <ul class="list-unstyled photo-remove__list">
+        <% camp.images.forEach(function(img, i) { %>
+        <li>
+          <label class="photo-remove__label">
+            <%- include('../partials/photo', {
+              camp,
+              img,
+              alt: '',
+              widths: [480],
+              sizes: '150px',
+              width: 150,
+              height: 100,
+              cls: 'photo-remove__img',
+              eager: false,
+            }) %>
+            <span class="photo-remove__text">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                name="deleteImages[]"
+                value="<%= img._id %>"<%= ticked.has(String(img._id)) ? " checked" : "" %>
+              />
+              Remove photo <%= i + 1 %> of <%= camp.images.length %>
+            </span>
+          </label>
+        </li>
+        <% }); %>
+      </ul>
+      <%- include('../partials/fieldError', { name: 'deleteImages' }) %>
+    </fieldset>
+    <% } %>
+    <%- include('../partials/photoInput') %>
+    <div class="form-actions">
+      <button class="btn btn-primary">Save changes</button>
+      <a class="btn btn-outline-primary" href="/camps/<%= camp._id %>">Back to camp</a>
+    </div>
+  </form>
+  <form
+    class="form-danger"
+    action="/camps/<%= camp._id %>?_method=DELETE"
+    method="POST"
+    data-confirm="Delete this camp and its reviews? This can't be undone."
+  >
+    <p class="form-danger__text">Deleting removes the camp, its photos and its reviews.</p>
+    <button class="btn btn-outline-danger btn-delete-camp">Delete camp</button>
+  </form>
 </div>

@@ -210,10 +210,9 @@ body {
   font-weight: 600;
 }
 .form-help {
-  color: #fff;
+  margin: 0.375rem 0 0;
+  color: var(--nzc-ink-muted);
   font-size: 0.875rem;
-  margin: 0.25rem 0 0;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 /* Error messages: white on dark red (7.7:1), readable on any background. */
 .field-error {
@@ -229,7 +228,12 @@ body {
 .field-error[hidden] {
   display: none;
 }
+/* Each problem is a 44 px link to its field. */
 .error-summary a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--nzc-tap);
+  padding: 0.25rem 0;
   color: var(--bs-danger-text-emphasis);
   font-weight: 600;
 }
@@ -247,9 +251,6 @@ body {
 }
 
 /* ---------- Cards and photos ---------- */
-.card-img-top {
-  height: auto;
-}
 .photo-placeholder {
   position: relative;
   margin: 0;
@@ -805,12 +806,18 @@ body {
   gap: 0.375rem;
   min-height: 44px;
   padding: 0.5rem;
-  color: #fff;
-  background-color: rgba(0, 0, 0, 0.7);
-  border-radius: 0.375rem;
+  border: 1px solid var(--nzc-line);
+  border-radius: var(--nzc-radius-sm);
+  background-color: var(--nzc-surface-alt);
+  color: var(--nzc-ink);
   cursor: pointer;
 }
+.photo-remove__label:has(input:checked) {
+  border-color: var(--nzc-danger);
+  background-color: #fbeaea;
+}
 .photo-remove__label img {
+  display: block;
   width: 150px;
   height: 100px;
   object-fit: cover;
@@ -835,9 +842,10 @@ body {
   margin: 0.5rem 0 0;
 }
 .photo-previews li {
-  color: #fff;
-  background-color: rgba(0, 0, 0, 0.7);
-  border-radius: 0.375rem;
+  border: 1px solid var(--nzc-line);
+  background-color: var(--nzc-surface-alt);
+  color: var(--nzc-ink);
+  border-radius: var(--nzc-radius-sm);
   padding: 0.5rem;
   font-size: 0.8125rem;
   max-width: 166px;
@@ -852,9 +860,92 @@ body {
   margin-bottom: 0.25rem;
 }
 
-/* ---------- Error pages ---------- */
-.error-panel {
-  background-color: #fff;
+/* ---------- Form pages ----------
+   Add, edit, log in and sign up sit on solid white panels with the heading
+   inside; buttons are full width on phones and never wrap. */
+.form-width,
+.form-panel {
+  max-width: 44rem;
+  margin-inline: auto;
+}
+.form-panel__title {
+  margin: 0 0 0.375rem;
+  font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.25rem);
+}
+.form-panel__intro {
+  margin: 0 0 1.5rem;
+  color: var(--nzc-ink-muted);
+}
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+.form-actions .btn,
+.form-danger .btn {
+  white-space: nowrap;
+}
+@media (max-width: 575.98px) {
+  .form-actions .btn {
+    width: 100%;
+  }
+}
+.form-danger {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--nzc-line);
+}
+.form-danger__text {
+  margin: 0;
+  color: var(--nzc-ink-muted);
+  font-size: 0.9375rem;
+}
+.input-group-text {
+  min-width: var(--nzc-tap);
+  justify-content: center;
+  border-color: #8a978f;
+  font-weight: 600;
+}
+
+/* Log in and sign up: the fern photo across the top of the panel. */
+.panel.auth-card {
+  max-width: 28rem;
+  margin-inline: auto;
+  padding: 0;
+  overflow: hidden;
+}
+.auth-card__photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 1;
+  object-fit: cover;
+}
+.auth-card__body {
+  padding: 1.5rem 1.25rem 1.75rem;
+}
+@media (min-width: 576px) {
+  .auth-card__body {
+    padding: 1.75rem 2rem 2rem;
+  }
+}
+.auth-card__title {
+  margin: 0 0 1.25rem;
+  font-size: 1.75rem;
+  text-align: center;
+}
+
+/* Short message pages: log out, errors. */
+.message-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 .error-stack {
   max-width: 100%;

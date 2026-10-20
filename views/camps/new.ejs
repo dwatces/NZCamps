@@ -2,22 +2,22 @@
 <% block('title', 'Add a camp') %>
 <% block('description', 'Add a campground to NZ Camps: its name, where it is, the price per night, a description and photos.') %>
 <% block('scripts', '<script defer src="/js/upload.js"></script>') %>
-<div class="row">
-  <h1 class="text-center text-white">Add a camp</h1>
-  <div class="col-md-8 offset-md-2 col-lg-6 offset-lg-3">
-    <%- include('../partials/formErrors') %>
-    <form
-      action="/camps"
-      method="post"
-      novalidate
-      class="validForm"
-      enctype="multipart/form-data"
-    >
-      <%- include('../partials/campFields') %>
-      <%- include('../partials/photoInput') %>
-      <div class="d-flex justify-content-center mb-5">
-        <button class="btn btn-primary">Add camp</button>
-      </div>
-    </form>
-  </div>
+<p class="back-link-row form-width"><a class="back-link" href="/camps"><span aria-hidden="true">&larr;</span> All camps</a></p>
+<div class="panel form-panel">
+  <h1 class="form-panel__title">Add a camp</h1>
+  <p class="form-panel__intro">Share a campground you know. Every field is needed except the photos.</p>
+  <%- include('../partials/formErrors') %>
+  <form
+    action="/camps"
+    method="post"
+    novalidate
+    class="validForm"
+    enctype="multipart/form-data"
+  >
+    <%- include('../partials/campFields') %>
+    <%- include('../partials/photoInput') %>
+    <div class="form-actions">
+      <button class="btn btn-primary">Add camp</button>
+    </div>
+  </form>
 </div>
