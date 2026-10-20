@@ -23,9 +23,14 @@ function sameId(a, b) {
   return String(x) === String(y);
 }
 
+// Older accounts could pick an email address as their username. It is never
+// shown; new usernames cannot contain "@" (registerSchema).
+const looksLikeEmail = (name) => name.includes("@");
+
 // The name shown for an author. Authors can be missing (a deleted account).
 function displayName(author) {
   if (!author || typeof author.username !== "string" || !author.username) return "Former member";
+  if (looksLikeEmail(author.username)) return "NZ Camps member";
   return author.username;
 }
 

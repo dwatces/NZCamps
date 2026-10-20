@@ -115,3 +115,20 @@ test("no template serialises data with <%- JSON", () => {
     assert.doesNotMatch(fs.readFileSync(f, "utf8"), /<%-\s*JSON/, f);
   }
 });
+
+test("an email-shaped username is shown as NZ Camps member and never printed", async () => {
+  const User = require("../models/user");
+  const Camp = require("../models/camp");
+  const Review = require("../models/review");
+  const legacy = new User({ username: "someone@example.test", email: "someone@example.test" });
+  await User.register(legacy, "legacy-password");
+  const review = await Review.create({ body: "Old review.", rating: 4, author: legacy._id });
+  await Camp.updateOne({ _id: campId }, { $push: { reviews: review._id } });
+
+  for (const page of [`/camps/${campId}`, "/camps"]) {
+    const res = await h.agentFor(app).get(page);
+    assert.equal(res.status, 200);
+    assert.ok(!res.text.includes("someone@example.test"), `${page} must not print the address`);
+  }
+  assert.match((await h.agentFor(app).get(`/camps/${campId}`)).text, /NZ Camps member/);
+});
