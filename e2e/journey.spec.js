@@ -9,6 +9,7 @@ const {
   expect,
   isPhone,
   headerLink,
+  logIn,
   logOut,
   signUp,
   freshName,
@@ -16,6 +17,7 @@ const {
   markerTotals,
   campData,
 } = require("./fixtures");
+const { NO_PHOTO_TITLE } = require("./constants");
 
 const BIG_PHOTO = path.join(__dirname, "fixtures", "big-photo.jpg"); // 2400 x 1600
 const SMALL_PHOTO = path.join(__dirname, "..", "public", "images", "hahei-kura-tregenza-800.jpg");
@@ -187,5 +189,77 @@ test("a member adds, reviews, edits and deletes a camp", async ({ page }, testIn
     await expect(page).toHaveURL(/\/camps$/);
     if (isPhone(page)) await page.getByRole("button", { name: "Menu" }).click();
     await expect(page.locator(".site-header").getByRole("link", { name: "Log in" })).toBeVisible();
+  });
+});
+
+// The error summary keeps up as fields are fixed: each fixed field's line
+// goes, focus stays in the field, and the summary goes with the last line.
+// Nothing here is sent once the problems are fixed.
+test.describe("error summaries", () => {
+  test("each fixed field leaves the add-camp summary, then the summary goes", async ({ page }) => {
+    await logIn(page);
+    await page.goto("/camps/new");
+    await page.getByRole("button", { name: "Add camp" }).click();
+    const summary = page.locator("#form-errors");
+    await expect(summary).toBeFocused();
+    await expect(summary.locator("li")).toHaveText([
+      "Enter a camp name.",
+      "Enter a location.",
+      "Enter a price per night, like 18 or 18.50. Use 0 for free.",
+      "Enter a description.",
+    ]);
+
+    await page.getByLabel("Camp name").fill("Tussock Saddle");
+    await expect(page.getByLabel("Camp name")).toBeFocused();
+    await expect(page.locator("#title-error")).toBeHidden();
+    await expect(summary.locator("li")).toHaveCount(3);
+    await expect(summary).not.toContainText("Enter a camp name.");
+    await expect(summary).toBeVisible();
+
+    await page.getByLabel("Location").fill("Nelson");
+    await page.getByLabel("Price per night").fill("18.50");
+    await expect(summary.locator("li")).toHaveText(["Enter a description."]);
+    await page.getByLabel("Description").fill("Flat sites beside the river.");
+    await expect(page.getByLabel("Description")).toBeFocused();
+    await expect(summary).toBeHidden();
+  });
+
+  test("the server's summary loses its line when that field is fixed", async ({ page, guard }) => {
+    guard.allow(/\/camps$/, 422);
+    await logIn(page);
+    await page.goto("/camps/new");
+    await page.getByLabel("Camp name").fill("Somewhere new");
+    await page.getByLabel("Location").fill("Nowhere at all");
+    await page.getByLabel("Price per night").fill("10");
+    await page.getByLabel("Description").fill("A camp at a place that cannot be found.");
+    await page.getByRole("button", { name: "Add camp" }).click();
+    const summary = page.locator("#form-errors");
+    await expect(summary).toBeFocused();
+    await expect(summary.locator("li")).toHaveCount(1);
+    await expect(summary).toContainText("couldn't find that location");
+
+    await page.getByLabel("Location").fill("Nelson");
+    await expect(page.locator("#location-error")).toBeHidden();
+    await expect(summary).toBeHidden();
+  });
+
+  test("picking a star removes the rating line from the review summary", async ({ page }) => {
+    await logIn(page);
+    const res = await page.request.get(`/camps?q=${encodeURIComponent(NO_PHOTO_TITLE)}`);
+    const m = /class="camp-card__title" href="(\/camps\/[^"]+)"/.exec(await res.text());
+    expect(m, `a camp called ${NO_PHOTO_TITLE}`).not.toBeNull();
+    await page.goto(m[1]);
+    await page.getByRole("button", { name: "Post review" }).click();
+    const summary = page.locator("#form-errors");
+    await expect(summary).toBeFocused();
+    await expect(summary.locator("li")).toHaveText([
+      "Choose a star rating from 1 to 5.",
+      "Enter your review.",
+    ]);
+
+    await page.locator('label[for="rating-3"]').click();
+    await expect(summary.locator("li")).toHaveText(["Enter your review."]);
+    await page.getByLabel("Your review").fill("Shady and quiet.");
+    await expect(summary).toBeHidden();
   });
 });

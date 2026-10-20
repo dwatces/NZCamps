@@ -5,7 +5,9 @@
 //   custom problem such as too many photos), is marked aria-invalid, and a
 //   summary above the form lists every problem, links to each field and takes
 //   focus.
-// - A field's message clears as soon as it is fixed.
+// - A field's message clears as soon as it is fixed, and its line leaves the
+//   summary (the browser's or the server's); once no line is left, the
+//   summary goes too. Focus stays in the field being typed in.
 // - While a valid form is sending, its submit button is disabled and reads
 //   "Saving…", so a slow upload cannot be sent twice.
 // - An error summary rendered by the server takes focus when the page opens.
@@ -112,6 +114,27 @@
     summary.focus();
   }
 
+  // Removes the summary's lines that link to a fixed control (for a radio,
+  // to any radio of its group), and hides the summary once it lists nothing.
+  function dropFromSummary(control) {
+    var summary = document.getElementById("form-errors");
+    if (!summary || summary.hidden) return;
+    Array.prototype.forEach.call(summary.querySelectorAll('a[href^="#"]'), function (link) {
+      var linked = document.getElementById(link.getAttribute("href").slice(1));
+      var same =
+        linked === control ||
+        (control.type === "radio" &&
+          linked &&
+          linked.type === "radio" &&
+          linked.form === control.form &&
+          linked.name === control.name);
+      if (!same) return;
+      var item = link.closest("li");
+      if (item) item.remove();
+    });
+    if (!summary.querySelector("li")) summary.hidden = true;
+  }
+
   function check(form) {
     var problems = [];
     var seenGroups = {};
@@ -174,7 +197,9 @@
     function recheck(event) {
       var control = event.target;
       if (!control.willValidate || !control.checkValidity()) return;
-      if (targetOf(control).getAttribute("aria-invalid") === "true") clearError(control);
+      if (targetOf(control).getAttribute("aria-invalid") !== "true") return;
+      clearError(control);
+      dropFromSummary(control);
     }
     form.addEventListener("input", recheck);
     form.addEventListener("change", recheck);
