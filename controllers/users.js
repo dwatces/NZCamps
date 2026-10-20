@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const { registerSchema } = require("../schemas");
+const { displayName } = require("../utils/viewHelpers");
 
 const DUPLICATE_MSG = "That username or email is already registered.";
 
@@ -56,7 +57,7 @@ module.exports.storeReturnTo = (req, res, next) => {
 };
 
 module.exports.login = (req, res) => {
-  req.flash("success", "Welcome back!");
+  req.flash("success", `Welcome back, ${displayName(req.user)}.`);
   const redirectUrl = res.locals.returnTo || "/camps";
   delete req.session.returnTo;
   res.redirect(redirectUrl);
@@ -69,7 +70,7 @@ module.exports.renderLogout = (req, res) => {
 module.exports.logout = (req, res, next) => {
   req.logout((err) => {
     if (err) return next(err);
-    req.flash("success", "Logged out!");
+    req.flash("success", "You've logged out.");
     res.redirect("/camps");
   });
 };

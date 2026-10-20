@@ -19,7 +19,7 @@ after(async () => {
 describe("pages render", () => {
   for (const [path, text] of [
     ["/", "New Zealand Camps"],
-    ["/camps", "Explore Camps"],
+    ["/camps", "Explore camps"],
     ["/login", 'action="/login"'],
     ["/register", 'action="/register"'],
   ]) {

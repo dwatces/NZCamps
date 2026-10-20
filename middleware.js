@@ -32,11 +32,20 @@ module.exports.validateObjectId =
     next();
   };
 
+// What the visitor was trying to do, for the "log in first" message.
+function loginPrompt(req) {
+  const url = req.originalUrl.split("?")[0];
+  if (url === "/camps/new" || (url === "/camps" && req.method === "POST"))
+    return "Log in to add a camp.";
+  if (/\/reviews(\/|$)/.test(url)) return "Log in to leave a review.";
+  return "Log in to continue.";
+}
+
 module.exports.isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
     // Only a page can be returned to; a POST or DELETE URL cannot.
     if (req.method === "GET") req.session.returnTo = req.originalUrl;
-    req.flash("error", "Please log in first.");
+    req.flash("error", loginPrompt(req));
     return res.redirect("/login");
   }
   next();

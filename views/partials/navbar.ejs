@@ -21,13 +21,13 @@
 
           <a class="nav-link" href="/camps">Camps</a>
           <% if(user) { %>
-          <a class="nav-link" href="/camps/new">New Camp</a>
+          <a class="nav-link" href="/camps/new">Add a camp</a>
           <% } %>
         </div>
         <div class="navbar-nav mobile__bg center ms-auto">
           <% if(!user) { %>
-          <a href="/login" class="nav-link">Login</a>
-          <a href="/register" class="nav-link">Register</a>
+          <a href="/login" class="nav-link">Log in</a>
+          <a href="/register" class="nav-link">Sign up</a>
           <% } else { %>
           <form action="/logout" method="post" class="nav-logout">
             <button type="submit" class="nav-link btn btn-link">Log out</button>

@@ -10,7 +10,7 @@ module.exports.createReview = async (req, res) => {
   camp.reviews.push(review);
   await review.save();
   await camp.save();
-  req.flash("success", "Review saved.");
+  req.flash("success", "Review posted.");
   res.redirect(`/camps/${camp._id}`);
 };
 

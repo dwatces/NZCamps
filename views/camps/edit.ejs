@@ -1,6 +1,6 @@
 <% layout('layouts/boilerplate')%>
 <div class="row mt-5">
-  <h1 class="text-center text-white">Edit Camp</h1>
+  <h1 class="text-center text-white">Edit camp</h1>
   <div class="col-md-6 offset-md-3">
     <%- include('../partials/formErrors') %>
     <form
@@ -11,7 +11,7 @@
       enctype="multipart/form-data"
     >
       <div class="mb-3">
-        <label class="form-label text-white" for="title">Title</label>
+        <label class="form-label text-white" for="title">Camp name</label>
         <input
           class="form-control"
           type="text"
@@ -35,7 +35,7 @@
         />
       </div>
       <div class="mb-3">
-        <label class="form-label text-white" for="price">Camp Price</label>
+        <label class="form-label text-white" for="price">Price per night</label>
         <div class="input-group mb-3">
           <span class="input-group-text" id="price-addon">$</span>
           <input
@@ -85,7 +85,7 @@
       <%# The file input is the last field: if a photo is refused, every
           other field has already been read and is shown again. %>
       <div class="mb-3">
-        <label class="form-label text-white" for="image">Upload Extra Images</label>
+        <label class="form-label text-white" for="image">Add photos</label>
         <input
           type="file"
           class="form-control"
@@ -96,8 +96,8 @@
         />
       </div>
       <div class="mb-3 d-flex justify-content-between">
-        <button class="btn btn-success btn-fixed">Update Camp</button>
-      <a class="btn btn-info btn-fixed" href="/camps/<%= camp._id%>">Back to Camp</a>
+        <button class="btn btn-success">Save changes</button>
+      <a class="btn btn-info btn-fixed" href="/camps/<%= camp._id%>">Back to camp</a>
     </div>
     </form>
   </div>

@@ -8,22 +8,20 @@
 <% block('scripts', '<script src="/vendor/leaflet.markercluster-1.5.3/leaflet.markercluster.js"></script>') %>
 <% block('scripts', '<script src="/js/clusterMap.js"></script>') %>
 <div class="mt-5">
-  <h1 class="text-center text-white">Explore Camps</h1>
+  <h1 class="text-center text-white">Explore camps</h1>
 </div>
 <% if(!user) { %>
-<div class="mt-5 text-center">
-  <h3 class="text-white">
-    Welcome, please register or login to create camps and upload reviews!
-  </h3>
-  <div class="mb-3 mt-3 d-flex justify-content-center gap-4">
-    <a class="btn btn-success btn-fixed" href="/register">Register</a>
-    <a class="btn btn-info btn-fixed" href="/login">Login</a>
+<div class="mt-4 text-center">
+  <p class="text-white mb-2">Sign up or log in to add camps and leave reviews.</p>
+  <div class="mb-3 d-flex justify-content-center gap-4">
+    <a class="btn btn-success btn-fixed" href="/register">Sign up</a>
+    <a class="btn btn-light btn-fixed" href="/login">Log in</a>
   </div>
 </div>
 <% } else { %>
-<div class="mt-5 text-center">
-  <div class="mb-3 mt-3 d-flex justify-content-center">
-    <a class="btn btn-success btn-fixed" href="/camps/new">New Camp</a>
+<div class="mt-4 text-center">
+  <div class="mb-3 d-flex justify-content-center">
+    <a class="btn btn-success" href="/camps/new">Add a camp</a>
   </div>
 </div>
 <% } %>
