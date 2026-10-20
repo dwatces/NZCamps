@@ -1,6 +1,11 @@
-// Local development reads .env; tests and production never do.
+// Local development reads .env (Node's built-in loader; existing variables
+// win, as with dotenv). Tests and production never read it.
 if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "test") {
-  require("dotenv").config();
+  try {
+    process.loadEnvFile();
+  } catch {
+    // No .env file: fine.
+  }
 }
 const express = require("express");
 const app = express();
