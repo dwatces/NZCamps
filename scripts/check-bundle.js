@@ -123,7 +123,8 @@ async function main() {
     );
     if (run.status !== 0) {
       console.error("The suite failed against the bundled copy.");
-      process.exit(run.status || 1);
+      process.exitCode = run.status || 1;
+      return;
     }
     console.log("Bundle check passed.");
   } finally {
