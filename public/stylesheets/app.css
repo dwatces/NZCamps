@@ -468,9 +468,13 @@ body {
   height: 100%;
   object-fit: cover;
 }
+/* On phones the card is 16:9, so cover crops the 4:3 drawing top and
+   bottom; keep its foot in view so the tent sits above "No photo yet"
+   instead of under the words. */
 .camp-card__media .photo-placeholder img {
   height: 100%;
   object-fit: cover;
+  object-position: center bottom;
 }
 @media (min-width: 576px) {
   .camp-card {

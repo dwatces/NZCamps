@@ -541,3 +541,11 @@ test("map controls, markers and popup close buttons are 44 px", h.notInBundle, (
     assert.match(src, /iconSize: \[44, 44\]/, file);
   }
 });
+
+test("the no-photo drawing on a phone card keeps the tent above its label", h.notInBundle, () => {
+  // A 16:9 card crops the 4:3 drawing; centred, the tent's base line ran
+  // through "No photo yet" at 320 and 390 px (seen in the T5 screenshots).
+  const rule = /\.camp-card__media \.photo-placeholder img \{([^}]*)\}/.exec(css("app.css"));
+  assert.ok(rule, "a rule for the card placeholder image");
+  assert.match(rule[1], /object-position:\s*center bottom/);
+});

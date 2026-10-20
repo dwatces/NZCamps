@@ -6,6 +6,8 @@
 //   node e2e/server.js --port 7204 --production
 //                                      the database run in production mode,
 //                                      for screenshots and timings
+//   add --samples-only                 only the eight sample camps (for the
+//                                      README screenshots)
 //
 // The database run starts mongodb-memory-server on a port the OS picks, runs
 // the real seeder (the eight labelled sample camps), and adds member camps:
@@ -25,6 +27,7 @@ const ROOT = path.join(__dirname, "..");
 const args = process.argv.slice(2);
 const demo = args.includes("--demo");
 const production = args.includes("--production");
+const samplesOnly = args.includes("--samples-only");
 const portArg = args.indexOf("--port");
 const port = portArg >= 0 ? Number(args[portArg + 1]) : demo ? PORTS.demo : PORTS.db;
 if (!(port >= 7201 && port <= 7209)) throw new Error("Use a port from 7201 to 7209");
@@ -124,7 +127,7 @@ async function main() {
     app = await h.makeApp({ dbUri: db.uri, env });
   }
   app.locals.geocode = geocode;
-  const memberId = demo ? null : await seedMembers(app);
+  const memberId = demo || samplesOnly ? null : await seedMembers(app);
 
   const server = app.listen(port, "127.0.0.1", () => {
     const mode = demo ? "demo mode" : "in-memory MongoDB";
