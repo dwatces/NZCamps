@@ -1,11 +1,11 @@
-const ExpressError = require("./utils/expressError");
-const catchAsync = require("./utils/catchAsync");
-const { campSchema, reviewSchema } = require("./schemas.js");
-const Camp = require("./models/camp");
-const Review = require("./models/review");
-const { formErrors, joiErrors, CAMP_FIELDS, REVIEW_FIELDS } = require("./utils/formErrors");
-const { findCampForShow } = require("./utils/campQueries");
-const { MAX_CAMP_PHOTOS } = require("./cloudinary");
+const ExpressError = require("./expressError");
+const catchAsync = require("./catchAsync");
+const { campSchema, reviewSchema } = require("../schemas.js");
+const Camp = require("../models/camp");
+const Review = require("../models/review");
+const { formErrors, joiErrors, CAMP_FIELDS, REVIEW_FIELDS } = require("./formErrors");
+const { findCampForShow } = require("./campQueries");
+const { MAX_CAMP_PHOTOS } = require("../cloudinary");
 
 const TEXT_FIELDS = ["title", "location", "price", "description"];
 const asText = (v) => (v === undefined || v === null || typeof v === "object" ? "" : String(v));

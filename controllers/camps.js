@@ -1,7 +1,7 @@
 const Camp = require("../models/camp");
 const ExpressError = require("../utils/expressError");
 const { storeImage, destroyImage, STORE_FAILED_MSG } = require("../cloudinary");
-const { renderCampForm, campFormValues } = require("../middleware");
+const { renderCampForm, campFormValues } = require("../utils/middleware");
 const {
   findCampForShow,
   parseListQuery,

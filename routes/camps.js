@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const camps = require("../controllers/camps");
 const catchAsync = require("../utils/catchAsync");
-const { isLoggedIn, isAuthor, validateCamp, validateObjectId } = require("../middleware");
+const { isLoggedIn, isAuthor, validateCamp, validateObjectId } = require("../utils/middleware");
 const { acceptPhotos } = require("../cloudinary");
 
 const validId = validateObjectId("id");

@@ -122,10 +122,10 @@ api/index.js      Vercel entry point (re-exports the app)
 routes/           camps, reviews and user routes
 controllers/      route handlers
 models/           Camp, Review and User (Mongoose)
-middleware.js     login, ownership and validation checks
 schemas.js        Joi validation schemas
 cloudinary/       photo uploads: limits, content checks, Cloudinary or data URIs
-utils/            geocoding, sessions, security headers, view helpers, errors
+utils/            route middleware (login, ownership and validation checks), geocoding,
+                  sessions, security headers, view helpers, errors
 seeds/            sample camps and the database seeder
 views/            EJS templates
 public/           stylesheets, images, browser scripts and vendored libraries
