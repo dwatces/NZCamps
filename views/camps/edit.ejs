@@ -97,8 +97,16 @@
       </div>
       <div class="mb-3 d-flex justify-content-between">
         <button class="btn btn-success">Save changes</button>
-      <a class="btn btn-info btn-fixed" href="/camps/<%= camp._id%>">Back to camp</a>
-    </div>
+        <a class="btn btn-light" href="/camps/<%= camp._id %>">Back to camp</a>
+      </div>
+    </form>
+    <form
+      class="mb-5 text-end"
+      action="/camps/<%= camp._id %>?_method=DELETE"
+      method="POST"
+      data-confirm="Delete this camp and its reviews? This can't be undone."
+    >
+      <button class="btn btn-outline-danger btn-delete-camp">Delete camp</button>
     </form>
   </div>
 </div>

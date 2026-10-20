@@ -85,7 +85,7 @@ module.exports.isAuthor = catchAsync(async (req, res, next) => {
   const camp = await Camp.findById(id);
   if (!camp) throw new ExpressError("Page not found", 404);
   if (!camp.author || !camp.author.equals(req.user._id)) {
-    req.flash("error", "Only the person who added this camp can change it.");
+    req.flash("error", "You can only change camps you added.");
     return res.redirect(`/camps/${id}`);
   }
   req.camp = camp;
@@ -97,7 +97,7 @@ module.exports.isReviewAuthor = catchAsync(async (req, res, next) => {
   const review = await Review.findById(reviewId);
   if (!review) throw new ExpressError("Page not found", 404);
   if (!review.author || !review.author.equals(req.user._id)) {
-    req.flash("error", "Only the person who wrote this review can delete it.");
+    req.flash("error", "You can only delete your own reviews.");
     return res.redirect(`/camps/${id}`);
   }
   next();
