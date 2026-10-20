@@ -1,6 +1,5 @@
 const Camp = require("../models/camp");
 const { fileToImage, destroyImage } = require("../cloudinary");
-const geocodeNZ = require("../utils/geocode");
 
 module.exports.index = async (req, res) => {
   try {
@@ -18,9 +17,9 @@ module.exports.newForm = (req, res) => {
   res.render("camps/new");
 };
 
-module.exports.createCamp = async (req, res, next) => {
+module.exports.createCamp = async (req, res) => {
   try {
-    const coords = await geocodeNZ(req.body.camp.location);
+    const coords = await req.app.locals.geocode(req.body.camp.location);
 
     if (!coords) {
       req.flash("error", "Location not found. Please try again.");

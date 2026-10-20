@@ -1,3 +1,4 @@
+/* global camps */
 // Initialize the map
 const map = L.map("cluster-map").setView([-41, 174], 4.5); // Set to New Zealand's latitude and longitude
 

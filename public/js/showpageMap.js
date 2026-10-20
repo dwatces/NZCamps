@@ -1,3 +1,4 @@
+/* global camp */
 // Replace Mapbox with Leaflet
 console.log("Raw camp data:", camp);
 const coordinates = camp.geometry.coordinates;

@@ -12,7 +12,7 @@ module.exports.createReview = async (req, res) => {
   res.redirect(`/camps/${camp._id}`);
 };
 
-module.exports.deleteReview = async (req, res, next) => {
+module.exports.deleteReview = async (req, res) => {
   const { id, reviewId } = req.params;
   await Camp.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
   await Review.findByIdAndDelete(reviewId);

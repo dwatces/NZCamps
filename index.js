@@ -1,4 +1,5 @@
-if (process.env.NODE_ENV !== "production") {
+// Local development reads .env; tests and production never do.
+if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "test") {
   require("dotenv").config();
 }
 const express = require("express");
@@ -35,6 +36,9 @@ db.once("open", () => {
   console.log("mongodb connected");
 });
 
+// Seam for tests: controllers geocode through app.locals so a stub can be swapped in.
+app.locals.geocode = require("./utils/geocode");
+
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -56,6 +60,7 @@ if (dbUrl) {
   store.on("error", function (e) {
     console.log("Error", e);
   });
+  app.locals.sessionStore = store;
 }
 
 const sessionConfig = {
@@ -126,7 +131,7 @@ app.all("*", (req, res, next) => {
   next(new ExpressError("Page Not Found: 404", 404));
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   const { statusCode = 500 } = err;
   if (!err.mesage) err.mesage = "Error: Something Went Wrong!";
   res.status(statusCode).render("error", { err });
