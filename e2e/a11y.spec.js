@@ -3,7 +3,7 @@
 // - axe-core with the wcag2a, wcag2aa, wcag21a, wcag21aa and wcag22aa tags
 //   must find nothing; its best-practice rules are run and saved, not failed;
 // - every control is a target of at least 44 by 44 px, except links inside a
-//   sentence (WCAG 2.5.8's inline exception) and the map's attribution line;
+//   sentence (WCAG 2.5.8's inline exception); the map's credit links count;
 // - nothing scrolls sideways at 320 px;
 // - with reduced motion, the carousel and both maps do not animate.
 // Results are saved as JSON under test-results/a11y/<project>/.
@@ -43,7 +43,6 @@ const smallTargets = (page) =>
         continue;
       if (target.closest(".visually-hidden")) continue;
       if (r.right <= 0 || r.bottom <= 0) continue; // the skip link until it has focus
-      if (target.closest(".leaflet-control-attribution")) continue;
       if (cs.display === "inline" && target.closest("p, li, dd, figcaption, small, td")) continue;
       if (r.width < 43.5 || r.height < 43.5) {
         const name = (target.textContent || el.getAttribute("aria-label") || el.name || "")

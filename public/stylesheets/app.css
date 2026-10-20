@@ -605,6 +605,21 @@ body {
   font: 1.5rem/var(--nzc-tap) var(--nzc-font);
   color: var(--nzc-ink-muted);
 }
+/* The map credit's two links are 44 px tall too. The map clips anything past
+   its edge, so their focus ring is drawn inside them: the same yellow
+   outline outside a dark ring, both within the link. */
+.leaflet-container .leaflet-control-attribution {
+  padding: 0 0.125rem;
+  line-height: var(--nzc-tap);
+}
+.leaflet-control-attribution a {
+  display: inline-block;
+  padding: 0 0.25rem;
+}
+.leaflet-control-attribution a:focus-visible {
+  outline-offset: -3px !important;
+  box-shadow: inset 0 0 0 5px var(--nzc-focus-halo) !important;
+}
 .leaflet-popup-content {
   margin: 0.875rem 2.75rem 0.875rem 1rem;
 }
