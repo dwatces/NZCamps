@@ -10,6 +10,7 @@ router
   .route("/login")
   .get(users.renderLogin)
   .post(
+    users.storeReturnTo,
     passport.authenticate("local", {
       failureFlash: true,
       failureRedirect: "/login",

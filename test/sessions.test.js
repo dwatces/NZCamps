@@ -186,3 +186,44 @@ test("with NODE_ENV=production and no SECRET the app starts, logs and serves", (
   assert.match(run.stdout, /STATUS 200/);
   assert.match(run.stderr, /SECRET is not set/);
 });
+
+describe("passport 0.7", () => {
+  test("the session id changes on login (no session fixation)", async () => {
+    const agent = h.agentFor(app);
+    const { user } = await agent.signUp();
+    // Logging out leaves an anonymous session (it carries the flash message).
+    const out = await agent.logOut();
+    const before = cookies(out).find((c) => c.startsWith("connect.sid="));
+    assert.ok(before, "a session existed before login");
+    const ok = await agent.logIn(user.username, user.password);
+    const after = cookies(ok).find((c) => c.startsWith("connect.sid="));
+    assert.ok(after, "login sets a new cookie");
+    assert.notEqual(after.split(";")[0], before.split(";")[0]);
+  });
+
+  test("logout redirects instead of failing", async () => {
+    const agent = h.agentFor(app);
+    await agent.signUp();
+    const res = await agent.post("/logout");
+    assert.equal(res.status, 302);
+    assert.equal(res.headers.location, "/camps");
+  });
+
+  test("a session stored by the old passport version still signs you in", async () => {
+    const signature = require("cookie-signature");
+    const agent = h.agentFor(app);
+    const { user } = await agent.signUp();
+    const sid = `legacy-${Date.now()}`;
+    await mongoose.connection.db.collection("sessions").insertOne({
+      _id: sid,
+      expires: new Date(Date.now() + 60 * 60 * 1000),
+      session: JSON.stringify({
+        cookie: { originalMaxAge: 604800000, httpOnly: true, sameSite: "lax", path: "/" },
+        passport: { user: user.username },
+      }),
+    });
+    const cookie = `connect.sid=${encodeURIComponent("s:" + signature.sign(sid, process.env.SECRET))}`;
+    const res = await request(app).get("/camps/new").set("Cookie", cookie);
+    assert.equal(res.status, 200, "signed in from the stored session");
+  });
+});

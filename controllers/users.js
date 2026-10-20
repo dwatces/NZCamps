@@ -48,9 +48,16 @@ module.exports.renderLogin = (req, res) => {
   res.render("users/login");
 };
 
+// Passport 0.6+ regenerates the session on login (closing session fixation),
+// which drops req.session.returnTo; storeReturnTo keeps a copy first.
+module.exports.storeReturnTo = (req, res, next) => {
+  if (req.session && req.session.returnTo) res.locals.returnTo = req.session.returnTo;
+  next();
+};
+
 module.exports.login = (req, res) => {
   req.flash("success", "Welcome back!");
-  const redirectUrl = req.session.returnTo || "/camps";
+  const redirectUrl = res.locals.returnTo || "/camps";
   delete req.session.returnTo;
   res.redirect(redirectUrl);
 };
@@ -59,8 +66,10 @@ module.exports.renderLogout = (req, res) => {
   res.set("Allow", "POST").status(405).render("users/logout");
 };
 
-module.exports.logout = (req, res) => {
-  req.logout();
-  req.flash("success", "Logged out!");
-  res.redirect("/camps");
+module.exports.logout = (req, res, next) => {
+  req.logout((err) => {
+    if (err) return next(err);
+    req.flash("success", "Logged out!");
+    res.redirect("/camps");
+  });
 };
