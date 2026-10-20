@@ -198,19 +198,19 @@
       if (!visible || !max) return;
       var format = new Intl.NumberFormat("en-NZ");
       var timer = null;
-      function text() {
-        var left = Math.max(0, max - area.value.length);
-        return format.format(left) + (left === 1 ? " character left" : " characters left");
+      function left() {
+        return Math.max(0, max - area.value.length);
       }
       function update() {
-        visible.textContent = text();
+        visible.textContent = format.format(left()) + " left";
         if (!live) return;
         clearTimeout(timer);
         timer = setTimeout(function () {
-          live.textContent = text();
+          var n = left();
+          live.textContent = format.format(n) + (n === 1 ? " character left" : " characters left");
         }, 1000);
       }
-      visible.textContent = text();
+      visible.textContent = format.format(left()) + " left";
       area.addEventListener("input", update);
     },
   );

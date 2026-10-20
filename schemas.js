@@ -31,7 +31,7 @@ const price = Joi.string()
     "string.empty": PRICE_MSG,
     "string.base": PRICE_MSG,
     "any.required": PRICE_MSG,
-    "price.max": `Prices go up to $${PRICE_MAX} a night.`,
+    "price.max": `Prices go up to $${PRICE_MAX.toLocaleString("en-NZ")} a night.`,
   });
 
 module.exports.campSchema = Joi.object({
