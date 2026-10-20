@@ -6,6 +6,9 @@
 
 <div class="responsive__column row mt-5">
   <div class="col-lg-6 col-sm-10">
+    <% if (!camp.images.length) { %>
+    <%- include('../partials/noPhoto') %>
+    <% } else { %>
     <div id="campCarousel" class="carousel slide" data-bs-ride="carousel">
       <div class="carousel-inner">
         <% camp.images.forEach((img, i) => { %>
@@ -41,6 +44,7 @@
       </button>
       <% } %>
     </div>
+    <% } %>
     <div class="card mt-3 mb-3">
       <div class="card-body">
         <h5 class="card-title"><%= camp.title%></h5>
@@ -141,6 +145,14 @@
       </div>
       <button class="btn btn-success">Submit</button>
     </form>
+    <% } %>
+    <% if (!camp.reviews.length) { %>
+    <div class="reviews-empty">
+      <p class="mb-2">No reviews yet. Be the first to leave one.</p>
+      <% if (!user) { %>
+      <a class="btn btn-success" href="/login">Log in to leave a review</a>
+      <% } %>
+    </div>
     <% } %>
     <% if (isSample(camp) && camp.reviews.length) { %>
     <p class="sample-note">Reviews on sample listings are test entries.</p>

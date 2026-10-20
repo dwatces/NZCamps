@@ -123,7 +123,7 @@ app.use((req, res, next) => {
 // but unreachable (an outage) writes get a 503 page directly: no flash and no
 // session write, so a returning visitor's real cookie is left alone.
 const OUTAGE_MSG =
-  "The database isn't reachable right now, so you can browse sample camps but not save changes";
+  "The database isn't reachable right now, so you can browse sample camps but not save changes.";
 app.use((req, res, next) => {
   if (mongoose.connection.readyState === 1) return next();
   if (req.method === "GET" && req.path === "/camps")
@@ -135,7 +135,11 @@ app.use((req, res, next) => {
   }
   if (req.method !== "GET") {
     if (dbUrl) {
-      return res.status(503).render("error", { status: 503, message: OUTAGE_MSG, err: {} });
+      return res.status(503).render("error", {
+        status: 503,
+        title: "Changes can't be saved right now",
+        message: OUTAGE_MSG,
+      });
     }
     req.flash(
       "error",
@@ -158,17 +162,30 @@ app.all("*", (req, res, next) => {
   next(new ExpressError("Page not found", 404));
 });
 
-// Users see a plain message, never a database or library error text.
+// Users see a plain message, never a database or library error text. The
+// stack trace is shown only in local development.
+const ERROR_PAGES = {
+  404: {
+    title: "Page not found",
+    message:
+      "There's no page at this address. The link may be wrong, or the page may have been removed.",
+  },
+  500: {
+    title: "Something went wrong",
+    message: "We couldn't load this page. Please try again in a minute.",
+  },
+};
 app.use((err, req, res, _next) => {
   let status = err.statusCode || err.status || 500;
   if (err.name === "CastError") status = 404;
-  let message;
-  if (status === 404) message = "Page not found";
-  else if (err instanceof ExpressError && err.message) message = err.message;
-  else if (status < 500 && err.expose && err.message) message = err.message;
-  else message = "Something went wrong";
+  let page = ERROR_PAGES[status];
+  if (!page) {
+    const ownMessage = (err instanceof ExpressError || (status < 500 && err.expose)) && err.message;
+    page = ownMessage ? { title: err.message, message: "" } : ERROR_PAGES[500];
+  }
   if (status >= 500) console.error(err);
-  res.status(status).render("error", { err, status, message });
+  const stack = process.env.NODE_ENV === "development" && status >= 500 ? err.stack : "";
+  res.status(status).render("error", { status, ...page, stack });
 });
 
 const port = process.env.PORT || 3000;

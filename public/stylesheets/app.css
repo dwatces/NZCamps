@@ -75,3 +75,46 @@
 .photo-credit a {
   color: #fff;
 }
+
+/* "No photo yet": a camp without photos. */
+.photo-placeholder {
+  position: relative;
+  margin: 0;
+  background-color: #24392c;
+}
+.photo-placeholder img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.photo-placeholder figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.75rem;
+  text-align: center;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Error pages: a solid panel, and a stack trace (development only) that
+   scrolls inside the panel instead of widening the page. */
+.error-panel {
+  background-color: #fff;
+}
+.error-stack {
+  max-width: 100%;
+  max-height: 20rem;
+  overflow: auto;
+  white-space: pre;
+  background-color: #f4f4f4;
+  padding: 0.75rem;
+}
+
+.reviews-empty {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+}

@@ -22,8 +22,9 @@ module.exports = function sameOriginWrites(req, res, next) {
   if (isSameOriginWrite(req)) return next();
   res.status(403).render("error", {
     status: 403,
-    message: "This form was sent from another website",
-    err: {},
+    title: "This form was sent from another website",
+    message:
+      "NZ Camps only accepts forms sent from its own pages. Go back to NZ Camps, reload the page and try again.",
   });
 };
 
