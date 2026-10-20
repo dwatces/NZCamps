@@ -89,3 +89,12 @@ test("without DB_URL, HEAD requests are reads, not refused writes", async () => 
   assert.equal((await h.agentFor(app).head("/camps")).status, 200);
   assert.equal((await h.agentFor(app).head("/camps/demo2")).status, 200);
 });
+
+// D3: the photo credits page needs no database.
+test("without DB_URL, the photo credits page renders with the banner", async () => {
+  const res = await h.agentFor(app).get("/credits");
+  assert.equal(res.status, 200);
+  assert.match(res.text, /<h1[^>]*>Photo credits<\/h1>/);
+  assert.match(res.text, /<p class="demo-banner[^"]*">Showing sample camps\./);
+  assert.match(res.text, /Robert Koorenny/);
+});
