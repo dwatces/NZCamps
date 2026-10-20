@@ -1,0 +1,17 @@
+<%#
+  One camp photo at the widths its slot can use (responsivePhoto in
+  utils/viewHelpers.js). Locals: camp, img, alt, widths, sizes, width and
+  height (the slot's shape; CSS crops the photo into it with object-fit),
+  cls, and eager (true for the first photo on screen: fetched first, not
+  lazy).
+%>
+<% const r = responsivePhoto(camp, img, widths); %>
+<% const loading = typeof eager !== "undefined" && eager ? 'fetchpriority="high"' : 'loading="lazy"'; %>
+<% if (r.avif) { %>
+<picture>
+  <source type="image/avif" srcset="<%= r.avif %>" sizes="<%= sizes %>" />
+  <img class="<%= cls %>" src="<%= r.src %>" srcset="<%= r.jpeg %>" sizes="<%= sizes %>" width="<%= width %>" height="<%= height %>" alt="<%= alt %>" decoding="async" <%- loading %> />
+</picture>
+<% } else { %>
+<img class="<%= cls %>" src="<%= r.src %>"<% if (r.srcset) { %> srcset="<%= r.srcset %>" sizes="<%= sizes %>"<% } %> width="<%= width %>" height="<%= height %>" alt="<%= alt %>" decoding="async" <%- loading %> />
+<% } %>

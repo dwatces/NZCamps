@@ -299,3 +299,68 @@ test("the home photo is a responsive picture, fetched first, never preloaded", a
   assert.doesNotMatch(html, /rel="preload"/);
   assert.doesNotMatch(html, /robert-koorenny/);
 });
+
+// ---------- D6: camps list ----------
+
+async function campWithSamplePhoto(title) {
+  const Camp = require("../models/camp");
+  const agent = h.agentFor(app);
+  await agent.signUp();
+  const id = h.campIdFrom(await agent.createCamp({ title }));
+  await Camp.updateOne(
+    { _id: id },
+    { $push: { images: { url: "/stylesheets/anderson-aguirre-bjTQqa6o_cM-unsplash.jpg" } } },
+  );
+  return { id, agent };
+}
+
+test("the list sits beside a map panel, with a List | Map toggle for small screens", async () => {
+  const html = (await request(app).get("/camps")).text;
+  assert.match(html, /<div class="camps-layout__list" id="camp-list-panel">/);
+  assert.match(html, /<div class="camps-layout__map" id="camp-map-panel" hidden>/);
+  assert.match(
+    html,
+    /<div id="cluster-map" class="camp-map" role="region" aria-label="Map of the camps in this list">/,
+  );
+  assert.match(
+    html,
+    /<div class="view-toggle is-pending" role="group" aria-label="Show camps as">/,
+  );
+  assert.match(html, /data-view="list" aria-pressed="true" aria-controls="camp-list-panel">List</);
+  assert.match(html, /data-view="map" aria-pressed="false" aria-controls="camp-map-panel">Map</);
+});
+
+test("cards: the title is the link, photos are small responsive AVIF with a size", async () => {
+  const { id } = await campWithSamplePhoto("Card Photo Camp");
+  const html = (await request(app).get("/camps?q=card+photo")).text;
+  const card = /<li class="camp-card">([\s\S]*?)<\/li>/.exec(html)[1];
+  assert.match(
+    card,
+    new RegExp(
+      `<h2 class="camp-card__heading"><a class="camp-card__title" href="/camps/${id}">Card Photo Camp</a></h2>`,
+    ),
+  );
+  assert.match(
+    card,
+    /<source type="image\/avif" srcset="\/images\/anderson-aguirre-480\.avif 480w, \/images\/anderson-aguirre-800\.avif 800w"/,
+  );
+  assert.match(
+    card,
+    /<img class="camp-card__img" src="\/images\/anderson-aguirre-800\.jpg"[^>]*width="800" height="600"[^>]*loading="lazy"/,
+  );
+  assert.doesNotMatch(card, /1200|1920|\/stylesheets\//, "no large or original files on a card");
+  assert.match(card, /View camp<span class="visually-hidden">: Card Photo Camp<\/span>/);
+});
+
+test("signed out: one Sign up button and a log in link; signed in: no duplicate add button", async () => {
+  const out = (await request(app).get("/camps")).text;
+  assert.match(
+    out,
+    /<p class="list-head__join">\s*<a class="btn btn-primary btn-sm" href="\/register">Sign up<\/a>\s*<span>or <a href="\/login">log in<\/a>/,
+  );
+  const agent = h.agentFor(app);
+  await agent.signUp();
+  const main = (await agent.get("/camps")).text.split('<main id="main"')[1];
+  assert.doesNotMatch(main, /href="\/camps\/new"/, "Add a camp is in the header only");
+  assert.doesNotMatch(main, /list-head__join/);
+});

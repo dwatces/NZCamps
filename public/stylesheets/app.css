@@ -252,16 +252,6 @@ body {
   border-radius: 0.375rem;
 }
 
-/* ---------- Maps ---------- */
-#cluster-map {
-  width: 100%;
-  height: 500px;
-}
-#map {
-  width: 100%;
-  height: 400px;
-}
-
 /* ---------- Cards and photos ---------- */
 .card-img-top {
   height: auto;
@@ -295,30 +285,319 @@ body {
   font-weight: 600;
 }
 
-/* ---------- Camps list ---------- */
+/* ---------- Camps list ----------
+   A dark panel for the heading, search and count; then the cards and, from
+   992 px, a sticky map beside them. Below 992 px the List | Map toggle in
+   clusterMap.js shows one panel at a time (list first). */
+.list-head {
+  margin-bottom: 1rem;
+}
+.list-head__title {
+  margin: 0 0 0.375rem;
+  font-size: clamp(1.75rem, 1.4rem + 1.5vw, 2.5rem);
+}
+.list-head__intro {
+  margin: 0 0 0.75rem;
+  color: var(--nzc-on-night-muted);
+}
+.list-head__join {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.625rem;
+  margin: 0 0 0.875rem;
+}
+.camp-search {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "q q"
+    "sort go";
+  gap: 0.75rem;
+  align-items: end;
+}
+.camp-search__q {
+  grid-area: q;
+}
+.camp-search__sort {
+  grid-area: sort;
+}
+.camp-search__go {
+  grid-area: go;
+  min-width: 6.5rem;
+}
+.camp-search .form-label {
+  margin-bottom: 0.25rem;
+  color: var(--nzc-on-night);
+}
+@media (min-width: 768px) {
+  .camp-search {
+    grid-template-columns: 1fr 14rem auto;
+    grid-template-areas: "q sort go";
+  }
+}
+.list-head__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-top: 1rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
 .results-count {
   font-weight: 600;
 }
-.list-empty {
-  color: #fff;
-  background-color: rgba(0, 0, 0, 0.7);
-  padding: 0.75rem 1rem;
-  border-radius: 0.375rem;
+.results-count a {
+  font-weight: 500;
 }
-.list-empty a {
-  color: #fff;
+@media (max-width: 575.98px) {
+  .list-head__intro {
+    display: none;
+  }
 }
-.camp-meta > span {
-  margin-right: 0.25rem;
+
+/* List | Map toggle: two buttons with aria-pressed. */
+.view-toggle {
+  display: inline-flex;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.view-toggle.is-pending {
+  visibility: hidden;
+}
+.view-toggle__btn {
+  min-width: 4.5rem;
+  min-height: var(--nzc-tap);
+  padding: 0 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #fff;
+  font-weight: 600;
+}
+.view-toggle__btn[aria-pressed="true"] {
+  background-color: #fff;
+  color: var(--nzc-ink);
+}
+@media (min-width: 992px) {
+  .view-toggle {
+    display: none;
+  }
+}
+
+.camps-layout {
+  display: grid;
+  gap: 1rem;
+}
+.camps-layout__list[hidden],
+.camps-layout__map[hidden] {
+  display: none;
+}
+@media (min-width: 992px) {
+  .camps-layout {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 1.5rem;
+    align-items: start;
+  }
+  /* Side by side, both panels always show, whatever the toggle last did
+     (!important to beat Bootstrap's [hidden] { display: none !important }). */
+  .camps-layout__list[hidden],
+  .camps-layout__map[hidden] {
+    display: block !important;
+  }
+  .camps-layout__map {
+    position: sticky;
+    top: calc(var(--nzc-header-h) + 1.25rem);
+  }
+}
+.camp-map {
+  height: min(70vh, 34rem);
+  min-height: 22rem;
+  border-radius: var(--nzc-radius);
+  background-color: #dfe6e1;
+  box-shadow: var(--nzc-shadow);
+}
+@media (min-width: 992px) {
+  .camp-map {
+    height: calc(100vh - var(--nzc-header-h) - 2.5rem);
+    max-height: 48rem;
+  }
+}
+.camp-map__fallback {
+  margin: 0;
+  padding: 1.5rem;
+  color: var(--nzc-ink-muted);
+  text-align: center;
+}
+
+/* Cards: the title is the main link and the whole card is clickable. */
+.camp-list {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+}
+.camp-card {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  border-radius: var(--nzc-radius);
+  background-color: var(--nzc-surface);
+  box-shadow: var(--nzc-shadow);
+}
+.camp-card__media {
+  aspect-ratio: 16 / 9;
+  background-color: #24392c;
+}
+.camp-card__media img,
+.camp-card__media .photo-placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.camp-card__media .photo-placeholder img {
+  height: 100%;
+  object-fit: cover;
+}
+@media (min-width: 576px) {
+  .camp-card {
+    grid-template-columns: 34% 1fr;
+  }
+  /* Beside the text the photo fills the card's height (at least 4:3). */
+  .camp-card__media {
+    aspect-ratio: auto;
+    min-height: 10rem;
+    overflow: hidden;
+  }
+}
+@media (min-width: 992px) {
+  .camp-card {
+    grid-template-columns: 13rem 1fr;
+  }
+}
+.camp-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 1rem 1.125rem 1.125rem;
+}
+.camp-card__heading {
+  margin: 0;
+  font-size: 1.1875rem;
 }
 .camp-card__title {
-  color: inherit;
+  color: var(--nzc-ink);
+  text-decoration: none;
+}
+.camp-card__title::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.camp-card__title:hover {
+  color: var(--nzc-green-700);
+  text-decoration: underline;
+}
+.camp-card__badge {
+  margin: 0;
+}
+.camp-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.375rem;
+  margin: 0;
+  color: var(--nzc-ink-muted);
+  font-size: 0.9375rem;
+}
+.camp-card__excerpt {
+  margin: 0;
+  color: var(--nzc-ink);
+  font-size: 0.9375rem;
+}
+.camp-card__cta {
+  position: relative;
+  z-index: 1;
+  align-self: flex-start;
+  margin-top: 0.375rem;
 }
 .rating-star {
   color: var(--nzc-star);
 }
+.list-empty a {
+  font-weight: 600;
+}
+
+/* Pagination: 44 px targets in the brand green. */
+.list-pages {
+  margin-top: 1.5rem;
+}
+.pagination {
+  --bs-pagination-padding-x: 0.875rem;
+  --bs-pagination-padding-y: 0.5rem;
+  --bs-pagination-color: var(--nzc-green-700);
+  --bs-pagination-hover-color: var(--nzc-green-900);
+  --bs-pagination-active-bg: var(--nzc-green-700);
+  --bs-pagination-active-border-color: var(--nzc-green-700);
+  --bs-pagination-disabled-color: var(--nzc-ink-muted);
+  gap: 0.25rem 0;
+}
+.page-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--nzc-tap);
+  min-height: var(--nzc-tap);
+}
+
+/* Map markers, clusters and popups. */
+.camp-pin {
+  background: url("/images/pin.svg") center bottom / 30px 40px no-repeat;
+}
+/* .leaflet-marker-icon sets display: block; this needs to beat it. */
+.leaflet-marker-icon.camp-cluster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: rgba(24, 165, 88, 0.35);
+}
+.camp-cluster__count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background-color: var(--nzc-green-700);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+.map-popup {
+  font-family: var(--nzc-font);
+  font-size: 0.875rem;
+}
+.map-popup__title {
+  margin: 0 0 0.25rem;
+  font-weight: 700;
+  font-size: 1rem;
+}
+.map-popup__meta {
+  margin: 0;
+}
+.map-popup .badge {
+  margin-bottom: 0.25rem;
+}
 
 /* ---------- Camp page ---------- */
+#map {
+  width: 100%;
+  height: 400px;
+}
 .reviews-empty {
   color: #fff;
   background-color: rgba(0, 0, 0, 0.7);
@@ -645,7 +924,7 @@ body {
 }
 /* Panels: solid surfaces for text that would otherwise sit on a photo. */
 .panel {
-  padding: 1.25rem;
+  padding: 1.125rem 1rem;
   border-radius: var(--nzc-radius);
   background-color: var(--nzc-surface);
   box-shadow: var(--nzc-shadow);
@@ -655,6 +934,15 @@ body {
   .panel {
     padding: 1.75rem 2rem;
   }
+}
+/* Dark panel: solid, so its text contrast never depends on the photo. */
+.panel--dark {
+  background-color: var(--nzc-panel-dark);
+  color: var(--nzc-on-night);
+  box-shadow: none;
+}
+.panel--dark a:not(.btn) {
+  color: #fff;
 }
 .panel--narrow {
   max-width: 46rem;

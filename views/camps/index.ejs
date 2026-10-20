@@ -6,131 +6,135 @@
 %>
 <% block('styles', '<link rel="stylesheet" href="/vendor/leaflet-1.9.4/leaflet.css" />') %>
 <% block('styles', '<link rel="stylesheet" href="/vendor/leaflet.markercluster-1.5.3/MarkerCluster.css" />') %>
-<% block('styles', '<link rel="stylesheet" href="/vendor/leaflet.markercluster-1.5.3/MarkerCluster.Default.css" />') %>
 <% block('scripts', '<script defer src="/vendor/leaflet-1.9.4/leaflet.js"></script>') %>
 <% block('scripts', '<script defer src="/vendor/leaflet.markercluster-1.5.3/leaflet.markercluster.js"></script>') %>
 <% block('scripts', '<script defer src="/js/clusterMap.js"></script>') %>
-<div class="mt-5">
-  <h1 class="text-center text-white">Explore camps</h1>
-</div>
-<% if(!user) { %>
-<div class="mt-4 text-center">
-  <p class="text-white mb-2">Sign up or log in to add camps and leave reviews.</p>
-  <div class="mb-3 d-flex justify-content-center gap-4">
-    <a class="btn btn-primary btn-fixed" href="/register">Sign up</a>
-    <a class="btn btn-outline-primary btn-fixed" href="/login">Log in</a>
-  </div>
-</div>
-<% } else { %>
-<div class="mt-4 text-center">
-  <div class="mb-3 d-flex justify-content-center">
-    <a class="btn btn-primary" href="/camps/new">Add a camp</a>
-  </div>
-</div>
-<% } %>
-
-<form class="camp-search row g-2 align-items-end mb-2" action="/camps" method="get" role="search" aria-label="Camps">
-  <div class="col-12 col-md-6">
-    <label class="form-label text-white" for="q">Search by name or place</label>
-    <input class="form-control" type="search" id="q" name="q" maxlength="60" value="<%= params.q %>" autocomplete="off" />
-  </div>
-  <div class="col-7 col-md-4">
-    <label class="form-label text-white" for="sort">Sort by</label>
-    <select class="form-select" id="sort" name="sort">
-      <% for (const [value, label] of sortOptions) { %>
-      <option value="<%= value %>"<%= params.sort === value ? ' selected' : '' %>><%= label %></option>
-      <% } %>
-    </select>
-  </div>
-  <div class="col-5 col-md-2">
-    <button class="btn btn-primary w-100" type="submit">Search</button>
-  </div>
-</form>
-
-<p class="results-count text-white mb-3">
-  <%= countText %>
-  <% if (params.q) { %>
-  <a class="link-light ms-2" href="<%= listUrl({ q: '', sort: params.sort }) %>">Clear search</a>
+<% block('pageClass', 'container page camps-page') %>
+<section class="panel panel--dark list-head" aria-labelledby="list-title">
+  <h1 class="list-head__title" id="list-title">Explore camps</h1>
+  <p class="list-head__intro">Campgrounds around Aotearoa, with prices, ratings and reviews.</p>
+  <% if (!user) { %>
+  <p class="list-head__join">
+    <a class="btn btn-primary btn-sm" href="/register">Sign up</a>
+    <span>or <a href="/login">log in</a> to add camps and leave reviews.</span>
+  </p>
   <% } %>
-</p>
-
-<div id="cluster-map"></div>
-<div class="mb-4"></div>
-
-<% if (!camps.length) { %>
-<div class="list-empty mb-4">
-  <% if (total > 0) { %>
-  <p class="mb-0">Page <%= params.page %> is past the end of the list. <a href="<%= listUrl(params, 1) %>">Go to page 1</a>.</p>
-  <% } else if (params.q) { %>
-  <p class="mb-0">Try a shorter name, or a nearby town, lake or park. <a href="<%= listUrl({ q: '', sort: params.sort }) %>">See all camps</a>.</p>
-  <% } else if (user) { %>
-  <p class="mb-0">Nobody has added a camp yet. <a href="/camps/new">Add the first one</a>.</p>
-  <% } else { %>
-  <p class="mb-0">Nobody has added a camp yet. <a href="/register">Sign up</a> to add the first one.</p>
-  <% } %>
-</div>
-<% } %>
-
-<% if (camps.length) { %>
-<ul class="list-unstyled camp-list">
-  <% for (const camp of camps) { %>
-  <li class="card mb-3">
-    <div class="row g-0">
-      <div class="col-md-4">
-        <% if (camp.images && camp.images.length) { %>
-        <img class="img-fluid camp-card__img" src="<%= imageUrl(camp, camp.images[0], 800) %>" alt="<%= photoAlt(camp.images[0], camp) %>" />
-        <% } else { %>
-        <%- include('../partials/noPhoto') %>
+  <form class="camp-search" action="/camps" method="get" role="search" aria-label="Camps">
+    <div class="camp-search__q">
+      <label class="form-label" for="q">Search by name or place</label>
+      <input class="form-control" type="search" id="q" name="q" maxlength="60" value="<%= params.q %>" autocomplete="off" />
+    </div>
+    <div class="camp-search__sort">
+      <label class="form-label" for="sort">Sort by</label>
+      <select class="form-select" id="sort" name="sort">
+        <% for (const [value, label] of sortOptions) { %>
+        <option value="<%= value %>"<%= params.sort === value ? ' selected' : '' %>><%= label %></option>
         <% } %>
-      </div>
-      <div class="col-md-8">
-        <div class="card-body d-flex flex-column h-100">
-          <h2 class="h5 card-title"><a class="camp-card__title" href="/camps/<%= camp._id %>"><%= camp.title %></a></h2>
-          <% if (isSample(camp)) { %>
-          <p class="mb-2"><span class="badge badge-sample">Sample listing</span></p>
+      </select>
+    </div>
+    <button class="btn btn-primary camp-search__go" type="submit">Search</button>
+  </form>
+  <div class="list-head__bar">
+    <p class="results-count mb-0">
+      <%= countText %>
+      <% if (params.q) { %>
+      <a class="ms-2" href="<%= listUrl({ q: '', sort: params.sort }) %>">Clear search</a>
+      <% } %>
+    </p>
+    <%# Below 992 px, where the list and the map share the space. It keeps its
+        place while invisible, and clusterMap.js makes it visible. %>
+    <div class="view-toggle is-pending" role="group" aria-label="Show camps as">
+      <button type="button" class="view-toggle__btn" data-view="list" aria-pressed="true" aria-controls="camp-list-panel">List</button>
+      <button type="button" class="view-toggle__btn" data-view="map" aria-pressed="false" aria-controls="camp-map-panel">Map</button>
+    </div>
+  </div>
+</section>
+
+<div class="camps-layout">
+  <div class="camps-layout__list" id="camp-list-panel">
+    <% if (!camps.length) { %>
+    <div class="panel list-empty">
+      <% if (total > 0) { %>
+      <p class="mb-0">Page <%= params.page %> is past the end of the list. <a href="<%= listUrl(params, 1) %>">Go to page 1</a>.</p>
+      <% } else if (params.q) { %>
+      <p class="mb-0">Try a shorter name, or a nearby town, lake or park. <a href="<%= listUrl({ q: '', sort: params.sort }) %>">See all camps</a>.</p>
+      <% } else if (user) { %>
+      <p class="mb-0">Nobody has added a camp yet. <a href="/camps/new">Add the first one</a>.</p>
+      <% } else { %>
+      <p class="mb-0">Nobody has added a camp yet. <a href="/register">Sign up</a> to add the first one.</p>
+      <% } %>
+    </div>
+    <% } else { %>
+    <ul class="list-unstyled camp-list">
+      <% for (const camp of camps) { %>
+      <li class="camp-card">
+        <div class="camp-card__media">
+          <% if (camp.images && camp.images.length) { %>
+          <%- include('../partials/photo', {
+            camp,
+            img: camp.images[0],
+            alt: photoAlt(camp.images[0], camp),
+            widths: [480, 800],
+            sizes: '(min-width: 992px) 13rem, (min-width: 576px) 34vw, calc(100vw - 2rem)',
+            width: 800,
+            height: 600,
+            cls: 'camp-card__img',
+            eager: false,
+          }) %>
+          <% } else { %>
+          <%- include('../partials/noPhoto') %>
           <% } %>
-          <p class="card-text camp-meta mb-2">
+        </div>
+        <div class="camp-card__body">
+          <h2 class="camp-card__heading"><a class="camp-card__title" href="/camps/<%= camp._id %>"><%= camp.title %></a></h2>
+          <% if (isSample(camp)) { %>
+          <p class="camp-card__badge"><span class="badge badge-sample">Sample listing</span></p>
+          <% } %>
+          <p class="camp-meta">
             <span><%= camp.location %></span>
             <span aria-hidden="true">&middot;</span>
             <span><%= formatPrice(camp.price) %></span>
             <span aria-hidden="true">&middot;</span>
             <%- include('../partials/rating', { camp }) %>
           </p>
-          <p class="card-text"><%= excerpt(camp.description, 140) %></p>
-          <div class="mt-auto">
-            <a class="btn btn-primary" href="/camps/<%= camp._id %>">View camp<span class="visually-hidden">: <%= camp.title %></span></a>
-          </div>
+          <p class="camp-card__excerpt"><%= excerpt(camp.description, 140) %></p>
+          <a class="btn btn-outline-primary btn-sm camp-card__cta" href="/camps/<%= camp._id %>">View camp<span class="visually-hidden">: <%= camp.title %></span></a>
         </div>
-      </div>
-    </div>
-  </li>
-  <% } %>
-</ul>
-<% } %>
-
-<% if (pages > 1) { %>
-<nav aria-label="Pagination" class="mb-5">
-  <ul class="pagination justify-content-center flex-wrap">
-    <li class="page-item<%= params.page <= 1 ? ' disabled' : '' %>">
-      <% if (params.page > 1) { %>
-      <a class="page-link" href="<%= listUrl(params, Math.min(params.page - 1, pages)) %>">Previous</a>
-      <% } else { %>
-      <span class="page-link">Previous</span>
+      </li>
       <% } %>
-    </li>
-    <% for (let n = 1; n <= pages; n++) { %>
-    <li class="page-item<%= n === params.page ? ' active' : '' %>">
-      <a class="page-link" href="<%= listUrl(params, n) %>"<% if (n === params.page) { %> aria-current="page"<% } %>><span class="visually-hidden">Page </span><%= n %></a>
-    </li>
+    </ul>
     <% } %>
-    <li class="page-item<%= params.page >= pages ? ' disabled' : '' %>">
-      <% if (params.page < pages) { %>
-      <a class="page-link" href="<%= listUrl(params, params.page + 1) %>">Next</a>
-      <% } else { %>
-      <span class="page-link">Next</span>
-      <% } %>
-    </li>
-  </ul>
-</nav>
-<% } %>
+    <% if (pages > 1) { %>
+    <nav aria-label="Pagination" class="list-pages">
+      <ul class="pagination justify-content-center flex-wrap">
+        <li class="page-item<%= params.page <= 1 ? ' disabled' : '' %>">
+          <% if (params.page > 1) { %>
+          <a class="page-link" href="<%= listUrl(params, Math.min(params.page - 1, pages)) %>">Previous</a>
+          <% } else { %>
+          <span class="page-link">Previous</span>
+          <% } %>
+        </li>
+        <% for (let n = 1; n <= pages; n++) { %>
+        <li class="page-item<%= n === params.page ? ' active' : '' %>">
+          <a class="page-link" href="<%= listUrl(params, n) %>"<% if (n === params.page) { %> aria-current="page"<% } %>><span class="visually-hidden">Page </span><%= n %></a>
+        </li>
+        <% } %>
+        <li class="page-item<%= params.page >= pages ? ' disabled' : '' %>">
+          <% if (params.page < pages) { %>
+          <a class="page-link" href="<%= listUrl(params, params.page + 1) %>">Next</a>
+          <% } else { %>
+          <span class="page-link">Next</span>
+          <% } %>
+        </li>
+      </ul>
+    </nav>
+    <% } %>
+  </div>
+  <%# Hidden until chosen below 992 px; always shown beside the list from 992 px (app.css). %>
+  <div class="camps-layout__map" id="camp-map-panel" hidden>
+    <div id="cluster-map" class="camp-map" role="region" aria-label="Map of the camps in this list">
+      <p class="camp-map__fallback">The map needs JavaScript.</p>
+    </div>
+  </div>
+</div>
 <script type="application/json" id="camps-data"><%- safeJson(mapPoints(mapCamps)) %></script>
