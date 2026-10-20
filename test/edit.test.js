@@ -131,6 +131,25 @@ test("each remove-photo checkbox has a name and a 44 px label", async () => {
   assert.match(html, /this one has room for 4 more/);
 });
 
+test("the edit form shows a stored price with two decimals, and whole prices as they are", async () => {
+  const cents = h.campIdFrom(await agent.createCamp({ title: "Cents", price: "18.50" }));
+  const whole = h.campIdFrom(await agent.createCamp({ title: "Whole", price: "20" }));
+  assert.match(
+    (await agent.get(`/camps/${cents}/edit`)).text,
+    /name="camp\[price\]"\s+value="18\.50"/,
+  );
+  assert.match((await agent.get(`/camps/${whole}/edit`)).text, /name="camp\[price\]"\s+value="20"/);
+  // What someone typed comes back as typed.
+  const res = await agent
+    .post(`/camps/${cents}?_method=PUT`)
+    .field("camp[title]", "")
+    .field("camp[location]", "Wellington")
+    .field("camp[price]", "18.5")
+    .field("camp[description]", "Typed values stay as typed.");
+  assert.equal(res.status, 422);
+  assert.match(res.text, /name="camp\[price\]"\s+value="18\.5"/);
+});
+
 test("a camp without photos has no remove section", async () => {
   const id = h.campIdFrom(await agent.createCamp({ title: "No Photos Here" }));
   const html = (await agent.get(`/camps/${id}/edit`)).text;

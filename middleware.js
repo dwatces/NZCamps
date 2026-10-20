@@ -15,6 +15,11 @@ const asText = (v) => (v === undefined || v === null || typeof v === "object" ? 
 function campFormValues(source = {}, deleteImages = []) {
   const values = {};
   for (const f of TEXT_FIELDS) values[f] = asText(source[f]);
+  // A stored price of 18.5 opens the edit form as 18.50, as the form's help
+  // text and the camp pages write it. Typed values are kept as typed.
+  if (typeof source.price === "number" && !Number.isInteger(source.price)) {
+    values.price = source.price.toFixed(2);
+  }
   values.deleteImages = [].concat(deleteImages || []).filter((v) => typeof v === "string");
   return values;
 }
