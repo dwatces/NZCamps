@@ -3,6 +3,12 @@
    libraries. Colours come from tokens.css. */
 
 /* ---------- Base ---------- */
+/* Whatever the browser scrolls to (the error summary taking focus, a field
+   reached from one of its links, the skip link's target) stops below the
+   sticky header instead of under it. */
+html {
+  scroll-padding-top: calc(var(--nzc-header-h) + 1rem);
+}
 body {
   font-family: var(--nzc-font);
   line-height: 1.55;

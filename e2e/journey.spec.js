@@ -240,6 +240,40 @@ test.describe("error summaries", () => {
     await expect(summary).toBeHidden();
   });
 
+  // The button is at the bottom of the form, so on a phone the page is
+  // scrolled down when it is pressed. Focus then moves up to the summary,
+  // which must land below the sticky header, not under it.
+  test("the summary's heading is not hidden under the header", async ({ page }) => {
+    await logIn(page);
+    for (const [url, button] of [
+      ["/camps/new", "Add camp"],
+      [null, "Post review"],
+    ]) {
+      if (url) {
+        await page.goto(url);
+      } else {
+        const res = await page.request.get(`/camps?q=${encodeURIComponent(NO_PHOTO_TITLE)}`);
+        const m = /class="camp-card__title" href="(\/camps\/[^"]+)"/.exec(await res.text());
+        expect(m, `a camp called ${NO_PHOTO_TITLE}`).not.toBeNull();
+        await page.goto(m[1]);
+      }
+      await page.evaluate(() =>
+        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }),
+      );
+      await page.getByRole("button", { name: button }).click();
+      const summary = page.locator("#form-errors");
+      await expect(summary).toBeFocused();
+      // The page may scroll smoothly, so wait for it to come to rest.
+      const header = await page.locator(".site-header").boundingBox();
+      const heading = summary.getByRole("heading", { name: "There's a problem" });
+      await expect
+        .poll(async () => (await heading.boundingBox()).y, {
+          message: `${button}: the heading's top, below the header's bottom`,
+        })
+        .toBeGreaterThanOrEqual(header.y + header.height);
+    }
+  });
+
   test("the server's summary loses its line when that field is fixed", async ({ page, guard }) => {
     guard.allow(/\/camps$/, 422);
     await logIn(page);
