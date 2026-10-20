@@ -1,6 +1,6 @@
 const Camp = require("../models/camp");
 const ExpressError = require("../utils/expressError");
-const { fileToImage, destroyImage } = require("../cloudinary");
+const { storeImage, destroyImage, STORE_FAILED_MSG } = require("../cloudinary");
 const { renderCampForm, campFormValues } = require("../middleware");
 
 const NOT_FOUND_MSG =
@@ -11,6 +11,16 @@ const GEOCODER_DOWN_MSG = "We couldn't check that location right now. Try again 
 function pickCampFields(body) {
   const { title, location, price, description } = body;
   return { title, location, price: Number(price), description };
+}
+
+// Stores checked photos; null if the image host failed.
+async function storeImages(files) {
+  try {
+    return await Promise.all((files || []).map(storeImage));
+  } catch (err) {
+    console.error("photo upload failed:", err && err.message);
+    return null;
+  }
 }
 
 async function geocodeOrMessage(req, location) {
@@ -53,10 +63,22 @@ module.exports.createCamp = async (req, res) => {
     });
   }
 
+  // Photos are stored only now, after every check has passed, so a refused
+  // form never leaves orphaned uploads behind.
+  const images = await storeImages(req.files);
+  if (!images) {
+    return renderCampForm(res, {
+      status: 503,
+      view: "camps/new",
+      values: campFormValues(req.body.camp),
+      errors: [STORE_FAILED_MSG],
+    });
+  }
+
   const camp = new Camp(fields);
   camp.geometry = { type: "Point", coordinates: [geo.coords.lng, geo.coords.lat] };
   camp.author = req.user._id;
-  camp.images = (req.files || []).map(fileToImage);
+  camp.images = images;
 
   await camp.save();
   req.flash("success", "Camp added.");
@@ -78,17 +100,29 @@ module.exports.editForm = async (req, res) => {
 
 module.exports.updateCamp = async (req, res) => {
   const camp = req.camp;
+  const added = await storeImages(req.files);
+  if (!added) {
+    return renderCampForm(res, {
+      status: 503,
+      view: "camps/edit",
+      camp,
+      values: campFormValues(req.body.camp),
+      errors: [STORE_FAILED_MSG],
+    });
+  }
+
+  // Only this camp's own images can be removed, whatever ids the form sent.
+  const ids = new Set(req.body.deleteImages || []);
+  const removed = camp.images.filter((img) => ids.has(String(img._id)));
+  const removedIds = new Set(removed.map((img) => String(img._id)));
+
   Object.assign(camp, pickCampFields(req.body.camp));
-  camp.images.push(...(req.files || []).map(fileToImage));
+  camp.images = camp.images.filter((img) => !removedIds.has(String(img._id)));
+  camp.images.push(...added);
   await camp.save();
 
-  if (req.body.deleteImages) {
-    for (let filename of req.body.deleteImages) {
-      await destroyImage(filename);
-    }
-    await camp.updateOne({
-      $pull: { images: { filename: { $in: req.body.deleteImages } } },
-    });
+  for (const img of removed) {
+    await destroyImage(img.filename);
   }
 
   req.flash("success", "Camp updated.");

@@ -35,17 +35,6 @@
         />
       </div>
       <div class="mb-3">
-        <label class="text-white" for="input">Upload Extra Images</label>
-      <div class="input-group mb-3 mt-2">
-        <input
-          type="file"
-          class="form-control"
-          id="input"
-          name="image"
-          multiple
-        />
-      </div>
-      <div class="mb-3">
         <label class="form-label text-white" for="price">Camp Price</label>
         <div class="input-group mb-3">
           <span class="input-group-text" id="price-addon">$</span>
@@ -73,14 +62,38 @@
           required
         ><%= values.description %></textarea>
       </div>
-      <div class="mb-4">
-        <h3 class="text-center text-white">Tick to Delete</h3>
+      <% if (camp.images.length) { %>
+      <fieldset class="mb-4">
+        <legend class="h5 text-center text-white">Tick to Delete</legend>
         <% camp.images.forEach(function(img, i) { %>
-            <img src="<%=img.thumbnail%>" class="img-thumbnail">
-            <div class="form-check-inline">
-              <input type="checkbox" id=<%=i%> name="deleteImages[]" value="<%=img.filename%>">
-            </div>
-          <% }); %> 
+        <div class="form-check-inline mb-2">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            id="delete-<%= img._id %>"
+            name="deleteImages[]"
+            value="<%= img._id %>"
+          />
+          <label class="form-check-label" for="delete-<%= img._id %>">
+            <img src="<%= img.thumbnail %>" class="img-thumbnail" alt="Photo <%= i + 1 %>" />
+            <span class="visually-hidden">Delete photo <%= i + 1 %></span>
+          </label>
+        </div>
+        <% }); %>
+      </fieldset>
+      <% } %>
+      <%# The file input is the last field: if a photo is refused, every
+          other field has already been read and is shown again. %>
+      <div class="mb-3">
+        <label class="form-label text-white" for="image">Upload Extra Images</label>
+        <input
+          type="file"
+          class="form-control"
+          id="image"
+          name="image"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+        />
       </div>
       <div class="mb-3 d-flex justify-content-between">
         <button class="btn btn-success" style="width: 8rem;">Update Camp</button>

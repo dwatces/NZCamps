@@ -43,7 +43,12 @@ module.exports.campSchema = Joi.object({
   })
     .required()
     .messages({ "any.required": "Fill in the camp details." }),
-  deleteImages: Joi.array().items(Joi.string().max(200)).max(20),
+  // Image subdocument ids from the edit form's checkboxes.
+  deleteImages: Joi.array()
+    .single()
+    .items(Joi.string().hex().length(24))
+    .max(20)
+    .messages({ "array.max": "Choose up to 20 photos to remove at a time." }),
 }).messages({ "object.unknown": "The form had an unexpected field." });
 
 module.exports.reviewSchema = Joi.object({

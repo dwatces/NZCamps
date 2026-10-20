@@ -35,16 +35,6 @@
           required
         />
       </div>
-      <label class="text-white" for="input">Upload Images</label>
-      <div class="input-group mb-3 mt-2">
-        <input
-          type="file"
-          class="form-control"
-          id="input"
-          name="image"
-          multiple
-        />
-      </div>
       <div class="mb-3">
         <label class="form-label text-white" for="price">Camp Price</label>
         <div class="input-group mb-3">
@@ -74,6 +64,19 @@
           maxlength="2000"
           required
         ><%= values.description %></textarea>
+      </div>
+      <%# The file input is the last field: if a photo is refused, every
+          other field has already been read and is shown again. %>
+      <div class="mb-3">
+        <label class="form-label text-white" for="image">Upload Images</label>
+        <input
+          type="file"
+          class="form-control"
+          id="image"
+          name="image"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+        />
       </div>
       <div class="d-flex justify-content-center mb-3">
         <button class="btn btn-success">Add Camp</button>

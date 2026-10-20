@@ -51,9 +51,10 @@ module.exports.campFormValues = campFormValues;
 // both with what the user typed and the list of problems.
 module.exports.validateCamp = (req, res, next) => {
   const { error, value } = campSchema.validate(req.body, { abortEarly: false });
-  if (error) {
+  const photoErrors = req.photoErrors || [];
+  if (error || photoErrors.length) {
     const values = campFormValues((req.body && req.body.camp) || {});
-    const errors = validationMessages(error);
+    const errors = [...(error ? validationMessages(error) : []), ...photoErrors];
     if (req.camp) {
       return module.exports.renderCampForm(res, {
         status: 422,
