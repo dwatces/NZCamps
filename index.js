@@ -43,6 +43,15 @@ app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+// Defaults for the layout, so an error raised before the session middleware
+// still renders the normal error page.
+app.use((req, res, next) => {
+  res.locals.user = null;
+  res.locals.success = [];
+  res.locals.error = [];
+  next();
+});
+
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
@@ -128,13 +137,20 @@ app.get("/", (req, res) => {
 });
 
 app.all("*", (req, res, next) => {
-  next(new ExpressError("Page Not Found: 404", 404));
+  next(new ExpressError("Page not found", 404));
 });
 
+// Users see a plain message, never a database or library error text.
 app.use((err, req, res, _next) => {
-  const { statusCode = 500 } = err;
-  if (!err.mesage) err.mesage = "Error: Something Went Wrong!";
-  res.status(statusCode).render("error", { err });
+  let status = err.statusCode || err.status || 500;
+  if (err.name === "CastError") status = 404;
+  let message;
+  if (status === 404) message = "Page not found";
+  else if (err instanceof ExpressError && err.message) message = err.message;
+  else if (status < 500 && err.expose && err.message) message = err.message;
+  else message = "Something went wrong";
+  if (status >= 500) console.error(err);
+  res.status(status).render("error", { err, status, message });
 });
 
 const port = process.env.PORT || 3000;

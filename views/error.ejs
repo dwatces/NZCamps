@@ -1,10 +1,15 @@
 <% layout('layouts/boilerplate')%>
 <div class="row">
-  <div class="col-6 offset-3">
+  <div class="col-md-8 offset-md-2">
     <div class="alert alert-danger" role="alert">
-      <h4 class="alert-heading">Error: <%=err.message%></h4>
-      <% if(process.env.NODE_ENV !== 'production') { %>
-      <p><%=err.stack%></p>
+      <h1 class="alert-heading h4"><%= message %></h1>
+      <% if (status === 404) { %>
+      <p class="mb-0">There is no page at this address. <a href="/camps">See all camps</a>.</p>
+      <% } else { %>
+      <p class="mb-0">Please try again. <a href="/camps">Back to all camps</a>.</p>
+      <% } %>
+      <% if(process.env.NODE_ENV !== 'production' && status >= 500) { %>
+      <pre class="mt-3 small text-wrap"><%= err.stack %></pre>
       <% } %>
     </div>
   </div>

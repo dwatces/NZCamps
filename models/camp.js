@@ -15,7 +15,7 @@ const options = { toJSON: { virtuals: true } };
 
 const CampSchema = new Schema(
   {
-    title: String,
+    title: { type: String, required: true, trim: true, maxlength: 100 },
     images: [ImageSchema],
     geometry: {
       type: {
@@ -28,9 +28,9 @@ const CampSchema = new Schema(
         required: true,
       },
     },
-    price: Number,
-    description: String,
-    location: String,
+    price: { type: Number, required: true, min: 0, max: 1000 },
+    description: { type: String, required: true, trim: true, maxlength: 2000 },
+    location: { type: String, required: true, trim: true, maxlength: 120 },
     author: {
       type: Schema.Types.ObjectId,
       ref: "User",

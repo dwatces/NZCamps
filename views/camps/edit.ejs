@@ -2,6 +2,7 @@
 <div class="row mt-5">
   <h1 class="text-center text-white">Edit Camp</h1>
   <div class="col-md-6 offset-md-3">
+    <%- include('../partials/formErrors') %>
     <form
       action="/camps/<%=camp._id%>?_method=PUT"
       method="post"
@@ -16,7 +17,8 @@
           type="text"
           id="title"
           name="camp[title]"
-          value="<%=camp.title%>"
+          value="<%= values.title %>"
+          maxlength="100"
           required
         />
       </div>
@@ -27,7 +29,8 @@
           type="text"
           id="location"
           name="camp[location]"
-          value="<%=camp.location%>"
+          value="<%= values.location %>"
+          maxlength="120"
           required
         />
       </div>
@@ -43,16 +46,18 @@
         />
       </div>
       <div class="mb-3">
-        <label class="form-labe text-white" for="price">Camp Price</label>
+        <label class="form-label text-white" for="price">Camp Price</label>
         <div class="input-group mb-3">
-          <span class="input-group-text" id="price">$</span>
+          <span class="input-group-text" id="price-addon">$</span>
           <input
             type="text"
             id="price"
             class="form-control"
             placeholder="0.00"
             name="camp[price]"
-            value="<%=camp.price%>"
+            value="<%= values.price %>"
+            inputmode="decimal"
+            aria-describedby="price-addon"
             required
           />
         </div>
@@ -64,10 +69,9 @@
           type="text"
           id="description"
           name="camp[description]"
+          maxlength="2000"
           required
-        >
-<%= camp.description%></textarea
-        >
+        ><%= values.description %></textarea>
       </div>
       <div class="mb-4">
         <h3 class="text-center text-white">Tick to Delete</h3>

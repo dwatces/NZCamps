@@ -1,0 +1,10 @@
+<% if (typeof errors !== "undefined" && errors && errors.length) { %>
+<div class="alert alert-danger" role="alert" id="form-errors">
+  <p class="fw-bold mb-1">Please fix the following:</p>
+  <ul class="mb-0">
+    <% for (const message of errors) { %>
+    <li><%= message %></li>
+    <% } %>
+  </ul>
+</div>
+<% } %>

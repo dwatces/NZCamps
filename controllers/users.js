@@ -1,25 +1,46 @@
 const User = require("../models/user");
+const { registerSchema } = require("../schemas");
+
+const DUPLICATE_MSG = "That username or email is already registered.";
 
 module.exports.renderRegister = (req, res) => {
-  res.render("users/register");
+  res.render("users/register", { values: {}, errors: [] });
 };
 
 module.exports.register = async (req, res, next) => {
+  const { error, value } = registerSchema.validate(
+    {
+      username: req.body.username,
+      email: req.body.email,
+      password: req.body.password,
+    },
+    { abortEarly: false },
+  );
+  const values = {
+    username: typeof req.body.username === "string" ? req.body.username : "",
+    email: typeof req.body.email === "string" ? req.body.email : "",
+  };
+  if (error) {
+    const errors = [...new Set(error.details.map((d) => d.message))];
+    return res.status(422).render("users/register", { values, errors });
+  }
+
   try {
-    const { email, username, password } = req.body;
-    const user = new User({ email, username });
-    await User.register(user, password);
+    const user = new User({ email: value.email, username: value.username });
+    await User.register(user, value.password);
     req.login(user, (err) => {
       if (err) return next(err);
       req.flash(
         "success",
-        `Welcome to NZ Camps, ${username}! add a camp you've visited before, or leave a review on an existing camp below.`,
+        `Welcome to NZ Camps, ${value.username}. Add a camp you've stayed at, or review one below.`,
       );
       res.redirect("/camps");
     });
   } catch (e) {
-    req.flash("error", e.message);
-    res.redirect("register");
+    // Never show raw database errors (they name indexes and confirm emails).
+    const duplicate = e && (e.name === "UserExistsError" || e.code === 11000);
+    if (!duplicate) return next(e);
+    return res.status(422).render("users/register", { values, errors: [DUPLICATE_MSG] });
   }
 };
 
@@ -28,9 +49,9 @@ module.exports.renderLogin = (req, res) => {
 };
 
 module.exports.login = (req, res) => {
-  req.flash("success", "Welcome Back!");
+  req.flash("success", "Welcome back!");
   const redirectUrl = req.session.returnTo || "/camps";
-  delete req.session.returnTos;
+  delete req.session.returnTo;
   res.redirect(redirectUrl);
 };
 
