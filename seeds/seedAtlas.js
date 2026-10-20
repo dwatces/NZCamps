@@ -9,29 +9,10 @@ const User = require("../models/user");
 const Camp = require("../models/camp");
 const demoCamps = require("./demoData");
 const { SEED_USERNAME } = require("../utils/sample");
-
-const LOOPBACK = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
-
-// True only when every host in a mongodb:// URL is this machine.
-function isLoopbackDbUrl(url) {
-  const m = /^mongodb:\/\/(?:[^@/]*@)?([^/?]+)/.exec(String(url || ""));
-  if (!m) return false;
-  return m[1].split(",").every((hostPort) => {
-    const host = hostPort.startsWith("[")
-      ? hostPort.slice(0, hostPort.indexOf("]") + 1)
-      : hostPort.split(":")[0];
-    return LOOPBACK.has(host.toLowerCase());
-  });
-}
+const { isLoopbackDbUrl, maskedHost, checkDbUrl } = require("./dbGuard");
 
 async function main() {
-  const dbUrl = process.env.DB_URL;
-  if (!dbUrl) throw new Error("DB_URL is required");
-  if (!isLoopbackDbUrl(dbUrl) && process.env.CONFIRM_REMOTE !== "yes") {
-    throw new Error(
-      "DB_URL is not a database on this machine. Set CONFIRM_REMOTE=yes to seed it anyway.",
-    );
-  }
+  const dbUrl = checkDbUrl();
   await mongoose.connect(dbUrl);
 
   let author = await User.findOne({ username: SEED_USERNAME });
@@ -54,7 +35,7 @@ async function main() {
       price: d.price,
       description: d.description,
       location: d.location,
-      images: d.images.map((i) => ({ url: i.url })),
+      images: d.images.map((i) => ({ url: i.url, alt: i.alt })),
       geometry: d.geometry,
       isDemo: true,
       author: author._id,
@@ -64,7 +45,9 @@ async function main() {
   }
 
   const camps = await Camp.countDocuments();
-  console.log(`Seed done: ${created} camps created. DB now has ${camps} camps.`);
+  console.log(
+    `Seed done on ${maskedHost(dbUrl)}: ${created} camps created. DB now has ${camps} camps.`,
+  );
   if (password && !process.env.SEED_PASSWORD) {
     console.log(`Created user "${SEED_USERNAME}" with password: ${password}`);
   }

@@ -64,3 +64,14 @@
   padding: 0.75rem 0;
   margin-top: 2rem;
 }
+
+/* Credit line under a sample listing photo. */
+.photo-credit {
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font-size: 0.8125rem;
+  padding: 0.25rem 0.75rem;
+}
+.photo-credit a {
+  color: #fff;
+}

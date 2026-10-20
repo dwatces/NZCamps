@@ -9,9 +9,15 @@
     <div id="campCarousel" class="carousel slide" data-bs-ride="carousel">
       <div class="carousel-inner">
         <% camp.images.forEach((img, i) => { %>
-        <div class="carousel-item <%= i === 0 ? 'active': ''%>">
-          <img src="<%= img.url%>" class="d-block w-100" alt="..." />
-        </div>
+        <% const credit = photoCredit(img); %>
+        <figure class="carousel-item mb-0 <%= i === 0 ? 'active': ''%>">
+          <img src="<%= img.url%>" class="d-block w-100" alt="<%= photoAlt(img, camp, i, camp.images.length) %>" />
+          <% if (credit) { %>
+          <figcaption class="photo-credit">
+            Photo: <a href="<%= credit.page %>" rel="noopener"><%= credit.name %></a> on Unsplash
+          </figcaption>
+          <% } %>
+        </figure>
         <% }) %>
       </div>
       <% if(camp.images.length > 1) { %>

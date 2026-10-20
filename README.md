@@ -22,8 +22,8 @@ I started it in July 2021 as a learning project, originally using Mapbox for map
 - **Reviews:** 1 to 5 star ratings with a written review. Reviewers can delete their own reviews, and deleting a camp removes its reviews.
 - **Validation:** Joi schemas (and matching Mongoose limits) check camp, review and sign-up input on the server; a form that fails comes back with what was typed and a list of problems. Bootstrap validation runs in the browser, and `express-mongo-sanitize` strips MongoDB operators from request data.
 - **Security:** a strict content security policy (no inline scripts or styles, front-end libraries served from this site), a cross-site form check, `HttpOnly`/`SameSite`/`Secure` session cookies and POST-only logout. Page data for the maps is written as escaped JSON and map popups are built from text, never HTML.
-- **Sample listings:** the sample camps are labelled "Sample listing" wherever they appear, and every page footer explains the label.
-- **Demo mode:** if `DB_URL` is not set, or the database cannot be reached within 5 seconds, the camps list and three sample camp pages render from `seeds/demoData.js`, and form submissions show a notice instead of saving.
+- **Sample listings:** eight invented camps at real places across both islands, labelled "Sample listing" wherever they appear; every page footer explains the label. Their photos are from Unsplash, each of the area it is listed in, with alt text and a credit line ([public/images/CREDITS.md](public/images/CREDITS.md)). There are no sample reviews.
+- **Demo mode:** if `DB_URL` is not set, or the database cannot be reached within 5 seconds, the camps list and the eight sample camp pages render from `seeds/demoData.js`, and form submissions show a notice instead of saving.
 
 ## Tech stack
 
@@ -63,13 +63,20 @@ When `NODE_ENV` is not `production`, settings are read from a `.env` file in the
 
 ### Seeding the database
 
-`seeds/seedAtlas.js` copies the three sample camps into a database, labelled as samples. It skips any camp whose title already exists, and creates a `ranger` user as the author if there isn't one. The script does not load `.env`, so pass the variables on the command line. A database that is not on your machine also needs `CONFIRM_REMOTE=yes`:
+`seeds/seedAtlas.js` copies the eight sample camps into a database, labelled as samples. It skips any camp whose title already exists, and creates a `ranger` user as the author if there isn't one. The script does not load `.env`, so pass the variables on the command line. A database that is not on your machine also needs `CONFIRM_REMOTE=yes`:
 
 ```bash
 DB_URL=mongodb://127.0.0.1:27017/nzcamps node seeds/seedAtlas.js
 ```
 
 Set `SEED_PASSWORD` to choose the `ranger` user's password; otherwise a random one is generated and printed once.
+
+`seeds/labelDemo.js` flags camps added by `ranger` in an existing database as samples (`isDemo`), and with `--photos` gives the sample camps the current credited photos. It is a dry run unless you add `--apply`, has the same `CONFIRM_REMOTE` guard, and prints only counts and a masked host:
+
+```bash
+DB_URL=mongodb://127.0.0.1:27017/nzcamps node seeds/labelDemo.js --photos          # dry run
+DB_URL=mongodb://127.0.0.1:27017/nzcamps node seeds/labelDemo.js --photos --apply
+```
 
 ### Tests and checks
 
@@ -106,7 +113,7 @@ scripts/          bundle check and vendoring scripts
 test/             integration tests and their helpers
 ```
 
-The background and sample camp photos in `public/stylesheets/` are from Unsplash; the photographers' names are in the file names.
+All photos are from Unsplash; [public/images/CREDITS.md](public/images/CREDITS.md) lists each photographer, its Unsplash page and the location that page gives.
 
 ## Author
 

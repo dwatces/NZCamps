@@ -3,6 +3,7 @@
 // none of these rely on Mongoose methods.
 
 const { isSample } = require("./sample");
+const { samplePhoto } = require("./samplePhotos");
 
 // JSON for a <script type="application/json"> block. Escaping <, > and &
 // means a "</script>" or "<!--" in user text cannot end the block early.
@@ -52,4 +53,28 @@ function mapPoint(camp) {
 
 const mapPoints = (camps) => (camps || []).map(mapPoint);
 
-module.exports = { safeJson, sameId, displayName, mapPoint, mapPoints, isSample };
+// Alt text for a camp photo: its own description (sample photos have one),
+// otherwise its place in the gallery. Uploads carry no description.
+function photoAlt(img, camp, index = 0, total = 1) {
+  const known = (img && img.alt) || (img && samplePhoto(img.url) && samplePhoto(img.url).alt);
+  if (known) return known;
+  const title = (camp && camp.title) || "this camp";
+  return total > 1 ? `Photo ${index + 1} of ${total} of ${title}` : `Photo of ${title}`;
+}
+
+// { name, page } for a credited sample photo, or null.
+function photoCredit(img) {
+  const p = img && samplePhoto(img.url);
+  return p ? { name: p.credit, page: p.page } : null;
+}
+
+module.exports = {
+  safeJson,
+  sameId,
+  displayName,
+  mapPoint,
+  mapPoints,
+  isSample,
+  photoAlt,
+  photoCredit,
+};

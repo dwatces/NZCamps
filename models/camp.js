@@ -5,6 +5,8 @@ const Schema = mongoose.Schema;
 const ImageSchema = new Schema({
   url: String,
   filename: String,
+  // What the photo shows. Set for the sample photos; uploads have none.
+  alt: { type: String, trim: true, maxlength: 200 },
 });
 
 // A 200px-wide Cloudinary rendition. Other URLs (local files, data URIs) are
