@@ -7,46 +7,41 @@ const ImageSchema = new Schema({
   filename: String,
 });
 
+// A 200px-wide Cloudinary rendition. Other URLs (local files, data URIs) are
+// returned unchanged: rewriting "/upload" inside base64 would corrupt them.
+const CLOUDINARY_UPLOAD = /^https?:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\//;
 ImageSchema.virtual("thumbnail").get(function () {
-  return this.url.replace("/upload", "/upload/w_200");
+  const url = this.url || "";
+  return CLOUDINARY_UPLOAD.test(url) ? url.replace("/image/upload/", "/image/upload/w_200/") : url;
 });
 
-const options = { toJSON: { virtuals: true } };
-
-const CampSchema = new Schema(
-  {
-    title: { type: String, required: true, trim: true, maxlength: 100 },
-    images: [ImageSchema],
-    geometry: {
-      type: {
-        type: String,
-        enum: ["Point"],
-        required: true,
-      },
-      coordinates: {
-        type: [Number],
-        required: true,
-      },
+const CampSchema = new Schema({
+  title: { type: String, required: true, trim: true, maxlength: 100 },
+  images: [ImageSchema],
+  geometry: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      required: true,
     },
-    price: { type: Number, required: true, min: 0, max: 1000 },
-    description: { type: String, required: true, trim: true, maxlength: 2000 },
-    location: { type: String, required: true, trim: true, maxlength: 120 },
-    author: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+    coordinates: {
+      type: [Number],
+      required: true,
     },
-    reviews: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Review",
-      },
-    ],
   },
-  options,
-);
-
-CampSchema.virtual("properties.popUpMarkup").get(function () {
-  return `<strong><a href="/camps/${this._id}">${this.title}</a></strong>`;
+  price: { type: Number, required: true, min: 0, max: 1000 },
+  description: { type: String, required: true, trim: true, maxlength: 2000 },
+  location: { type: String, required: true, trim: true, maxlength: 120 },
+  author: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+  },
+  reviews: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Review",
+    },
+  ],
 });
 
 CampSchema.post("findOneAndDelete", async function (doc) {

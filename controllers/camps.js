@@ -23,10 +23,13 @@ async function geocodeOrMessage(req, location) {
   }
 }
 
+// Authors are populated with their username only: never email, hash or salt.
+const AUTHOR = { path: "author", select: "username" };
+
 module.exports.index = async (req, res) => {
-  const camps = await Camp.find({})
-    .populate({ path: "reviews", populate: { path: "author" } })
-    .populate("author");
+  const camps = await Camp.find({}, "title location description price images geometry reviews")
+    .populate({ path: "reviews", select: "rating" })
+    .lean();
   res.render("camps/index", { camps });
 };
 
@@ -58,8 +61,8 @@ module.exports.createCamp = async (req, res) => {
 
 module.exports.showCamps = async (req, res) => {
   const camp = await Camp.findById(req.params.id)
-    .populate({ path: "reviews", populate: { path: "author" } })
-    .populate("author");
+    .populate({ path: "reviews", populate: AUTHOR })
+    .populate(AUTHOR);
   if (!camp) throw new ExpressError("Page not found", 404);
   res.render("camps/show", { camp });
 };

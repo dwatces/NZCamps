@@ -121,7 +121,7 @@
                 ></p>
                 <% } %> <% if(camp.reviews.length === 1) { %>
                 <h6 class="card-title">Latest Review:</h6>
-                <% for(review of camp.reviews) { %>
+                <% for(const review of camp.reviews) { %>
                 <p
                   class="starability-result"
                   data-rating="<%= review.rating %>"
@@ -138,10 +138,8 @@
         </div>
       </div>
       <%}%>
-      <script>
-        const camps = {features: <%-JSON.stringify(camps)%>};
-      </script>
-      <script src="js/clusterMap.js"></script>
+      <script type="application/json" id="camps-data"><%- safeJson(mapPoints(camps)) %></script>
+      <script src="/js/clusterMap.js"></script>
     </main>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"

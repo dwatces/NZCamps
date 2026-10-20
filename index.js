@@ -38,6 +38,7 @@ db.once("open", () => {
 
 // Seam for tests: controllers geocode through app.locals so a stub can be swapped in.
 app.locals.geocode = require("./utils/geocode");
+Object.assign(app.locals, require("./utils/viewHelpers"));
 
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
