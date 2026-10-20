@@ -245,25 +245,10 @@ body {
   font-weight: 700;
   text-shadow: none;
 }
-.sample-note {
-  color: #fff;
-  background-color: rgba(0, 0, 0, 0.7);
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.375rem;
-}
 
 /* ---------- Cards and photos ---------- */
 .card-img-top {
   height: auto;
-}
-.photo-credit {
-  background: rgba(0, 0, 0, 0.72);
-  color: #fff;
-  font-size: 0.8125rem;
-  padding: 0.25rem 0.75rem;
-}
-.photo-credit a {
-  color: #fff;
 }
 .photo-placeholder {
   position: relative;
@@ -593,25 +578,217 @@ body {
   margin-bottom: 0.25rem;
 }
 
-/* ---------- Camp page ---------- */
-#map {
-  width: 100%;
-  height: 400px;
+/* ---------- Camp page ----------
+   Name and summary first; then the photos and description beside the map
+   and reviews from 992 px, stacked below that. */
+.back-link-row {
+  margin: 0 0 0.75rem;
 }
-.reviews-empty {
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: var(--nzc-tap);
+  padding: 0 0.875rem;
+  border-radius: 999px;
+  background-color: var(--nzc-panel-dark);
   color: #fff;
-  background-color: rgba(0, 0, 0, 0.7);
-  padding: 0.75rem 1rem;
-  border-radius: 0.375rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.back-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+.camp-head {
   margin-bottom: 1rem;
 }
-@media (max-width: 768px) {
-  .responsive__column {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+.camp-head__title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.75rem, 1.35rem + 1.6vw, 2.5rem);
+}
+.camp-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  margin: 0;
+  color: var(--nzc-ink-muted);
+}
+.camp-summary .badge-sample {
+  margin-left: 0.25rem;
+}
+.camp-layout {
+  display: grid;
+  gap: 1rem;
+}
+.camp-layout__main,
+.camp-layout__side {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+  min-width: 0;
+}
+@media (min-width: 992px) {
+  .camp-layout {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 1.5rem;
   }
+}
+
+/* Gallery: a fixed 3:2 frame, never moving on its own. */
+.gallery {
+  overflow: hidden;
+  border-radius: var(--nzc-radius);
+  background-color: #24392c;
+  box-shadow: var(--nzc-shadow);
+}
+.gallery__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+.gallery--empty .photo-placeholder img {
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+.gallery__nav {
+  top: 50%;
+  bottom: auto;
+  width: var(--nzc-tap);
+  height: var(--nzc-tap);
+  margin: 0 0.75rem;
+  border-radius: 50%;
+  background-color: rgba(5, 12, 8, 0.72);
+  opacity: 1;
+  transform: translateY(-50%);
+}
+.gallery__nav:hover {
+  background-color: rgba(5, 12, 8, 0.9);
+}
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.gallery__count {
+  margin: 0;
+  padding: 0.5rem 0.875rem;
+  background-color: var(--nzc-panel-dark);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.photo-credit {
+  padding: 0.375rem 0.875rem;
+  background-color: var(--nzc-panel-dark);
+  color: var(--nzc-on-night-muted);
+  font-size: 0.8125rem;
+}
+.photo-credit a {
+  color: #fff;
+}
+
+.camp-about h2,
+.camp-where h2 {
+  margin-bottom: 0.75rem;
+}
+.camp-description {
+  max-width: 65ch;
+  white-space: pre-line;
+}
+.camp-added {
+  margin: 0;
+  color: var(--nzc-ink-muted);
+}
+.camp-owner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--nzc-line);
+}
+.camp-owner form {
+  margin: 0;
+}
+.camp-where__place {
+  margin: -0.25rem 0 0.75rem;
+  color: var(--nzc-ink-muted);
+}
+.camp-where__map {
+  height: 18rem;
+  border-radius: var(--nzc-radius-sm);
+  background-color: #dfe6e1;
+}
+@media (min-width: 992px) {
+  .camp-where__map {
+    height: 16rem;
+  }
+}
+
+.camp-reviews__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  margin-bottom: 1rem;
+}
+.reviews-prompt {
+  margin: 0 0 1rem;
+}
+.reviews-empty,
+.sample-note {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--nzc-radius-sm);
+  background-color: var(--nzc-surface-alt);
+  color: var(--nzc-ink);
+}
+.review-compose {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--nzc-line);
+}
+.review-list {
+  margin: 0;
+}
+.review {
+  padding: 1rem 0;
+  border-top: 1px solid var(--nzc-line);
+}
+.review:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.review__meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 1rem;
+  margin: 0 0 0.25rem;
+}
+.review__author {
+  font-weight: 700;
+}
+.review__date {
+  color: var(--nzc-ink-muted);
+  font-size: 0.9375rem;
+}
+.review__stars {
+  margin: 0 0 0.375rem;
+}
+.review__body {
+  margin: 0;
+  white-space: pre-line;
+}
+.review__delete {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0.5rem 0 0;
 }
 
 /* Edit form: photos to remove. The whole label (photo and text) is the

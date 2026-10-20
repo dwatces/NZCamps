@@ -364,3 +364,83 @@ test("signed out: one Sign up button and a log in link; signed in: no duplicate 
   assert.doesNotMatch(main, /href="\/camps\/new"/, "Add a camp is in the header only");
   assert.doesNotMatch(main, /list-head__join/);
 });
+
+// ---------- D7: camp page ----------
+
+test("the camp page leads with its name, a back link and a summary", async () => {
+  const { id } = await campWithSamplePhoto("Summary Camp");
+  const html = (await request(app).get(`/camps/${id}`)).text;
+  assert.match(
+    html,
+    /<a class="back-link" href="\/camps"><span aria-hidden="true">&larr;<\/span> All camps<\/a>/,
+  );
+  assert.match(html, /<h1 class="camp-head__title">Summary Camp<\/h1>\s*<p class="camp-summary">/);
+  const summary = /<p class="camp-summary">([\s\S]*?)<\/p>/.exec(html)[1];
+  assert.match(summary, /Wellington/);
+  assert.match(summary, /\$18 a night/);
+  assert.match(summary, /No reviews yet/);
+});
+
+test("the gallery never moves on its own and says which photo is shown", async () => {
+  const Camp = require("../models/camp");
+  const { id } = await campWithSamplePhoto("Gallery Camp");
+  await Camp.updateOne(
+    { _id: id },
+    { $push: { images: { url: "/stylesheets/tyler-lastovich-MfRNe40ihls-unsplash.jpg" } } },
+  );
+  const html = (await request(app).get(`/camps/${id}`)).text;
+  assert.match(html, /<div id="campCarousel" class="carousel slide" data-bs-interval="false"/);
+  assert.doesNotMatch(html, /data-bs-ride/);
+  assert.match(
+    html,
+    /<p class="gallery__count" id="gallery-count" aria-live="polite">Photo 1 of 2<\/p>/,
+  );
+  assert.match(html, /<span class="visually-hidden">Previous photo<\/span>/);
+  assert.match(html, /<span class="visually-hidden">Next photo<\/span>/);
+  const imgs = tags(html, /<img class="gallery__img"[^>]*>/g);
+  assert.equal(imgs.length, 2);
+  assert.match(imgs[0], /fetchpriority="high"/);
+  assert.match(imgs[1], /loading="lazy"/);
+  assert.match(imgs[0], /alt="A quiet sealed road through tall beech forest"/);
+  assert.match(
+    html,
+    /<source type="image\/avif" srcset="\/images\/anderson-aguirre-480\.avif 480w, [^"]*1920\.avif 1920w"/,
+  );
+  assert.match(html, /<script defer src="\/js\/gallery\.js"><\/script>/);
+});
+
+test("reviews: names are text, not headings, with stars and a spoken rating", async () => {
+  const agent = h.agentFor(app);
+  await agent.signUp({ username: "kereru_fan" });
+  await agent
+    .post(`/camps/${campId}/reviews`)
+    .type("form")
+    .send({ "review[rating]": "4", "review[body]": "Shady and quiet." });
+  const html = (await request(app).get(`/camps/${campId}`)).text;
+  assert.match(html, /<span class="review__author">kereru_fan<\/span>/);
+  assert.doesNotMatch(html, /<h[3-6][^>]*>kereru_fan</);
+  assert.match(
+    html,
+    /<span class="stars" data-rating="4" aria-hidden="true"><\/span><span class="visually-hidden">Rated 4 out of 5<\/span>/,
+  );
+});
+
+test("the review form groups its stars under the legend Your rating", async () => {
+  const agent = h.agentFor(app);
+  await agent.signUp();
+  const html = (await agent.get(`/camps/${campId}`)).text;
+  const fieldset = /<fieldset class="mb-3" role="radiogroup"[^>]*>([\s\S]*?)<\/fieldset>/.exec(
+    html,
+  )[1];
+  assert.match(fieldset, /<legend[^>]*>Your rating<\/legend>/);
+  assert.equal(tags(fieldset, /<input\s+type="radio"/g).length, 5);
+  assert.match(fieldset, /<label for="rating-4" title="Very good">4 stars, very good<\/label>/);
+  assert.doesNotMatch(html, /starability|star__bg/);
+});
+
+test("the camp map starts with its popup closed and lets the page scroll", h.notInBundle, () => {
+  const src = fs.readFileSync(path.join(h.ROOT, "public", "js", "campMap.js"), "utf8");
+  assert.doesNotMatch(src, /openPopup/);
+  assert.match(src, /dragging: !L\.Browser\.mobile/);
+  assert.match(src, /scrollWheelZoom: false/);
+});

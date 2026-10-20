@@ -5,175 +5,198 @@
 <% block('styles', '<link rel="stylesheet" href="/vendor/leaflet-1.9.4/leaflet.css" />') %>
 <% block('scripts', '<script defer src="/vendor/leaflet-1.9.4/leaflet.js"></script>') %>
 <% block('scripts', '<script defer src="/js/campMap.js"></script>') %>
+<% if (camp.images.length > 1) { block('scripts', '<script defer src="/js/gallery.js"></script>'); } %>
+<% block('pageClass', 'container page camp-page') %>
+<% const sample = isSample(camp); %>
+<p class="back-link-row"><a class="back-link" href="/camps"><span aria-hidden="true">&larr;</span> All camps</a></p>
+<div class="panel camp-head">
+  <h1 class="camp-head__title"><%= camp.title %></h1>
+  <p class="camp-summary">
+    <span><span class="visually-hidden">Location: </span><%= camp.location %></span>
+    <span aria-hidden="true">&middot;</span>
+    <span><span class="visually-hidden">Price: </span><%= formatPrice(camp.price) %></span>
+    <span aria-hidden="true">&middot;</span>
+    <%- include('../partials/rating', { camp }) %>
+    <% if (sample) { %>
+    <span class="badge badge-sample">Sample listing</span>
+    <% } %>
+  </p>
+</div>
 
-<div class="responsive__column row">
-  <div class="col-lg-6 col-sm-10">
+<div class="camp-layout">
+  <div class="camp-layout__main">
     <% if (!camp.images.length) { %>
-    <%- include('../partials/noPhoto') %>
+    <div class="gallery gallery--empty"><%- include('../partials/noPhoto') %></div>
     <% } else { %>
-    <div id="campCarousel" class="carousel slide" data-bs-ride="carousel">
-      <div class="carousel-inner">
-        <% camp.images.forEach((img, i) => { %>
-        <% const credit = photoCredit(img); %>
-        <figure class="carousel-item mb-0 <%= i === 0 ? 'active': ''%>">
-          <img src="<%= imageUrl(camp, img, 1200) %>" class="d-block w-100" alt="<%= photoAlt(img, camp, i, camp.images.length) %>" />
-          <% if (credit) { %>
-          <figcaption class="photo-credit">
-            Photo: <a href="<%= credit.page %>" rel="noopener"><%= credit.name %></a> on Unsplash
-          </figcaption>
-          <% } %>
-        </figure>
-        <% }) %>
+    <div class="gallery">
+      <div id="campCarousel" class="carousel slide" data-bs-interval="false" data-bs-touch="true">
+        <div class="carousel-inner">
+          <% camp.images.forEach((img, i) => { %>
+          <% const credit = photoCredit(img); %>
+          <figure class="carousel-item mb-0 <%= i === 0 ? 'active': ''%>">
+            <%- include('../partials/photo', {
+              camp,
+              img,
+              alt: photoAlt(img, camp, i, camp.images.length),
+              widths: [480, 800, 1200, 1920],
+              sizes: '(min-width: 1400px) 44rem, (min-width: 992px) 56vw, calc(100vw - 2rem)',
+              width: 1200,
+              height: 800,
+              cls: 'gallery__img',
+              eager: i === 0,
+            }) %>
+            <% if (credit) { %>
+            <figcaption class="photo-credit">
+              Photo: <a href="<%= credit.page %>" rel="noopener"><%= credit.name %></a> on Unsplash
+            </figcaption>
+            <% } %>
+          </figure>
+          <% }) %>
+        </div>
+        <% if (camp.images.length > 1) { %>
+        <button class="carousel-control-prev gallery__nav" type="button" data-bs-target="#campCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous photo</span>
+        </button>
+        <button class="carousel-control-next gallery__nav" type="button" data-bs-target="#campCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next photo</span>
+        </button>
+        <% } %>
       </div>
-      <% if(camp.images.length > 1) { %>
-      <button
-        class="carousel-control-prev"
-        type="button"
-        data-bs-target="#campCarousel"
-        data-bs-slide="prev"
-      >
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-      </button>
-      <button
-        class="carousel-control-next"
-        type="button"
-        data-bs-target="#campCarousel"
-        data-bs-slide="next"
-      >
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-      </button>
+      <% if (camp.images.length > 1) { %>
+      <p class="gallery__count" id="gallery-count" aria-live="polite">Photo 1 of <%= camp.images.length %></p>
       <% } %>
     </div>
     <% } %>
-    <div class="card mt-3 mb-3">
-      <div class="card-body">
-        <h1 class="h3 card-title"><%= camp.title %></h1>
-        <% if (isSample(camp)) { %>
-        <p class="mb-2"><span class="badge badge-sample">Sample listing</span></p>
+
+    <section class="panel camp-about" aria-labelledby="about-title">
+      <h2 class="h4" id="about-title">About this camp</h2>
+      <p class="camp-description"><%= camp.description %></p>
+      <% const added = createdDate(camp); %>
+      <p class="camp-added">
+        <% if (sample) { %>
+        Added by: Sample listing, not a real campground
+        <% } else { %>
+        Added by <%= displayName(camp.author) %><% if (added) { %> on <time datetime="<%= isoDate(added) %>"><%= formatDate(added) %></time><% } %>
         <% } %>
-        <p class="camp-summary mb-2"><%- include('../partials/rating', { camp }) %></p>
-        <p class="card-text"><%= camp.description %></p>
-      </div>
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item"><span class="visually-hidden">Location: </span><%= camp.location %></li>
-        <li class="list-group-item"><span class="visually-hidden">Price: </span><%= formatPrice(camp.price) %></li>
-        <% const added = createdDate(camp); %>
-        <li class="list-group-item">
-          <% if (isSample(camp)) { %>
-          Added by: Sample listing, not a real campground
-          <% } else { %>
-          Added by <%= displayName(camp.author) %><% if (added) { %> on <time datetime="<%= isoDate(added) %>"><%= formatDate(added) %></time><% } %>
-          <% } %>
-        </li>
-      </ul>
+      </p>
       <% if(user && sameId(camp.author, user)) { %>
-      <div class="card-body d-flex justify-content-between">
-        <a class="card-link btn btn-outline-primary" href="/camps/<%=camp._id%>/edit">Edit camp</a>
+      <div class="camp-owner">
+        <a class="btn btn-outline-primary" href="/camps/<%=camp._id%>/edit">Edit camp</a>
         <form
-          class="d-inline"
           action="/camps/<%=camp._id%>?_method=DELETE"
           method="POST"
           data-confirm="Delete this camp and its reviews? This can't be undone."
         >
-          <button class="btn btn-danger">Delete camp</button>
+          <button class="btn btn-outline-danger">Delete camp</button>
         </form>
       </div>
       <% } %>
-    </div>
+    </section>
   </div>
-  <div class="col-lg-6 col-sm-10">
-    <div class="mb-5 card" id="map"></div>
-    <% if(user) { %>
-    <% const typed = typeof reviewValues !== "undefined" && reviewValues ? reviewValues : {}; %>
-    <% const STARS = ["", "Terrible", "Not good", "Average", "Very good", "Amazing"]; %>
-    <h2 class="h4 text-white" id="review-form-title">Leave a review</h2>
-    <%- include('../partials/formErrors') %>
-    <form
-      action="/camps/<%=camp._id%>/reviews"
-      method="POST"
-      class="mb-4 validForm review-form"
-      aria-labelledby="review-form-title"
-      novalidate
-    >
-      <fieldset class="mb-3" role="radiogroup"<%- fieldAria('rating', typeof fieldErrors !== "undefined" ? fieldErrors : null) %>>
-        <legend class="form-label text-white fs-6 mb-1">Your rating</legend>
-        <div class="star__bg">
-          <div class="starability-basic">
-            <% for (let n = 1; n <= 5; n++) { %>
-            <input
-              type="radio"
-              id="rating-<%= n %>"
-              name="review[rating]"
-              value="<%= n %>"
-              data-field="rating"<%= typed.rating === String(n) ? " checked" : "" %><% if (n === 1) { %>
-              required
-              data-error="Choose a star rating from 1 to 5."<% } %>
-            />
-            <label for="rating-<%= n %>" title="<%= STARS[n] %>"><%= n %> star<%= n === 1 ? "" : "s" %>, <%= STARS[n].toLowerCase() %></label>
-            <% } %>
-          </div>
-        </div>
-        <%- include('../partials/fieldError', { name: 'rating' }) %>
-      </fieldset>
-      <div class="mb-3">
-        <label class="form-label text-white" for="review-body">Your review</label>
-        <textarea
-          class="form-control<%= invalidClass('body', typeof fieldErrors !== "undefined" ? fieldErrors : null) %>"
-          name="review[body]"
-          id="review-body"
-          rows="3"
-          maxlength="1000"
-          required
-          data-field="body"
-          data-error="Enter your review."<%- fieldAria('body', typeof fieldErrors !== "undefined" ? fieldErrors : null) %>
-        ><%= typed.body || "" %></textarea>
-        <%- include('../partials/fieldError', { name: 'body' }) %>
+
+  <div class="camp-layout__side">
+    <section class="panel camp-where" aria-labelledby="where-title">
+      <h2 class="h4" id="where-title">Where it is</h2>
+      <p class="camp-where__place"><%= camp.location %></p>
+      <div id="map" class="camp-where__map" role="region" aria-label="Map of where <%= camp.title %> is">
+        <p class="camp-map__fallback">The map needs JavaScript.</p>
       </div>
-      <button class="btn btn-primary">Post review</button>
-    </form>
-    <% } %>
-    <h2 class="h4 text-white" id="reviews">Reviews</h2>
-    <% if (!user) { %>
-    <p class="reviews-prompt">
-      <a class="btn btn-primary" href="/login?returnTo=<%= encodeURIComponent('/camps/' + camp._id) %>">Log in to leave a review</a>
-    </p>
-    <% } %>
-    <% if (!camp.reviews.length) { %>
-    <div class="reviews-empty">
-      <p class="mb-0">No reviews yet. Be the first to leave one.</p>
-    </div>
-    <% } %>
-    <% if (isSample(camp) && camp.reviews.length) { %>
-    <p class="sample-note">Reviews on sample listings are test entries.</p>
-    <% } %>
-    <% for (const review of camp.reviews) { %>
-    <% const posted = createdDate(review); %>
-    <article class="card mb-3">
-      <div class="card-body">
-        <h3 class="h6 card-title mb-1"><%= displayName(review.author) %></h3>
-        <% if (posted) { %>
-        <p class="small text-muted mb-1"><time datetime="<%= isoDate(posted) %>"><%= formatDate(posted) %></time></p>
-        <% } %>
-        <p class="card-subtitle mb-2 starability-result" data-rating="<%= review.rating %>">
-          Rated <%= review.rating %> out of 5
-        </p>
-        <p class="card-text"><%= review.body %></p>
-        <% if(user && sameId(review.author, user)) { %>
+    </section>
+
+    <section class="panel camp-reviews" aria-labelledby="reviews">
+      <div class="camp-reviews__head">
+        <h2 class="h4 mb-0" id="reviews">Reviews</h2>
+        <% if (camp.reviews.length) { %><%- include('../partials/rating', { camp }) %><% } %>
+      </div>
+      <% if (!user) { %>
+      <p class="reviews-prompt">
+        <a class="btn btn-primary" href="/login?returnTo=<%= encodeURIComponent('/camps/' + camp._id) %>">Log in to leave a review</a>
+      </p>
+      <% } else { %>
+      <% const typed = typeof reviewValues !== "undefined" && reviewValues ? reviewValues : {}; %>
+      <% const STARS = ["", "Terrible", "Not good", "Average", "Very good", "Amazing"]; %>
+      <div class="review-compose">
+        <h3 class="h5" id="review-form-title">Leave a review</h3>
+        <%- include('../partials/formErrors') %>
         <form
-          action="/camps/<%=camp._id%>/reviews/<%=review._id%>?_method=DELETE"
+          action="/camps/<%=camp._id%>/reviews"
           method="POST"
-          data-confirm="Delete your review?"
+          class="validForm review-form"
+          aria-labelledby="review-form-title"
+          novalidate
         >
-          <div class="d-flex justify-content-end">
-            <button class="btn btn-sm btn-danger">Delete review</button>
+          <fieldset class="mb-3" role="radiogroup"<%- fieldAria('rating', typeof fieldErrors !== "undefined" ? fieldErrors : null) %>>
+            <legend class="form-label fs-6 mb-1">Your rating</legend>
+            <div class="star-input">
+              <% for (let n = 1; n <= 5; n++) { %>
+              <input
+                type="radio"
+                id="rating-<%= n %>"
+                name="review[rating]"
+                value="<%= n %>"
+                data-field="rating"<%= typed.rating === String(n) ? " checked" : "" %><% if (n === 1) { %>
+                required
+                data-error="Choose a star rating from 1 to 5."<% } %>
+              />
+              <label for="rating-<%= n %>" title="<%= STARS[n] %>"><%= n %> star<%= n === 1 ? "" : "s" %>, <%= STARS[n].toLowerCase() %></label>
+              <% } %>
+            </div>
+            <%- include('../partials/fieldError', { name: 'rating' }) %>
+          </fieldset>
+          <div class="mb-3">
+            <label class="form-label" for="review-body">Your review</label>
+            <textarea
+              class="form-control<%= invalidClass('body', typeof fieldErrors !== "undefined" ? fieldErrors : null) %>"
+              name="review[body]"
+              id="review-body"
+              rows="4"
+              maxlength="1000"
+              required
+              data-field="body"
+              data-error="Enter your review."<%- fieldAria('body', typeof fieldErrors !== "undefined" ? fieldErrors : null) %>
+            ><%= typed.body || "" %></textarea>
+            <%- include('../partials/fieldError', { name: 'body' }) %>
           </div>
+          <button class="btn btn-primary">Post review</button>
         </form>
-        <% } %>
       </div>
-    </article>
-    <% } %>
+      <% } %>
+      <% if (!camp.reviews.length) { %>
+      <p class="reviews-empty">No reviews yet. Be the first to leave one.</p>
+      <% } %>
+      <% if (sample && camp.reviews.length) { %>
+      <p class="sample-note">Reviews on sample listings are test entries.</p>
+      <% } %>
+      <% if (camp.reviews.length) { %>
+      <ul class="review-list list-unstyled">
+        <% for (const review of camp.reviews) { %>
+        <% const posted = createdDate(review); %>
+        <li class="review">
+          <p class="review__meta">
+            <span class="review__author"><%= displayName(review.author) %></span>
+            <% if (posted) { %>
+            <span class="review__date"><time datetime="<%= isoDate(posted) %>"><%= formatDate(posted) %></time></span>
+            <% } %>
+          </p>
+          <p class="review__stars"><span class="stars" data-rating="<%= review.rating %>" aria-hidden="true"></span><span class="visually-hidden">Rated <%= review.rating %> out of 5</span></p>
+          <p class="review__body"><%= review.body %></p>
+          <% if(user && sameId(review.author, user)) { %>
+          <form
+            class="review__delete"
+            action="/camps/<%=camp._id%>/reviews/<%=review._id%>?_method=DELETE"
+            method="POST"
+            data-confirm="Delete your review?"
+          >
+            <button class="btn btn-sm btn-outline-danger">Delete review</button>
+          </form>
+          <% } %>
+        </li>
+        <% } %>
+      </ul>
+      <% } %>
+    </section>
   </div>
 </div>
 
