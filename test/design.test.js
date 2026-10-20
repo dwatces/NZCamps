@@ -199,3 +199,72 @@ test("landmarks, a skip link and one H1 with headings in order", async () => {
     assert.equal(new Set(ids).size, ids.length, `${name} has no duplicate ids`);
   }
 });
+
+// ---------- D3: header, menu and footer ----------
+
+const header = (html) => html.slice(html.indexOf("<header"), html.indexOf("</header>"));
+
+test("the header has the wordmark, the menu button and one current link", async () => {
+  const expected = {
+    "/": "NZ Camps",
+    "/camps": "Camps",
+    "/login": "Log in",
+    "/register": "Sign up",
+    [`/camps/${campId}`]: "Camps",
+  };
+  for (const [p, label] of Object.entries(expected)) {
+    const head = header((await request(app).get(p)).text);
+    assert.match(head, /<a class="navbar-brand site-brand" href="\/"/, p);
+    assert.match(head, /<svg class="site-brand__mark"[^>]*aria-hidden="true"/, p);
+    assert.match(head, /navbar-expand-md/, p);
+    assert.match(head, /aria-controls="site-menu"\s+aria-expanded="false"/, p);
+    const current = tags(
+      head,
+      /aria-current="[^"]+"[^<]*?>(?:\s*<svg[\s\S]*?<\/svg>\s*<span>)?[^<]*/g,
+    );
+    assert.equal(current.length, 1, `${p} marks one link`);
+    assert.ok(current[0].endsWith(label), `${p} marks ${label}`);
+  }
+  for (const p of ["/nope", "/credits"]) {
+    assert.doesNotMatch(header((await request(app).get(p)).text), /aria-current/, p);
+  }
+});
+
+test("signed in, the header offers Add a camp and a Log out button", async () => {
+  const agent = h.agentFor(app);
+  await agent.signUp();
+  const head = header((await agent.get("/camps/new")).text);
+  assert.match(head, /href="\/camps\/new" aria-current="page">Add a camp</);
+  assert.match(head, /<form action="\/logout" method="post"[^>]*>\s*<button type="submit"/);
+  assert.doesNotMatch(head, /href="\/login"/);
+});
+
+test("the footer is on every page with its credits and links", async () => {
+  for (const p of ["/", "/camps", `/camps/${campId}`, "/login", "/nope", "/credits"]) {
+    const html = (await request(app).get(p)).text;
+    const footer = html.slice(html.indexOf("<footer"), html.indexOf("</footer>"));
+    assert.match(
+      footer,
+      /A portfolio project by <a href="https:\/\/danielolliver\.com\/dev\/">Daniel Olliver<\/a>/,
+      p,
+    );
+    assert.match(
+      footer,
+      /<a href="https:\/\/github\.com\/dwatces\/NZCamps">Code on GitHub<\/a>/,
+      p,
+    );
+    assert.match(footer, /Listings marked Sample are invented examples/, p);
+    assert.match(footer, /OpenStreetMap<\/a> contributors/, p);
+    assert.match(footer, /<a href="\/credits">Photo credits<\/a>/, p);
+  }
+});
+
+test("the credits page names every photographer and links each photo", async () => {
+  const res = await request(app).get("/credits");
+  assert.equal(res.status, 200);
+  assert.match(res.text, /<h1[^>]*>Photo credits<\/h1>/);
+  for (const c of require("../utils/credits")) {
+    assert.ok(res.text.includes(`<a href="${c.page}">${c.credit}</a>`), c.credit);
+  }
+  assert.match(res.text, /the sample listing Milford Sound Basecamp/);
+});

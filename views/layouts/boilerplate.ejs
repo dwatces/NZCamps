@@ -37,20 +37,24 @@
   </head>
   <% const bodyClass = block('bodyClass').toString().trim(); %>
   <% const mainClass = block('mainClass').toString().trim(); %>
+  <% const pageClass = block('pageClass').toString().trim(); %>
   <body class="<%= bodyClass || 'has-backdrop' %>">
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
       <%- include('../partials/navbar') %>
     </header>
-    <main id="main" class="site-main <%= mainClass || 'container mt-5' %>" tabindex="-1">
+    <main id="main" class="site-main <%= mainClass %>" tabindex="-1">
       <% if (typeof demoBanner !== "undefined" && demoBanner) { %>
       <p class="demo-banner mb-0"><%= demoBanner %></p>
       <% } %>
-      <%- include('../partials/flash') %>
-      <%- body %>
+      <div class="<%= pageClass || 'container page' %>">
+        <%- include('../partials/flash') %>
+        <%- body %>
+      </div>
     </main>
     <%- include('../partials/footer') %>
     <script defer src="/vendor/bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
+    <script defer src="/js/nav.js"></script>
     <script defer src="/js/forms.js"></script>
     <script defer src="/js/confirm.js"></script>
     <%- block('scripts').toString() %>

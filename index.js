@@ -84,6 +84,10 @@ app.use((req, res, next) => {
   res.locals.success = [];
   res.locals.error = [];
   res.locals.demoBanner = "";
+  // For aria-current in the header: the path, and whether a query string
+  // (search, page, returnTo) makes this a variant of that page.
+  res.locals.currentPath = req.path;
+  res.locals.currentHasQuery = req.originalUrl.includes("?");
   // BASE_URL only builds absolute URLs (canonical, og:url, og:image). Navigation links
   // stay relative so a preview deployment never sends people to production.
   const base = (process.env.BASE_URL || "").replace(/\/+$/, "");
@@ -193,6 +197,10 @@ app.use("/camps/:id/reviews", reviewRoutes);
 
 app.get("/", (req, res) => {
   res.render("home");
+});
+
+app.get("/credits", (req, res) => {
+  res.render("credits", { credits: require("./utils/credits") });
 });
 
 app.all("*", (req, res, next) => {

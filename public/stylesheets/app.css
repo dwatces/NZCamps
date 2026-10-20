@@ -443,69 +443,186 @@ body {
   }
 }
 
-/* ---------- Navigation bar ---------- */
-.nav-link {
-  margin-top: 2.8rem;
-  padding: 0.15rem 0.5rem;
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: white !important;
-  margin-left: 0.5rem;
+/* ---------- Header ----------
+   Sticky, so pages need no offset for it. The menu collapses below 768 px
+   into a full-width panel with 48 px rows. */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  background-color: rgba(11, 21, 16, 0.96);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
-.navbar__bg {
-  background-color: rgba(0, 0, 0, 0.582) !important;
-  height: 2.8rem;
+@supports (backdrop-filter: blur(1px)) {
+  .site-header {
+    background-color: rgba(11, 21, 16, 0.86);
+    backdrop-filter: blur(10px);
+  }
 }
-.hamburger__bg {
-  background-color: rgba(0, 0, 0, 0.582) !important;
+.site-nav {
+  --bs-navbar-padding-y: 0.375rem;
+  --bs-navbar-color: var(--nzc-on-night);
+  --bs-navbar-hover-color: #fff;
+  --bs-navbar-active-color: #fff;
+  --bs-navbar-toggler-focus-width: 0;
 }
-@media (max-width: 991.98px) {
-  .nav-link {
-    padding: 0.2rem 0.2rem;
-    margin-top: 1rem !important;
-    margin-left: 0 !important;
-    font-size: 1rem;
-    font-weight: bold;
-    text-align: center !important;
-    width: 6rem !important;
-  }
-  .navbar__bg {
-    height: 3.5rem;
-    width: 5rem;
-  }
-  .mobile__bg {
-    background-color: rgba(0, 0, 0, 0.9) !important;
-    padding-bottom: 1rem !important;
-  }
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--nzc-tap);
+  padding: 0;
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.25rem;
+  letter-spacing: -0.015em;
+}
+.site-brand:hover,
+.site-brand:focus {
+  color: #fff;
+}
+.site-brand__mark {
+  color: var(--nzc-green-700);
+  flex: none;
+}
+.site-nav .nav-link {
+  display: flex;
+  align-items: center;
+  min-height: var(--nzc-tap);
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--nzc-radius-sm);
+  color: var(--nzc-on-night);
+  font-weight: 600;
+}
+.site-nav .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+/* The current page: a green underline (5.8:1 against the header). */
+.site-nav .nav-link[aria-current] {
+  color: #fff;
+  box-shadow: inset 0 -3px 0 var(--nzc-green-500);
+  border-radius: var(--nzc-radius-sm) var(--nzc-radius-sm) 0 0;
+}
+.site-nav .nav-link--cta {
+  margin-left: 0.25rem;
+  background-color: var(--nzc-green-700);
+  color: #fff;
+}
+.site-nav .nav-link--cta:hover {
+  background-color: var(--nzc-green-800);
 }
 .nav-logout {
-  display: inline;
   margin: 0;
 }
-.nav-logout .btn-link {
-  border: 0;
-  text-decoration: none;
+.site-nav__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--nzc-tap);
+  padding: 0.375rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  font-weight: 600;
+}
+.site-nav__toggle .navbar-toggler-icon {
+  width: 1.25em;
+  height: 1.25em;
+}
+@media (max-width: 767.98px) {
+  .site-nav .navbar-collapse {
+    margin: 0.375rem calc(var(--bs-gutter-x, 1.5rem) * -0.5) -0.375rem;
+    padding: 0.25rem 0 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    background-color: var(--nzc-night);
+  }
+  .site-nav .navbar-nav .nav-link {
+    min-height: 3rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0;
+  }
+  .site-nav .nav-link[aria-current] {
+    box-shadow: inset 4px 0 0 var(--nzc-green-500);
+    border-radius: 0;
+  }
+  .site-nav .nav-link--cta {
+    justify-content: center;
+    margin: 0.5rem 1rem 0;
+    border-radius: var(--nzc-radius-sm);
+  }
+  .nav-logout .nav-link {
+    width: 100%;
+    text-align: left;
+  }
 }
 
-/* ---------- Site footer and demo banner ---------- */
-.site-footer {
-  color: #fff;
-  background-color: rgba(0, 0, 0, 0.75);
-  padding: 0.75rem 0;
-  margin-top: 2rem;
+/* ---------- Page frame ---------- */
+.page {
+  padding-top: 1.5rem;
+  padding-bottom: 2.5rem;
 }
+@media (min-width: 992px) {
+  .page {
+    padding-top: 2.25rem;
+  }
+}
+/* Demo mode (no database): a full-width strip at the top of the page. */
 .demo-banner {
-  position: relative;
-  z-index: 1020;
-  margin-top: 56px;
-  padding: 0.5rem 1rem;
+  padding: 0.625rem 1rem;
   text-align: center;
   color: var(--nzc-ink);
   background-color: var(--nzc-sample);
   font-weight: 600;
 }
-@media (min-width: 992px) {
-  .demo-banner {
-    margin-top: 45px;
+/* Panels: solid surfaces for text that would otherwise sit on a photo. */
+.panel {
+  padding: 1.25rem;
+  border-radius: var(--nzc-radius);
+  background-color: var(--nzc-surface);
+  box-shadow: var(--nzc-shadow);
+  color: var(--nzc-ink);
+}
+@media (min-width: 576px) {
+  .panel {
+    padding: 1.75rem 2rem;
   }
+}
+.panel--narrow {
+  max-width: 46rem;
+  margin-inline: auto;
+}
+.credit-list {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--nzc-line);
+}
+.credit {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--nzc-line);
+}
+.credit__name {
+  font-weight: 700;
+}
+.credit__meta {
+  color: var(--nzc-ink-muted);
+  font-size: 0.9375rem;
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  padding: 1.5rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: var(--nzc-night);
+  color: var(--nzc-on-night-muted);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+.site-footer p {
+  margin-bottom: 0.375rem;
+}
+.site-footer a {
+  color: #fff;
+}
+.site-footer__note {
+  color: #fff;
+  font-weight: 600;
 }

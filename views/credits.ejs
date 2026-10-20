@@ -1,0 +1,23 @@
+<% layout('layouts/boilerplate') %>
+<% block('title', 'Photo credits') %>
+<% block('description', 'Who took the photos on NZ Camps: every photo is from Unsplash, listed with its photographer and location.') %>
+<article class="panel panel--narrow">
+  <h1 class="h2">Photo credits</h1>
+  <p>
+    Every photo on NZ Camps is from <a href="https://unsplash.com">Unsplash</a> and used under the
+    <a href="https://unsplash.com/license">Unsplash License</a>. The sample listings are invented, and each
+    one uses a photo whose Unsplash page names that area.
+  </p>
+  <ul class="credit-list list-unstyled mb-0">
+    <% for (const c of credits) { %>
+    <li class="credit">
+      <p class="credit__name mb-1"><a href="<%= c.page %>"><%= c.credit %></a> on Unsplash</p>
+      <% if (c.alt) { %><p class="mb-1"><%= c.alt %>.</p><% } %>
+      <p class="credit__meta mb-0">
+        Location on Unsplash: <%= c.place || "not given" %>.
+        Used for: <%= c.usedFor.join(", ") %>.
+      </p>
+    </li>
+    <% } %>
+  </ul>
+</article>

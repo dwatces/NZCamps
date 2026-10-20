@@ -1,40 +1,55 @@
-<section id="navigation">
-  <nav
-    role="navigation"
-    class="navbar navbar-dark fixed-top navbar-expand-lg navbar__bg"
-  >
-    <div class="container-fluid mb-5">
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNavAltMarkup"
-        aria-controls="navbarNavAltMarkup"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon hamburger__bg"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav mobile__bg">
-          <a class="nav-link nav-brand" href="/">Home</a>
-
-          <a class="nav-link" href="/camps">Camps</a>
-          <% if(user) { %>
-          <a class="nav-link" href="/camps/new">Add a camp</a>
-          <% } %>
-        </div>
-        <div class="navbar-nav mobile__bg center ms-auto">
-          <% if(!user) { %>
-          <a href="/login" class="nav-link">Log in</a>
-          <a href="/register" class="nav-link">Sign up</a>
-          <% } else { %>
+<%
+  // aria-current marks at most one header link: "page" when this is exactly
+  // the page the link opens, "true" for a variant of it (a search or page 2
+  // of Camps, log in with a return address) or a camp's own pages under
+  // Camps. Other pages (404, log out, credits) mark nothing.
+  const here = typeof currentPath === "string" ? currentPath.replace(/\/+$/, "") || "/" : "";
+  const variant = typeof currentHasQuery !== "undefined" && currentHasQuery;
+  const inCamps = /^\/camps\/(?!new$)[^/]+(\/edit)?$/.test(here);
+  const current = (path) => {
+    if (here === path) return variant ? ' aria-current="true"' : ' aria-current="page"';
+    return path === "/camps" && inCamps ? ' aria-current="true"' : "";
+  };
+%>
+<nav class="navbar navbar-expand-md navbar-dark site-nav" aria-label="Main">
+  <div class="container">
+    <a class="navbar-brand site-brand" href="/"<%- current('/') %>>
+      <svg class="site-brand__mark" viewBox="0 0 32 32" width="30" height="30" aria-hidden="true" focusable="false">
+        <rect width="32" height="32" rx="7" fill="currentColor" />
+        <path d="M6.5 24 16 8l9.5 16M12.5 24l3.5-6.5 3.5 6.5M4 24h24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <span>NZ Camps</span>
+    </a>
+    <button
+      class="navbar-toggler site-nav__toggle"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#site-menu"
+      aria-controls="site-menu"
+      aria-expanded="false"
+    >
+      <span class="navbar-toggler-icon" aria-hidden="true"></span>
+      <span>Menu</span>
+    </button>
+    <div class="collapse navbar-collapse" id="site-menu">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link" href="/camps"<%- current('/camps') %>>Camps</a></li>
+        <% if (user) { %>
+        <li class="nav-item"><a class="nav-link" href="/camps/new"<%- current('/camps/new') %>>Add a camp</a></li>
+        <% } %>
+      </ul>
+      <ul class="navbar-nav">
+        <% if (!user) { %>
+        <li class="nav-item"><a class="nav-link" href="/login"<%- current('/login') %>>Log in</a></li>
+        <li class="nav-item"><a class="nav-link nav-link--cta" href="/register"<%- current('/register') %>>Sign up</a></li>
+        <% } else { %>
+        <li class="nav-item">
           <form action="/logout" method="post" class="nav-logout">
-            <button type="submit" class="nav-link btn btn-link">Log out</button>
+            <button type="submit" class="nav-link">Log out</button>
           </form>
-          <% } %>
-        </div>
-      </div>
+        </li>
+        <% } %>
+      </ul>
     </div>
-  </nav>
-</section>
+  </div>
+</nav>
