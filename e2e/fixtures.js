@@ -187,12 +187,14 @@ async function signUp(page, username) {
   await expect(page.locator(".alert-success")).toContainText(`Welcome to NZ Camps, ${username}`);
 }
 
-// Shows the camps map (the Map toggle on a phone) and waits for its markers.
-async function showListMap(page) {
+// Shows the camps map (the Map toggle on a phone) and waits for its markers
+// (or, for an empty list, for the map itself).
+async function showListMap(page, { markers = true } = {}) {
   if (isPhone(page)) await page.getByRole("button", { name: "Map", exact: true }).click();
   const map = page.locator("#cluster-map");
   await expect(map).toBeVisible();
-  await expect(map.locator(".leaflet-marker-icon").first()).toBeVisible();
+  if (markers) await expect(map.locator(".leaflet-marker-icon").first()).toBeVisible();
+  else await expect(map.locator(".leaflet-tile-loaded").first()).toBeVisible();
   return map;
 }
 
