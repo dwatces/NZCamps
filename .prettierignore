@@ -1,0 +1,11 @@
+node_modules/
+package-lock.json
+docs/
+public/vendor/
+views/**/*.ejs
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.ico
+*.svg
