@@ -24,5 +24,7 @@ The files in `public/images/samples/` were downloaded at 1600 px wide and recomp
 
 | File | Photographer | Unsplash page | Location on the page | Used for |
 |---|---|---|---|---|
-| `/stylesheets/robert-koorenny-Py2ULdPgHac-unsplash.jpg` | Robert Koorenny | https://unsplash.com/photos/Py2ULdPgHac | None given | Home page background |
+| `/stylesheets/robert-koorenny-Py2ULdPgHac-unsplash.jpg` | Robert Koorenny | https://unsplash.com/photos/Py2ULdPgHac | None given | Home page photo, and the social card (`og-nzcamps.jpg`) |
 | `/stylesheets/harry-knight-mqpY5vyNrKE-unsplash.jpg` | Harry Knight | https://unsplash.com/photos/mqpY5vyNrKE | New Zealand | Source of `auth-ferns-480.jpg` and `auth-ferns-960.jpg` (log in and sign up cards) |
+
+The resized AVIF and JPEG copies in this folder (made by `npm run images`) are versions of the photos above and carry the same credits. The site lists the same credits at /credits.

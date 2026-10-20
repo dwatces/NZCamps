@@ -18,11 +18,12 @@ I started it in July 2021 as a learning project, originally using Mapbox for map
 - **Camps:** create, edit and delete campgrounds (title, price per night, location, description, photos). Only the camp's creator can edit or delete it.
 - **Photo uploads:** up to three JPG, PNG or WebP photos of up to 1.4 MB each per form, checked by their content, not the declared type. With Cloudinary credentials set, uploads go to Cloudinary, and only after the rest of the form has passed its checks. Without them, images are stored in the camp document as data URIs, so uploads still work on serverless hosting with no writable disk. The edit form can add more photos or remove existing ones.
 - **Geocoding:** the location text is turned into coordinates, with ", New Zealand" added to the search. Uses OpenCage when a token is set, otherwise the keyless OpenStreetMap Nominatim API; both are restricted to New Zealand results and give up after 5 seconds.
-- **Maps:** the camps page shows every camp on a Leaflet map with marker clustering; each camp page has its own map with a marker.
+- **Maps:** the camps page shows every matching camp on a Leaflet map with marker clustering, fitted to the markers; on desktop the map sits beside the list, on phones a List | Map toggle swaps them. Each camp page has its own map with a marker.
 - **Reviews:** 1 to 5 star ratings with a written review. Reviewers can delete their own reviews, and deleting a camp removes its reviews.
-- **Validation:** Joi schemas (and matching Mongoose limits) check camp, review and sign-up input on the server; a form that fails comes back with what was typed and a list of problems. Bootstrap validation runs in the browser, and `express-mongo-sanitize` strips MongoDB operators from request data.
+- **Validation:** Joi schemas (and matching Mongoose limits) check camp, review and sign-up input on the server; a form that fails comes back with what was typed and a list of problems. The browser runs the same checks first with the same messages, and `express-mongo-sanitize` strips MongoDB operators from request data.
 - **Security:** a strict content security policy (no inline scripts or styles, front-end libraries served from this site), a cross-site form check, `HttpOnly`/`SameSite`/`Secure` session cookies and POST-only logout. Page data for the maps is written as escaped JSON and map popups are built from text, never HTML.
 - **Sample listings:** eight invented camps at real places across both islands, labelled "Sample listing" wherever they appear; every page footer explains the label. Their photos are from Unsplash, each of the area it is listed in, with alt text and a credit line ([public/images/CREDITS.md](public/images/CREDITS.md)). There are no sample reviews.
+- **Pages and photos:** responsive from 320 px wide, with one design system on Bootstrap 5.3 (`public/stylesheets/tokens.css`). Photos are served as AVIF (with JPEG fallbacks) at the width each slot needs, made by `npm run images`; the home page loads 173 KB of images on a phone instead of a 4.8 MB photo. Every page has its own title, description and social card image, a skip link, a visible focus ring on every control, buttons and controls at least 44 px, and no motion when reduced motion is set.
 - **Demo mode:** if `DB_URL` is not set, or the database cannot be reached within 5 seconds, the camps list (with search, sort and pages) and the eight sample camp pages render from `seeds/demoData.js`, every page shows a banner saying so, and form submissions get a page explaining that nothing can be saved. After a failed connection the app tries again on a later request, at most once every 30 seconds, so one cold-start blip does not leave an instance on sample content.
 
 ## Tech stack
@@ -86,6 +87,7 @@ npm run lint          # ESLint
 npm run format:check  # Prettier
 npm run check:bundle  # trace the Vercel function and run the tests against that copy
 npm run vendor        # re-copy the pinned Leaflet and Bootstrap files into public/vendor
+npm run images        # remake the AVIF and JPEG photo variants (needs ImageMagick with AVIF)
 ```
 
 The tests download nothing at install time: `mongodb-memory-server` is pinned to MongoDB 8.2.6 in `package.json` and fetches the binary on first use (cached in `~/.cache/mongodb-binaries`).
@@ -109,11 +111,11 @@ utils/            geocoding, sessions, security headers, view helpers, errors
 seeds/            sample camps and the database seeder
 views/            EJS templates
 public/           stylesheets, images, browser scripts and vendored libraries
-scripts/          bundle check and vendoring scripts
+scripts/          bundle check, vendoring and image scripts
 test/             integration tests and their helpers
 ```
 
-All photos are from Unsplash; [public/images/CREDITS.md](public/images/CREDITS.md) lists each photographer, its Unsplash page and the location that page gives.
+All photos are from Unsplash; [public/images/CREDITS.md](public/images/CREDITS.md) and the site's own /credits page list each photographer, its Unsplash page and the location that page gives.
 
 ## Author
 
