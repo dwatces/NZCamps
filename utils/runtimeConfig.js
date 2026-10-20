@@ -8,4 +8,6 @@ module.exports = {
   serverSelectionTimeoutMS: 5000,
   // How long a geocoder request may take before the form says to try again.
   geocodeTimeoutMs: 5000,
+  // After a failed connection, the soonest a request may try again.
+  reconnectBackoffMs: 30000,
 };

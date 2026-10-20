@@ -37,10 +37,31 @@ test("sample photos have real alt text and a credit", async () => {
   assert.doesNotMatch(res.text, /alt="\.\.\."/);
 });
 
-test("without DB_URL, writes are refused", async () => {
+// X7 changed this from a flash and a redirect to the same 503 page an outage
+// gives, with copy that is true for a copy of the app with no database.
+test("without DB_URL, writes are refused with an honest message", async () => {
   const res = await h.agentFor(app).post("/register").type("form").send({ username: "x" });
-  assert.equal(res.status, 302);
-  assert.equal(res.headers.location, "/camps");
+  assert.equal(res.status, 503);
+  assert.match(res.text, /has no database connected, so you can browse sample camps but not save/);
+  assert.doesNotMatch(res.text, /provisioned/);
+});
+
+test("without DB_URL, every page shows the sample-camps banner", async () => {
+  for (const p of ["/", "/camps", "/camps/demo3", "/login"]) {
+    const res = await h.agentFor(app).get(p);
+    assert.match(
+      res.text,
+      /<p class="demo-banner[^"]*">Showing sample camps\. This copy of NZ Camps has no database connected, so you can browse but not save changes\.<\/p>/,
+      p,
+    );
+  }
+});
+
+test("without DB_URL, an unknown camp is a quick 404", async () => {
+  const started = Date.now();
+  const res = await h.agentFor(app).get("/camps/0123456789abcdef01234567");
+  assert.equal(res.status, 404);
+  assert.ok(Date.now() - started < 2000, "no wait for a database");
 });
 
 test("without DB_URL, every sample camp carries the Sample listing badge", async () => {

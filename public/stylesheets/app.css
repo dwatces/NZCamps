@@ -228,3 +228,15 @@
   border-radius: 0.25rem;
   margin-bottom: 0.25rem;
 }
+
+/* Demo mode (no database): a plain strip under the fixed navbar. */
+.demo-banner {
+  position: relative;
+  z-index: 1020;
+  margin-top: 56px;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  color: #1b1b1b;
+  background-color: #ffd166;
+  font-weight: 600;
+}

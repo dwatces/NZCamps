@@ -23,7 +23,7 @@ I started it in July 2021 as a learning project, originally using Mapbox for map
 - **Validation:** Joi schemas (and matching Mongoose limits) check camp, review and sign-up input on the server; a form that fails comes back with what was typed and a list of problems. Bootstrap validation runs in the browser, and `express-mongo-sanitize` strips MongoDB operators from request data.
 - **Security:** a strict content security policy (no inline scripts or styles, front-end libraries served from this site), a cross-site form check, `HttpOnly`/`SameSite`/`Secure` session cookies and POST-only logout. Page data for the maps is written as escaped JSON and map popups are built from text, never HTML.
 - **Sample listings:** eight invented camps at real places across both islands, labelled "Sample listing" wherever they appear; every page footer explains the label. Their photos are from Unsplash, each of the area it is listed in, with alt text and a credit line ([public/images/CREDITS.md](public/images/CREDITS.md)). There are no sample reviews.
-- **Demo mode:** if `DB_URL` is not set, or the database cannot be reached within 5 seconds, the camps list and the eight sample camp pages render from `seeds/demoData.js`, and form submissions show a notice instead of saving.
+- **Demo mode:** if `DB_URL` is not set, or the database cannot be reached within 5 seconds, the camps list (with search, sort and pages) and the eight sample camp pages render from `seeds/demoData.js`, every page shows a banner saying so, and form submissions get a page explaining that nothing can be saved. After a failed connection the app tries again on a later request, at most once every 30 seconds, so one cold-start blip does not leave an instance on sample content.
 
 ## Tech stack
 
@@ -92,7 +92,7 @@ The tests download nothing at install time: `mongodb-memory-server` is pinned to
 
 ## Deployment
 
-`vercel.json` rewrites every request to `api/index.js`, which exports the Express app from `index.js`. `index.js` only calls `app.listen` when run directly, so the same code serves both `npm start` and Vercel. On a cold start, requests wait for the MongoDB connection (up to 5 seconds) before falling back to demo content. The function bundle holds the traced code plus `views/`; `public/` is served by Vercel's CDN, and `public/vendor/` is cached for a year.
+`vercel.json` rewrites every request to `api/index.js`, which exports the Express app from `index.js`. `index.js` only calls `app.listen` when run directly, so the same code serves both `npm start` and Vercel. On a cold start, requests wait for the MongoDB connection (up to 5 seconds) before falling back to demo content; a failed connection is retried on the request path (no timers, since a frozen function runs none) at most every 30 seconds. The function bundle holds the traced code plus `views/`; `public/` is served by Vercel's CDN, and `public/vendor/` is cached for a year.
 
 ## Project structure
 

@@ -20,6 +20,9 @@
   <% const mainClass = block('mainClass').toString().trim(); %>
   <body class="<%= bodyClass || 'd-flex flex-column background__color__auth' %>">
     <%- include('../partials/navbar') %>
+    <% if (typeof demoBanner !== "undefined" && demoBanner) { %>
+    <p class="demo-banner mb-0"><%= demoBanner %></p>
+    <% } %>
     <main id="main" class="<%= mainClass || 'container mt-5' %>">
       <%- include('../partials/flash') %>
       <%- body %>

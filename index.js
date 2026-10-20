@@ -32,17 +32,27 @@ const { parseListQuery, listDemoCamps, renderCampList } = require("./utils/campQ
 const dbUrl = process.env.DB_URL;
 
 // One connection per serverless instance, started at module load and reused.
+// If that first connection fails (a cold start during a network blip), a
+// later request tries again, at most once per reconnectBackoffMs. Once a
+// connection has been made, the driver handles drops and reconnects itself.
 let connecting = Promise.resolve();
-if (dbUrl) {
+let lastAttempt = 0;
+let connectFailed = false;
+function connect() {
+  lastAttempt = Date.now();
+  connectFailed = false;
   connecting = mongoose
     .connect(dbUrl, {
       serverSelectionTimeoutMS: runtimeConfig.serverSelectionTimeoutMS,
       maxPoolSize: 5,
     })
-    .catch((e) => console.error("mongo connect failed:", e.message));
-} else {
-  console.warn("DB_URL not set - running without database");
+    .catch((e) => {
+      connectFailed = true;
+      console.error("mongo connect failed:", e.message);
+    });
 }
+if (dbUrl) connect();
+else console.warn("DB_URL not set - running without database");
 
 const db = mongoose.connection;
 db.on("error", (e) => console.error("connection error:", e && e.message));
@@ -73,6 +83,7 @@ app.use((req, res, next) => {
   res.locals.user = null;
   res.locals.success = [];
   res.locals.error = [];
+  res.locals.demoBanner = "";
   // BASE_URL only builds absolute URLs (the canonical link). Navigation links
   // stay relative so a preview deployment never sends people to production.
   const base = (process.env.BASE_URL || "").replace(/\/+$/, "");
@@ -88,9 +99,13 @@ app.use(mongoSanitize());
 
 // Serverless: the function freezes between requests, so the boot-time connect
 // may still be in flight on the first request. Wait for it (bounded) before
-// sessions are read, so a cold start finds the session store ready.
+// sessions are read, so a cold start finds the session store ready. A failed
+// connection is retried here, on the request path, rather than on a timer:
+// a frozen instance runs no timers, and a timer would keep tests alive.
 app.use(async (req, res, next) => {
   if (dbUrl && mongoose.connection.readyState !== 1) {
+    const due = Date.now() - lastAttempt >= runtimeConfig.reconnectBackoffMs;
+    if (connectFailed && mongoose.connection.readyState === 0 && due) connect();
     let timer;
     await Promise.race([
       connecting,
@@ -136,35 +151,33 @@ app.use((req, res, next) => {
 });
 
 // DEMO MODE: without a database connection, camp pages render the sample
-// camps. Without DB_URL (local demo) writes flash a notice. With DB_URL set
-// but unreachable (an outage) writes get a 503 page directly: no flash and no
-// session write, so a returning visitor's real cookie is left alone.
-const OUTAGE_MSG =
-  "The database isn't reachable right now, so you can browse sample camps but not save changes.";
+// camps, every page shows a banner saying so, and writes get a 503 page
+// directly: no flash and no session write, so a returning visitor's real
+// cookie is left alone.
+const NO_DB = dbUrl
+  ? "The database isn't reachable right now"
+  : "This copy of NZ Camps has no database connected";
+const OUTAGE_MSG = `${NO_DB}, so you can browse sample camps but not save changes.`;
+const DEMO_BANNER = `Showing sample camps. ${NO_DB}, so you can browse but not save changes.`;
 app.use((req, res, next) => {
   if (mongoose.connection.readyState === 1) return next();
+  res.locals.demoBanner = DEMO_BANNER;
   if (req.method === "GET" && /^\/camps\/?$/.test(req.path)) {
     const params = parseListQuery(req.query);
     return renderCampList(res, params, listDemoCamps(demoCamps, params));
   }
-  const m = req.path.match(/^\/camps\/([a-z0-9]+)$/);
+  const m = req.path.match(/^\/camps\/([^/]+)$/);
   if (req.method === "GET" && m && m[1] !== "new") {
     const camp = demoCamps.find((c) => c._id === m[1]);
     if (camp) return res.render("camps/show", { camp });
+    return next(new ExpressError("Page not found", 404));
   }
   if (req.method !== "GET") {
-    if (dbUrl) {
-      return res.status(503).render("error", {
-        status: 503,
-        title: "Changes can't be saved right now",
-        message: OUTAGE_MSG,
-      });
-    }
-    req.flash(
-      "error",
-      "Demo mode: the live database is being provisioned - browsing only for now.",
-    );
-    return res.redirect("/camps");
+    return res.status(503).render("error", {
+      status: 503,
+      title: "Changes can't be saved right now",
+      message: OUTAGE_MSG,
+    });
   }
   return next();
 });

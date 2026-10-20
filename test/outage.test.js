@@ -35,6 +35,7 @@ test("the camps page shows the sample camps quickly", async () => {
   const elapsed = Date.now() - started;
   assert.equal(res.status, 200);
   assert.match(res.text, /Milford Sound Basecamp/);
+  assert.match(res.text, /Showing sample camps\. The database isn&#39;t reachable right now/);
   assert.ok(elapsed < 2000, `answered in ${elapsed} ms`);
 });
 
