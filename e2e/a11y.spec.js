@@ -104,6 +104,23 @@ const STATES = [
     },
   },
   {
+    // The server's own error page for the form (a place the geocoder cannot
+    // find), not the summary the browser script builds.
+    name: "new-server-error",
+    go: () => "/camps/new",
+    user: MEMBER.username,
+    allow: [/\/camps$/, 422],
+    act: async (page) => {
+      await page.getByLabel("Camp name").fill("Somewhere new");
+      await page.getByLabel("Location").fill("Nowhere at all");
+      await page.getByLabel("Price per night").fill("10");
+      await page.getByLabel("Description").fill("A camp at a place that cannot be found.");
+      await page.getByRole("button", { name: "Add camp" }).click();
+      await expect(page.locator("#form-errors")).toBeFocused();
+      await expect(page.locator("#location-error")).toContainText("couldn't find that location");
+    },
+  },
+  {
     name: "edit-with-photos",
     go: async (p) => `${await campPath(p, MEMBER.campTitle)}/edit`,
     user: MEMBER.username,

@@ -1,11 +1,19 @@
 // End-to-end and accessibility tests (npm run test:e2e). They are not part of
 // npm test. Playwright starts two local servers (e2e/server.js): one with an
 // in-memory MongoDB on 7203 and one in demo mode on 7206, and stops them at
-// the end. The browser is the system Chrome: no browser download.
+// the end.
+//
+// Browser: CHROME_PATH if it is set, otherwise Google Chrome at
+// /usr/bin/google-chrome if it is there. Without either, Playwright uses its
+// own Chromium, which has to be installed once with
+// `npx playwright install chromium`; nothing is downloaded automatically.
+const fs = require("node:fs");
 const { defineConfig } = require("@playwright/test");
 const { PORTS } = require("./e2e/constants");
 
-const CHROME = process.env.CHROME_PATH || "/usr/bin/google-chrome";
+const SYSTEM_CHROME = "/usr/bin/google-chrome";
+const CHROME =
+  process.env.CHROME_PATH || (fs.existsSync(SYSTEM_CHROME) ? SYSTEM_CHROME : undefined);
 
 module.exports = defineConfig({
   testDir: "e2e",
