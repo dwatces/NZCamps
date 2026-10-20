@@ -8,6 +8,9 @@ const helmet = require("helmet");
 //
 // Referrer-Policy is the browser default rather than helmet's no-referrer:
 // OpenStreetMap's tile servers refuse tile requests that carry no Referer.
+//
+// X-Frame-Options is DENY so it says the same as frame-ancestors 'none'
+// (browsers that know CSP follow frame-ancestors; older ones read this).
 module.exports = helmet({
   contentSecurityPolicy: {
     useDefaults: true,
@@ -31,5 +34,6 @@ module.exports = helmet({
       "upgrade-insecure-requests": null,
     },
   },
+  frameguard: { action: "deny" },
   referrerPolicy: { policy: "strict-origin-when-cross-origin" },
 });

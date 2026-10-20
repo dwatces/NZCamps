@@ -382,7 +382,7 @@ describe("P1-2 security headers", () => {
   };
 
   for (const p of ["/", "/camps", "/camps/:id", "/login", "/register", "/nope"]) {
-    test(`P1-2 ${p} sends the CSP, nosniff and a referrer policy that keeps map tiles working`, async () => {
+    test(`P1-2 ${p} sends the CSP, nosniff, DENY framing and a referrer policy that keeps map tiles working`, async () => {
       const res = await request(app).get(p.replace(":id", campId));
       const csp = parseCsp(res.headers["content-security-policy"] || "");
       for (const [name, values] of Object.entries(EXPECTED)) {
@@ -390,6 +390,8 @@ describe("P1-2 security headers", () => {
       }
       assert.equal(csp["upgrade-insecure-requests"], undefined, "no upgrade-insecure-requests");
       assert.equal(res.headers["x-content-type-options"], "nosniff");
+      // The old framing header agrees with frame-ancestors 'none'.
+      assert.equal(res.headers["x-frame-options"], "DENY");
       // OpenStreetMap refuses tile requests without a Referer (helmet's default is no-referrer).
       assert.equal(res.headers["referrer-policy"], "strict-origin-when-cross-origin");
       assert.equal(res.headers["x-powered-by"], undefined, "no X-Powered-By");
