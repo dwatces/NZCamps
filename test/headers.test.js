@@ -95,3 +95,50 @@ test("pages are valid single documents: one head, nav inside body", async () => 
     assert.equal((res.text.match(/<main/g) || []).length, 1, `${p} has one <main>`);
   }
 });
+
+test("BASE_URL only sets the canonical link; navigation links stay relative", async () => {
+  process.env.BASE_URL = "https://nz-camps.vercel.app/";
+  try {
+    const res = await request(app).get("/camps?page=2");
+    assert.match(
+      res.text,
+      /<link rel="canonical" href="https:\/\/nz-camps\.vercel\.app\/camps" \/>/,
+    );
+    assert.doesNotMatch(
+      res.text,
+      /href="https:\/\/nz-camps\.vercel\.app\/(register|login|camps\/new)"/,
+    );
+    assert.match(res.text, /href="\/register"/);
+  } finally {
+    process.env.BASE_URL = "";
+  }
+  const local = await request(app).get("/login").set("Host", "camps.example");
+  assert.match(local.text, /<link rel="canonical" href="http:\/\/camps\.example\/login" \/>/);
+});
+
+test("repo hygiene: .env.example is committed and lists every variable", h.notInBundle, () => {
+  const root = path.join(__dirname, "..");
+  const example = fs.readFileSync(path.join(root, ".env.example"), "utf8");
+  for (const name of [
+    "DB_URL",
+    "SECRET",
+    "OPENCAGE_ACCESS_TOKEN",
+    "CLOUDINARY_NAME",
+    "CLOUDINARY_API_KEY",
+    "CLOUDINARY_SECRET",
+    "BASE_URL",
+    "PORT",
+    "NODE_ENV",
+    "SEED_PASSWORD",
+    "CONFIRM_REMOTE",
+  ]) {
+    assert.match(example, new RegExp(`^${name}=`, "m"), name);
+  }
+  const vercel = JSON.parse(fs.readFileSync(path.join(root, "vercel.json"), "utf8"));
+  const rule = vercel.headers.find((r) => r.source === "/vendor/(.*)");
+  assert.match(rule.headers[0].value, /immutable/);
+  assert.ok(
+    !vercel.headers.some((r) => /^\/(js|stylesheets)\//.test(r.source)),
+    "js and css keep the default",
+  );
+});

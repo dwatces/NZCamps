@@ -64,6 +64,10 @@ app.use((req, res, next) => {
   res.locals.user = null;
   res.locals.success = [];
   res.locals.error = [];
+  // BASE_URL only builds absolute URLs (the canonical link). Navigation links
+  // stay relative so a preview deployment never sends people to production.
+  const base = (process.env.BASE_URL || "").replace(/\/+$/, "");
+  res.locals.canonicalUrl = (base || `${req.protocol}://${req.get("host")}`) + req.path;
   next();
 });
 

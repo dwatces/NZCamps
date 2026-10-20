@@ -1,7 +1,7 @@
 {
   "name": "nzcamps",
   "version": "1.0.0",
-  "description": "Camps across New Zealand",
+  "description": "Campground reviews for New Zealand: Express, EJS, MongoDB and Passport",
   "main": "index.js",
   "engines": {
     "node": "22.x"
@@ -17,9 +17,15 @@
   },
   "keywords": [
     "camping",
-    "camps",
-    "nz",
-    "purenz"
+    "campgrounds",
+    "new-zealand",
+    "reviews",
+    "express",
+    "ejs",
+    "mongodb",
+    "mongoose",
+    "passport",
+    "leaflet"
   ],
   "author": "Daniel Olliver",
   "license": "ISC",
