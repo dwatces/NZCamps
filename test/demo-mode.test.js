@@ -84,3 +84,8 @@ test("without DB_URL, search, sort and pages work on the sample camps", async ()
   assert.match(cheap.text, /Free/);
   assert.equal((await h.agentFor(app).get("/camps/?page=abc")).status, 200);
 });
+
+test("without DB_URL, HEAD requests are reads, not refused writes", async () => {
+  assert.equal((await h.agentFor(app).head("/camps")).status, 200);
+  assert.equal((await h.agentFor(app).head("/camps/demo2")).status, 200);
+});

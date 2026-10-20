@@ -32,7 +32,10 @@
                 spellcheck="false"
                 autofocus
                 required
+                data-field="username"
+                data-error="Enter your username."
               />
+              <%- include('../partials/fieldError', { name: 'username' }) %>
             </div>
 
             <div class="mb-3">
@@ -44,7 +47,10 @@
                 name="password"
                 autocomplete="current-password"
                 required
+                data-field="password"
+                data-error="Enter your password."
               />
+              <%- include('../partials/fieldError', { name: 'password' }) %>
             </div>
             <button class="btn btn-success w-100">Log in</button>
           </form>

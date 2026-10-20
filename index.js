@@ -162,17 +162,18 @@ const DEMO_BANNER = `Showing sample camps. ${NO_DB}, so you can browse but not s
 app.use((req, res, next) => {
   if (mongoose.connection.readyState === 1) return next();
   res.locals.demoBanner = DEMO_BANNER;
-  if (req.method === "GET" && /^\/camps\/?$/.test(req.path)) {
+  const reading = req.method === "GET" || req.method === "HEAD";
+  if (reading && /^\/camps\/?$/.test(req.path)) {
     const params = parseListQuery(req.query);
     return renderCampList(res, params, listDemoCamps(demoCamps, params));
   }
   const m = req.path.match(/^\/camps\/([^/]+)$/);
-  if (req.method === "GET" && m && m[1] !== "new") {
+  if (reading && m && m[1] !== "new") {
     const camp = demoCamps.find((c) => c._id === m[1]);
     if (camp) return res.render("camps/show", { camp });
     return next(new ExpressError("Page not found", 404));
   }
-  if (req.method !== "GET") {
+  if (!reading) {
     return res.status(503).render("error", {
       status: 503,
       title: "Changes can't be saved right now",
