@@ -1,0 +1,58 @@
+name: No Claude attribution
+
+# Daniel's rule: Claude must never show as a contributor. This fails any push or pull request
+# that carries a commit authored or committed by Claude/Anthropic, or a Claude trailer or
+# "Generated with Claude Code" line in a commit message.
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check commit authors and messages
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            RANGE="origin/main..$HEAD_SHA"
+            git rev-parse -q --verify origin/main >/dev/null || RANGE="$HEAD_SHA"
+          else
+            RANGE="$BASE_SHA..$HEAD_SHA"
+          fi
+          echo "Checking $RANGE"
+          bad=0
+          while IFS= read -r sha; do
+            meta=$(git log -1 --format='%an <%ae> | %cn <%ce>' "$sha")
+            msg=$(git log -1 --format='%B' "$sha")
+            if printf '%s' "$meta" | grep -qiE 'claude|anthropic'; then
+              echo "::error::$sha has a Claude/Anthropic author or committer: $meta"; bad=1
+            fi
+            if printf '%s' "$msg" | grep -qiE 'co-authored-by:.*(claude|anthropic)|generated with \[?claude|claude\.com/claude-code|noreply@anthropic\.com'; then
+              echo "::error::$sha has a Claude trailer or 'Generated with Claude Code' line"; bad=1
+            fi
+          done < <(git rev-list "$RANGE")
+          if [ "$bad" = 1 ]; then
+            echo "Fix: git config user.name 'Daniel Olliver'; git config user.email '74215535+dwatces@users.noreply.github.com'; git rebase <base> --exec 'git commit --amend --no-edit --reset-author', remove the trailer lines, then force-push the branch."
+            exit 1
+          fi
+          echo "OK: no Claude attribution in $RANGE"
+      - name: Check the pull request text
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          if printf '%s\n%s' "$PR_TITLE" "$PR_BODY" | grep -qiE 'generated with \[?claude|claude\.com/claude-code|co-authored-by:.*claude'; then
+            echo "::error::Remove the Claude attribution line from the pull request title or body."; exit 1
+          fi
+          echo "OK: pull request text is clean"
