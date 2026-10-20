@@ -1,15 +1,36 @@
 <% layout('layouts/boilerplate') %>
-<% block('bodyClass', 'text-center text-white home-page') %>
-<% block('mainClass', 'd-flex flex-column') %>
-<% block('pageClass', 'd-flex flex-column flex-grow-1') %>
-<% block('preload', '<link rel="preload" as="image" href="/stylesheets/robert-koorenny-Py2ULdPgHac-unsplash.jpg" />') %>
-<div class="cover-container d-flex w-100 p-3 mx-auto flex-column flex-grow-1 justify-content-center">
-  <h1 class="home__title">New Zealand Camps</h1>
-  <p class="lead home__subheader">
-    Welcome to NZ Camps! <br />
-    Jump right in and explore camps across beautiful Aotearoa.
-  </p>
-  <div>
+<% block('bodyClass', 'home-page') %>
+<% block('mainClass', 'home') %>
+<% block('pageClass', 'home__inner') %>
+<% const portrait = imageSet('hero.portrait'); %>
+<% const wide = imageSet('hero.wide'); %>
+<%# The gravel path photo: a portrait crop on portrait screens, a wide crop
+    elsewhere, AVIF first. No preload: the browser finds this <img> early
+    and fetchpriority puts it first. %>
+<picture class="home__photo">
+  <source media="(orientation: portrait)" type="image/avif" srcset="<%= portrait.avif %>" sizes="100vw" />
+  <source media="(orientation: portrait)" srcset="<%= portrait.jpeg %>" sizes="100vw" />
+  <source type="image/avif" srcset="<%= wide.avif %>" sizes="100vw" />
+  <img
+    src="<%= wide.src %>"
+    srcset="<%= wide.jpeg %>"
+    sizes="100vw"
+    width="1920"
+    height="1200"
+    alt=""
+    fetchpriority="high"
+    decoding="async"
+  />
+</picture>
+<div class="home__content">
+  <h1 class="home__title"><span class="text-nowrap">New Zealand</span> Camps</h1>
+  <p class="home__lead">Find and review campgrounds around Aotearoa.</p>
+  <div class="home__actions">
     <a href="/camps" class="btn btn-primary btn-lg home__button">View Camps</a>
+    <% if (user) { %>
+    <a class="home__link" href="/camps/new">Add a camp</a>
+    <% } else { %>
+    <a class="home__link" href="/register">Sign up to add a camp</a>
+    <% } %>
   </div>
 </div>

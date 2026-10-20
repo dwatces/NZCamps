@@ -409,38 +409,107 @@ body {
   padding: 0.75rem;
 }
 
-/* ---------- Home ---------- */
-.home-page {
-  min-height: 100vh;
-  background-color: var(--nzc-night);
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
-    url("./robert-koorenny-Py2ULdPgHac-unsplash.jpg");
-  background-size: cover;
-  background-position: center;
-  text-shadow: 0 0.05rem 0.1rem rgba(0, 0, 0, 0.5);
-  box-shadow: inset 0 0 5rem rgba(0, 0, 0, 0.5);
+/* ---------- Home ----------
+   The gravel path photo fills the screen behind a see-through header, with
+   a darker centre so the title and button stay readable on any crop. */
+.home-page .site-header {
+  position: fixed;
+  left: 0;
+  right: 0;
+  background-color: rgba(11, 21, 16, 0.62);
 }
-.cover-container {
-  max-width: 60vw;
+@supports (backdrop-filter: blur(1px)) {
+  .home-page .site-header {
+    background-color: rgba(11, 21, 16, 0.42);
+  }
+}
+.home {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;
+  background-color: var(--nzc-night);
+  color: #fff;
+}
+.home__photo img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 60%;
+}
+.home::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 75% 55% at 50% 50%, rgba(5, 12, 8, 0.62), rgba(5, 12, 8, 0.28)),
+    linear-gradient(rgba(5, 12, 8, 0.45), transparent 25%, transparent 75%, rgba(5, 12, 8, 0.5));
+}
+.home-page .demo-banner {
+  position: relative;
+  margin-top: 3.5rem;
+}
+.home__inner {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 5.5rem 1rem 3.5rem;
+  text-align: center;
 }
 .home__title {
-  margin-top: -4rem;
-  margin-bottom: 2rem;
-  font-size: 3rem;
+  margin: 0 0 1rem;
+  font-size: clamp(2.125rem, 1.15rem + 4.2vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
 }
-.home__subheader {
-  margin-bottom: 3rem;
-  font-size: 1.8rem;
+.home__lead {
+  max-width: 36rem;
+  margin: 0 auto 2rem;
+  text-wrap: balance;
+  font-size: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
 }
-@media (max-width: 600px) {
-  .home__title {
-    font-size: 2rem;
+.home__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+@media (min-width: 576px) {
+  .home__actions {
+    flex-direction: row;
+    justify-content: center;
+    gap: 1.5rem;
   }
-  .home__subheader {
-    font-size: 1.3rem;
-    margin-bottom: 1.5rem;
-  }
+}
+.home__button {
+  min-width: 12rem;
+  min-height: 3.25rem;
+  font-size: 1.125rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+.home__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--nzc-tap);
+  padding: 0 0.5rem;
+  color: #fff;
+  font-weight: 600;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+}
+.home__link:hover {
+  color: #fff;
 }
 
 /* ---------- Header ----------

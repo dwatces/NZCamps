@@ -268,3 +268,34 @@ test("the credits page names every photographer and links each photo", async () 
   }
   assert.match(res.text, /the sample listing Milford Sound Basecamp/);
 });
+
+// ---------- D4: home hero ----------
+
+test("home keeps its identity: the path photo, the title and View Camps", async () => {
+  const html = (await request(app).get("/")).text;
+  const h1 = /<h1[^>]*>([\s\S]*?)<\/h1>/.exec(html)[1].replace(/<[^>]+>/g, "");
+  assert.equal(h1, "New Zealand Camps");
+  assert.match(
+    html,
+    /<a href="\/camps" class="btn btn-primary btn-lg home__button">View Camps<\/a>/,
+  );
+  assert.match(html, /<a class="home__link" href="\/register">Sign up to add a camp<\/a>/);
+  assert.match(html, /Find and review campgrounds around Aotearoa\./);
+});
+
+test("the home photo is a responsive picture, fetched first, never preloaded", async () => {
+  const html = (await request(app).get("/")).text;
+  const picture = /<picture class="home__photo">([\s\S]*?)<\/picture>/.exec(html)[1];
+  assert.match(
+    picture,
+    /media="\(orientation: portrait\)" type="image\/avif" srcset="\/images\/home-hero-480\.avif 480w/,
+  );
+  assert.match(
+    picture,
+    /type="image\/avif" srcset="\/images\/home-hero-wide-1200\.avif 1200w, \/images\/home-hero-wide-1920\.avif 1920w"/,
+  );
+  assert.match(picture, /<img[^>]*fetchpriority="high"/);
+  assert.match(picture, /<img[^>]*width="1920"[^>]*height="1200"/);
+  assert.doesNotMatch(html, /rel="preload"/);
+  assert.doesNotMatch(html, /robert-koorenny/);
+});
