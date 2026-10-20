@@ -13,7 +13,7 @@ module.exports.register = async (req, res, next) => {
       if (err) return next(err);
       req.flash(
         "success",
-        `Welcome to NZ Camps, ${username}! add a camp you've visited before, or leave a review on an existing camp below.`
+        `Welcome to NZ Camps, ${username}! add a camp you've visited before, or leave a review on an existing camp below.`,
       );
       res.redirect("/camps");
     });

@@ -17,7 +17,7 @@ async function main() {
     password = process.env.SEED_PASSWORD || crypto.randomBytes(9).toString("base64url");
     author = await User.register(
       new User({ username: "ranger", email: "ranger@camps.example" }),
-      password
+      password,
     );
   }
 

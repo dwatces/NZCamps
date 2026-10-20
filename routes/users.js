@@ -4,10 +4,7 @@ const passport = require("passport");
 const catchAsync = require("../utils/catchAsync");
 const users = require("../controllers/users");
 
-router
-  .route("/register")
-  .get(users.renderRegister)
-  .post(catchAsync(users.register));
+router.route("/register").get(users.renderRegister).post(catchAsync(users.register));
 
 router
   .route("/login")
@@ -17,7 +14,7 @@ router
       failureFlash: true,
       failureRedirect: "/login",
     }),
-    users.login
+    users.login,
   );
 
 router.get("/logout", users.logout);

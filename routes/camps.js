@@ -10,25 +10,14 @@ const upload = multer({ storage, limits: { fileSize: 3 * 1024 * 1024 } });
 router
   .route("/")
   .get(catchAsync(camps.index))
-  .post(
-    isLoggedIn,
-    upload.array("image"),
-    validateCamp,
-    catchAsync(camps.createCamp)
-  );
+  .post(isLoggedIn, upload.array("image"), validateCamp, catchAsync(camps.createCamp));
 
 router.get("/new", isLoggedIn, camps.newForm);
 
 router
   .route("/:id")
   .get(catchAsync(camps.showCamps))
-  .put(
-    isLoggedIn,
-    isAuthor,
-    upload.array("image"),
-    validateCamp,
-    catchAsync(camps.updateCamp)
-  )
+  .put(isLoggedIn, isAuthor, upload.array("image"), validateCamp, catchAsync(camps.updateCamp))
   .delete(isLoggedIn, isAuthor, catchAsync(camps.deleteCamp));
 
 router.get("/:id/edit", isLoggedIn, isAuthor, catchAsync(camps.editForm));

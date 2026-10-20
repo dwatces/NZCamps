@@ -1,6 +1,7 @@
 body {
   height: 100vh;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
     url("./robert-koorenny-Py2ULdPgHac-unsplash.jpg");
   background-size: cover;
   background-position: center;

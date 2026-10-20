@@ -9,3 +9,4 @@ views/**/*.ejs
 *.webp
 *.ico
 *.svg
+*.md

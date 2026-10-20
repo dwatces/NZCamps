@@ -94,10 +94,7 @@ app.use((req, res, next) => {
 const demoCamps = require("./seeds/demoData");
 app.use(async (req, res, next) => {
   if (mongoose.connection.readyState !== 1 && dbUrl) {
-    await Promise.race([
-      connecting,
-      new Promise((resolve) => setTimeout(resolve, 8000)),
-    ]);
+    await Promise.race([connecting, new Promise((resolve) => setTimeout(resolve, 8000))]);
   }
   if (mongoose.connection.readyState === 1) return next();
   if (req.method === "GET" && req.path === "/camps")
@@ -108,7 +105,10 @@ app.use(async (req, res, next) => {
     if (camp) return res.render("camps/show", { camp });
   }
   if (req.method !== "GET") {
-    req.flash("error", "Demo mode: the live database is being provisioned - browsing only for now.");
+    req.flash(
+      "error",
+      "Demo mode: the live database is being provisioned - browsing only for now.",
+    );
     return res.redirect("/camps");
   }
   return next();
