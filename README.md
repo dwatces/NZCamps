@@ -118,7 +118,7 @@ Results go to `test-results/` (not committed): failure traces and screenshots, a
 
 ## History
 
-I started it in July 2021 as a learning project, originally using Mapbox for maps and geocoding and hosted on Heroku. In January 2025 the maps moved to Leaflet with OpenStreetMap tiles and geocoding moved to OpenCage. In June 2026 I upgraded it to Mongoose 8 and redeployed it as a serverless function on Vercel. In October 2026 I closed security holes (email addresses in the page source, script injection through camp text, session and upload handling), labelled the sample listings, rebuilt the pages for phones, keyboards and screen readers, and added the tests described above.
+I started it in July 2021, originally using Mapbox for maps and geocoding and hosted on Heroku. In January 2025 the maps moved to Leaflet with OpenStreetMap tiles and geocoding moved to OpenCage. In June 2026 I upgraded it to Mongoose 8 and redeployed it as a serverless function on Vercel. In October 2026 I closed security holes (email addresses in the page source, script injection through camp text, session and upload handling), labelled the sample listings, rebuilt the pages for phones, keyboards and screen readers, and added the tests described above.
 
 ## Project structure
 
