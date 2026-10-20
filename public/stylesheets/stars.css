@@ -190,6 +190,13 @@
   }
 }
 
+/* No rating chosen yet: every star shows empty. (The old form used a
+   pre-checked "no rating" radio for this, which also sent a rating of 0;
+   now the rating is required and nothing is chosen until the visitor picks.) */
+.starability-basic:not(:has(> input:checked)) > label {
+  background-position: 0 0;
+}
+
 .star__bg {
   width: 9.5rem;
   height: 2.1rem;

@@ -3,13 +3,14 @@ const { registerSchema } = require("../schemas");
 const passport = require("passport");
 const { displayName } = require("../utils/viewHelpers");
 const { safeReturnTo } = require("../utils/returnTo");
+const { formErrors, joiErrors, REGISTER_FIELDS } = require("../utils/formErrors");
 
 const DUPLICATE_MSG = "That username or email is already registered.";
 
 module.exports.renderRegister = (req, res) => {
   res.render("users/register", {
     values: {},
-    errors: [],
+    ...formErrors(),
     returnTo: safeReturnTo(req.query.returnTo),
   });
 };
@@ -29,8 +30,11 @@ module.exports.register = async (req, res, next) => {
   };
   const returnTo = safeReturnTo(req.body.returnTo);
   if (error) {
-    const errors = [...new Set(error.details.map((d) => d.message))];
-    return res.status(422).render("users/register", { values, errors, returnTo });
+    return res.status(422).render("users/register", {
+      values,
+      ...formErrors(joiErrors(error), REGISTER_FIELDS),
+      returnTo,
+    });
   }
 
   try {
@@ -48,7 +52,11 @@ module.exports.register = async (req, res, next) => {
     // Never show raw database errors (they name indexes and confirm emails).
     const duplicate = e && (e.name === "UserExistsError" || e.code === 11000);
     if (!duplicate) return next(e);
-    return res.status(422).render("users/register", { values, errors: [DUPLICATE_MSG], returnTo });
+    return res.status(422).render("users/register", {
+      values,
+      ...formErrors([DUPLICATE_MSG]),
+      returnTo,
+    });
   }
 };
 

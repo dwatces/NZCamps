@@ -84,71 +84,50 @@
   <div class="col-lg-6 col-sm-10">
     <div class="mb-5 card" id="map"></div>
     <% if(user) { %>
-    <h2 class="text-white">Leave a review</h2>
+    <% const typed = typeof reviewValues !== "undefined" && reviewValues ? reviewValues : {}; %>
+    <% const STARS = ["", "Terrible", "Not good", "Average", "Very good", "Amazing"]; %>
+    <h2 class="h4 text-white" id="review-form-title">Leave a review</h2>
+    <%- include('../partials/formErrors') %>
     <form
       action="/camps/<%=camp._id%>/reviews"
       method="POST"
-      class="mb-3 validForm"
+      class="mb-4 validForm review-form"
+      aria-labelledby="review-form-title"
       novalidate
     >
-      <div class="mt-3 mb-3 star__bg">
-        <fieldset class="starability-basic">
-          <input
-            type="radio"
-            id="no-rate"
-            class="input-no-rate"
-            name="review[rating]"
-            value="0"
-            checked
-            aria-label="No rating."
-          />
-          <input
-            type="radio"
-            id="first-rate1"
-            name="review[rating]"
-            value="1"
-          />
-          <label for="first-rate1" title="Terrible">1 star</label>
-          <input
-            type="radio"
-            id="first-rate2"
-            name="review[rating]"
-            value="2"
-          />
-          <label for="first-rate2" title="Not good">2 stars</label>
-          <input
-            type="radio"
-            id="first-rate3"
-            name="review[rating]"
-            value="3"
-          />
-          <label for="first-rate3" title="Average">3 stars</label>
-          <input
-            type="radio"
-            id="first-rate4"
-            name="review[rating]"
-            value="4"
-          />
-          <label for="first-rate4" title="Very good">4 stars</label>
-          <input
-            type="radio"
-            id="first-rate5"
-            name="review[rating]"
-            value="5"
-          />
-          <label for="first-rate5" title="Amazing">5 stars</label>
-        </fieldset>
-      </div>
+      <fieldset class="mb-3" role="radiogroup"<%- fieldAria('rating', typeof fieldErrors !== "undefined" ? fieldErrors : null) %>>
+        <legend class="form-label text-white fs-6 mb-1">Your rating</legend>
+        <div class="star__bg">
+          <div class="starability-basic">
+            <% for (let n = 1; n <= 5; n++) { %>
+            <input
+              type="radio"
+              id="rating-<%= n %>"
+              name="review[rating]"
+              value="<%= n %>"
+              data-field="rating"<%= typed.rating === String(n) ? " checked" : "" %><% if (n === 1) { %>
+              required
+              data-error="Choose a star rating from 1 to 5."<% } %>
+            />
+            <label for="rating-<%= n %>" title="<%= STARS[n] %>"><%= n %> star<%= n === 1 ? "" : "s" %>, <%= STARS[n].toLowerCase() %></label>
+            <% } %>
+          </div>
+        </div>
+        <%- include('../partials/fieldError', { name: 'rating' }) %>
+      </fieldset>
       <div class="mb-3">
-        <label class="form-label text-white" for="body">Review</label>
+        <label class="form-label text-white" for="review-body">Your review</label>
         <textarea
-          class="form-control"
+          class="form-control<%= invalidClass('body', typeof fieldErrors !== "undefined" ? fieldErrors : null) %>"
           name="review[body]"
-          id="body"
-          cols="30"
+          id="review-body"
           rows="3"
+          maxlength="1000"
           required
-        ></textarea>
+          data-field="body"
+          data-error="Enter your review."<%- fieldAria('body', typeof fieldErrors !== "undefined" ? fieldErrors : null) %>
+        ><%= typed.body || "" %></textarea>
+        <%- include('../partials/fieldError', { name: 'body' }) %>
       </div>
       <button class="btn btn-success">Post review</button>
     </form>

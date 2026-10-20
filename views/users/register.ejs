@@ -24,7 +24,7 @@
               <label for="username" class="form-label">Username</label>
               <input
                 type="text"
-                class="form-control"
+                class="form-control<%= invalidClass('username', fieldErrors) %>"
                 id="username"
                 name="username"
                 value="<%= values.username %>"
@@ -34,42 +34,48 @@
                 autocomplete="username"
                 autocapitalize="none"
                 spellcheck="false"
-                aria-describedby="username-help"
                 required
+                data-field="username"
+                data-error="Usernames are 3 to 30 characters: letters, numbers, dots, dashes and underscores."<%- fieldAria('username', fieldErrors, 'username-help') %>
               />
               <div id="username-help" class="form-text">
                 3 to 30 characters: letters, numbers, dots, dashes and underscores. Other people see it on your reviews.
               </div>
+              <%- include('../partials/fieldError', { name: 'username' }) %>
             </div>
             <div class="mb-3">
               <label for="email" class="form-label">Email</label>
               <input
                 type="email"
-                class="form-control"
+                class="form-control<%= invalidClass('email', fieldErrors) %>"
                 id="email"
                 name="email"
                 value="<%= values.email %>"
                 maxlength="254"
                 autocomplete="email"
-                aria-describedby="email-help"
                 required
+                data-field="email"
+                data-error="Enter a valid email address, like name@example.com."<%- fieldAria('email', fieldErrors, 'email-help') %>
               />
               <div id="email-help" class="form-text">Never shown on the site.</div>
+              <%- include('../partials/fieldError', { name: 'email' }) %>
             </div>
             <div class="mb-4">
               <label for="password" class="form-label">Password</label>
               <input
                 type="password"
-                class="form-control"
+                class="form-control<%= invalidClass('password', fieldErrors) %>"
                 id="password"
                 name="password"
                 minlength="8"
                 maxlength="200"
                 autocomplete="new-password"
-                aria-describedby="password-help"
                 required
+                data-field="password"
+                data-error="Choose a password of at least 8 characters."<%- fieldAria('password', fieldErrors, 'password-help') %>
               />
               <div id="password-help" class="form-text">At least 8 characters.</div>
+              <%- include('../partials/fieldError', { name: 'password' }) %>
             </div>
             <button class="btn btn-success w-100">Sign up</button>
           </form>

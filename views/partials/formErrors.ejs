@@ -1,9 +1,9 @@
 <% if (typeof errors !== "undefined" && errors && errors.length) { %>
-<div class="alert alert-danger" role="alert" id="form-errors">
-  <p class="fw-bold mb-1">Please fix the following:</p>
+<div class="alert alert-danger error-summary" role="alert" id="form-errors" tabindex="-1" aria-labelledby="form-errors-title">
+  <h2 class="h5" id="form-errors-title">There's a problem</h2>
   <ul class="mb-0">
-    <% for (const message of errors) { %>
-    <li><%= message %></li>
+    <% for (const e of errors) { %>
+    <li><% if (e.href) { %><a href="<%= e.href %>"><%= e.message %></a><% } else { %><%= e.message %><% } %></li>
     <% } %>
   </ul>
 </div>

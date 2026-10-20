@@ -1,0 +1,2 @@
+<% const fieldMessage = typeof fieldErrors !== "undefined" && fieldErrors ? fieldErrors[name] : ""; %>
+<p class="field-error" id="<%= name %>-error"<%= fieldMessage ? "" : " hidden" %>><%= fieldMessage || "" %></p>

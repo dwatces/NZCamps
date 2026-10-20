@@ -1,8 +1,8 @@
 <% layout('layouts/boilerplate')%>
-
+<% block('scripts', '<script src="/js/upload.js"></script>') %>
 <div class="row mt-5">
   <h1 class="text-center text-white">Add a camp</h1>
-  <div class="col-md-6 offset-md-3">
+  <div class="col-md-8 offset-md-2 col-lg-6 offset-lg-3">
     <%- include('../partials/formErrors') %>
     <form
       action="/camps"
@@ -11,74 +11,9 @@
       class="validForm"
       enctype="multipart/form-data"
     >
-      <div class="mb-3">
-        <label class="form-label text-white" for="title">Camp name</label>
-        <input
-          class="form-control"
-          type="text"
-          id="title"
-          name="camp[title]"
-          value="<%= values.title %>"
-          maxlength="100"
-          required
-        />
-      </div>
-      <div class="mb-3">
-        <label class="form-label text-white" for="location">Location</label>
-        <input
-          class="form-control"
-          type="text"
-          id="location"
-          name="camp[location]"
-          value="<%= values.location %>"
-          maxlength="120"
-          required
-        />
-      </div>
-      <div class="mb-3">
-        <label class="form-label text-white" for="price">Price per night</label>
-        <div class="input-group mb-3">
-          <span class="input-group-text" id="price-addon">$</span>
-          <input
-            type="text"
-            id="price"
-            class="form-control"
-            placeholder="0.00"
-            name="camp[price]"
-            value="<%= values.price %>"
-            inputmode="decimal"
-            aria-describedby="price-addon"
-            required
-          />
-        </div>
-      </div>
-      <div class="mb-3">
-        <label class="form-label text-white" for="description"
-          >Description</label
-        >
-        <textarea
-          class="form-control"
-          type="text"
-          id="description"
-          name="camp[description]"
-          maxlength="2000"
-          required
-        ><%= values.description %></textarea>
-      </div>
-      <%# The file input is the last field: if a photo is refused, every
-          other field has already been read and is shown again. %>
-      <div class="mb-3">
-        <label class="form-label text-white" for="image">Photos</label>
-        <input
-          type="file"
-          class="form-control"
-          id="image"
-          name="image"
-          accept="image/jpeg,image/png,image/webp"
-          multiple
-        />
-      </div>
-      <div class="d-flex justify-content-center mb-3">
+      <%- include('../partials/campFields') %>
+      <%- include('../partials/photoInput') %>
+      <div class="d-flex justify-content-center mb-5">
         <button class="btn btn-success">Add camp</button>
       </div>
     </form>

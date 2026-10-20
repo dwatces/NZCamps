@@ -1,0 +1,26 @@
+<%# The photo field, always last in the camp forms: if a photo is refused,
+    every other field has already been read and is shown again. %>
+<% const editing = typeof camp !== "undefined" && camp; %>
+<% const room = editing ? Math.max(0, maxCampPhotos - camp.images.length) : maxCampPhotos; %>
+<div class="mb-3">
+  <label class="form-label text-white" for="image"><%= editing ? "Add photos" : "Photos (optional)" %></label>
+  <input
+    type="file"
+    class="form-control<%= invalidClass('image', fieldErrors) %>"
+    id="image"
+    name="image"
+    accept="image/jpeg,image/png,image/webp"
+    multiple
+    data-field="image"
+    data-resize
+    data-max-files="<%= Math.min(maxPhotosPerUpload, room) %>"
+    data-max-bytes="<%= maxPhotoBytes %>"<%- fieldAria('image', fieldErrors, 'image-help') %>
+  />
+  <p class="form-help" id="image-help">
+    JPG, PNG or WebP, up to <%= maxPhotosPerUpload %> photos at a time.
+    <% if (editing) { %>A camp can have <%= maxCampPhotos %> photos; this one has room for <%= room %> more.<% } %>
+  </p>
+  <%- include('fieldError', { name: 'image' }) %>
+  <p class="form-help" id="image-status" aria-live="polite"></p>
+  <ul class="photo-previews list-unstyled" id="image-previews" hidden></ul>
+</div>

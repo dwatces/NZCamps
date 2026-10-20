@@ -1,0 +1,71 @@
+<%# The text fields of the add and edit camp forms. %>
+<div class="mb-3">
+  <label class="form-label text-white" for="title">Camp name</label>
+  <input
+    class="form-control<%= invalidClass('title', fieldErrors) %>"
+    type="text"
+    id="title"
+    name="camp[title]"
+    value="<%= values.title %>"
+    maxlength="100"
+    required
+    data-field="title"
+    data-error="Enter a camp name."<%- fieldAria('title', fieldErrors) %>
+  />
+  <%- include('fieldError', { name: 'title' }) %>
+</div>
+<div class="mb-3">
+  <label class="form-label text-white" for="location">Location</label>
+  <input
+    class="form-control<%= invalidClass('location', fieldErrors) %>"
+    type="text"
+    id="location"
+    name="camp[location]"
+    value="<%= values.location %>"
+    maxlength="120"
+    required
+    data-field="location"
+    data-error="Enter a location."<%- fieldAria('location', fieldErrors, 'location-help') %>
+  />
+  <p class="form-help" id="location-help">A town, lake or park, for example Lake Tekapo. We add “New Zealand” for you.</p>
+  <%- include('fieldError', { name: 'location' }) %>
+</div>
+<div class="mb-3">
+  <label class="form-label text-white" for="price">Price per night</label>
+  <div class="input-group">
+    <span class="input-group-text" aria-hidden="true">$</span>
+    <input
+      type="text"
+      id="price"
+      class="form-control<%= invalidClass('price', fieldErrors) %>"
+      name="camp[price]"
+      value="<%= values.price %>"
+      inputmode="decimal"
+      pattern="\d{1,4}(\.\d{1,2})?"
+      required
+      data-field="price"
+      data-error="Enter a price per night, like 18 or 18.50. Use 0 for free."<%- fieldAria('price', fieldErrors, 'price-help') %>
+    />
+  </div>
+  <p class="form-help" id="price-help">In dollars, like 18 or 18.50. Use 0 for a free site.</p>
+  <%- include('fieldError', { name: 'price' }) %>
+</div>
+<div class="mb-3">
+  <label class="form-label text-white" for="description">Description</label>
+  <textarea
+    class="form-control<%= invalidClass('description', fieldErrors) %>"
+    id="description"
+    name="camp[description]"
+    rows="5"
+    maxlength="2000"
+    required
+    data-field="description"
+    data-error="Enter a description."
+    data-counter="description-count"<%- fieldAria('description', fieldErrors, 'description-help') %>
+  ><%= values.description %></textarea>
+  <p class="form-help" id="description-help">
+    Up to 2,000 characters. <span id="description-count" aria-hidden="true"></span>
+  </p>
+  <p class="visually-hidden" id="description-count-live" aria-live="polite"></p>
+  <%- include('fieldError', { name: 'description' }) %>
+</div>

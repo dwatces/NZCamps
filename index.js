@@ -53,6 +53,12 @@ db.once("open", () => {
 // Seam for tests: controllers geocode through app.locals so a stub can be swapped in.
 app.locals.geocode = require("./utils/geocode");
 Object.assign(app.locals, require("./utils/viewHelpers"));
+{
+  const uploads = require("./cloudinary");
+  app.locals.maxCampPhotos = uploads.MAX_CAMP_PHOTOS;
+  app.locals.maxPhotosPerUpload = uploads.MAX_PHOTOS;
+  app.locals.maxPhotoBytes = uploads.MAX_PHOTO_BYTES;
+}
 
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");

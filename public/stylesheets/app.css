@@ -141,3 +141,90 @@
 .rating-star {
   color: #8a5a00;
 }
+
+/* Forms: help text, and error messages that stay readable over the
+   background photos (white on dark red, 7:1). */
+.form-help {
+  color: #fff;
+  font-size: 0.875rem;
+  margin: 0.25rem 0 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+.field-error {
+  display: inline-block;
+  color: #fff;
+  background-color: #a4161a;
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  margin: 0.375rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.field-error[hidden] {
+  display: none;
+}
+.error-summary:focus {
+  outline: 3px solid #ffd166;
+  outline-offset: 2px;
+}
+
+/* Edit form: photos to remove. The whole label (photo and text) is the
+   target, well over 44 px. */
+.photo-remove__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0.5rem 0 0;
+}
+.photo-remove__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-height: 44px;
+  padding: 0.5rem;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 0.375rem;
+  cursor: pointer;
+}
+.photo-remove__label img {
+  width: 150px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 0.25rem;
+}
+.photo-remove__text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.photo-remove__text .form-check-input {
+  margin: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Photo previews before upload (public/js/upload.js). */
+.photo-previews {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0.5rem 0 0;
+}
+.photo-previews li {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  font-size: 0.8125rem;
+  max-width: 166px;
+  overflow-wrap: anywhere;
+}
+.photo-previews img {
+  display: block;
+  width: 150px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 0.25rem;
+  margin-bottom: 0.25rem;
+}

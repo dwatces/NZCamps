@@ -24,6 +24,8 @@ if (configured) {
 
 // Three photos of up to 1.4 MB stay under Vercel's 4.5 MB request body limit.
 const MAX_PHOTOS = 3;
+// Photos one camp can have in total (edits add to what it has).
+const MAX_CAMP_PHOTOS = 6;
 const MAX_PHOTO_BYTES = Math.floor(1.4 * 1024 * 1024);
 const ACCEPTED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const PHOTO_RULES = "Photos must be JPG, PNG or WebP, up to 1.4 MB each, 3 at most.";
@@ -105,4 +107,5 @@ module.exports = {
   STORE_FAILED_MSG,
   MAX_PHOTOS,
   MAX_PHOTO_BYTES,
+  MAX_CAMP_PHOTOS,
 };

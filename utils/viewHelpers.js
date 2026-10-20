@@ -167,6 +167,22 @@ function excerpt(text, max = 140) {
   return `${head.replace(/[\s,.;:\u2013-]+$/, "")}\u2026`;
 }
 
+// aria-describedby and aria-invalid for a form field: the ids of its help
+// texts and, when it has an error, of its error message. Ids come from the
+// templates, never from user input.
+const ID = /^[a-z][\w-]*$/i;
+function fieldAria(name, fieldErrors, ...helpIds) {
+  const ids = helpIds.filter(Boolean);
+  if (![name, ...ids].every((id) => ID.test(id))) throw new Error("fieldAria: bad id");
+  const invalid = Boolean(fieldErrors && fieldErrors[name]);
+  if (invalid) ids.push(`${name}-error`);
+  return (
+    (ids.length ? ` aria-describedby="${ids.join(" ")}"` : "") +
+    (invalid ? ' aria-invalid="true"' : "")
+  );
+}
+const invalidClass = (name, fieldErrors) => (fieldErrors && fieldErrors[name] ? " is-invalid" : "");
+
 module.exports = {
   safeJson,
   sameId,
@@ -186,4 +202,6 @@ module.exports = {
   formatDate,
   isoDate,
   excerpt,
+  fieldAria,
+  invalidClass,
 };

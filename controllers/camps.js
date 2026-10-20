@@ -32,12 +32,28 @@ async function storeImages(files) {
 async function geocodeOrMessage(req, location) {
   try {
     const coords = await req.app.locals.geocode(location);
-    return coords ? { coords } : { message: NOT_FOUND_MSG, status: 422 };
+    if (coords) return { coords };
+    return { error: { field: "location", message: NOT_FOUND_MSG }, status: 422 };
   } catch (err) {
     console.error("geocoder failed:", err && err.message);
-    return { message: GEOCODER_DOWN_MSG, status: 503 };
+    return { error: { field: "location", message: GEOCODER_DOWN_MSG }, status: 503 };
   }
 }
+
+// "We placed it at Lake Tekapo, Mackenzie District, ..." (or the coordinates
+// when the geocoder gives no name), so people can see where the pin went.
+function placedAt({ name, lat, lng }) {
+  const where = name || `${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)}`;
+  return `We placed it at ${where}.`;
+}
+
+const sameText = (a, b) =>
+  String(a || "")
+    .trim()
+    .toLowerCase() ===
+  String(b || "")
+    .trim()
+    .toLowerCase();
 
 module.exports.index = async (req, res) => {
   const params = parseListQuery(req.query);
@@ -50,27 +66,21 @@ module.exports.newForm = (req, res) => {
 
 module.exports.createCamp = async (req, res) => {
   const fields = pickCampFields(req.body.camp);
-  const geo = await geocodeOrMessage(req, fields.location);
-  if (!geo.coords) {
-    return renderCampForm(res, {
-      status: geo.status,
+  const formAgain = (status, error) =>
+    renderCampForm(res, {
+      status,
       view: "camps/new",
       values: campFormValues(req.body.camp),
-      errors: [geo.message],
+      errors: [error],
     });
-  }
+
+  const geo = await geocodeOrMessage(req, fields.location);
+  if (!geo.coords) return formAgain(geo.status, geo.error);
 
   // Photos are stored only now, after every check has passed, so a refused
   // form never leaves orphaned uploads behind.
   const images = await storeImages(req.files);
-  if (!images) {
-    return renderCampForm(res, {
-      status: 503,
-      view: "camps/new",
-      values: campFormValues(req.body.camp),
-      errors: [STORE_FAILED_MSG],
-    });
-  }
+  if (!images) return formAgain(503, { field: "image", message: STORE_FAILED_MSG });
 
   const camp = new Camp(fields);
   camp.geometry = { type: "Point", coordinates: [geo.coords.lng, geo.coords.lat] };
@@ -78,7 +88,7 @@ module.exports.createCamp = async (req, res) => {
   camp.images = images;
 
   await camp.save();
-  req.flash("success", "Camp added.");
+  req.flash("success", `Camp added. ${placedAt(geo.coords)}`);
   res.redirect(`/camps/${camp._id}`);
 };
 
@@ -95,23 +105,34 @@ module.exports.editForm = async (req, res) => {
 
 module.exports.updateCamp = async (req, res) => {
   const camp = req.camp;
-  const added = await storeImages(req.files);
-  if (!added) {
-    return renderCampForm(res, {
-      status: 503,
+  const fields = pickCampFields(req.body.camp);
+  const formAgain = (status, error) =>
+    renderCampForm(res, {
+      status,
       view: "camps/edit",
       camp,
-      values: campFormValues(req.body.camp),
-      errors: [STORE_FAILED_MSG],
+      values: campFormValues(req.body.camp, req.body.deleteImages),
+      errors: [error],
     });
+
+  // The pin moves only when the location text changed; a place that can't
+  // be found leaves the camp (and its pin) as it was.
+  let geo = null;
+  if (!sameText(fields.location, camp.location)) {
+    geo = await geocodeOrMessage(req, fields.location);
+    if (!geo.coords) return formAgain(geo.status, geo.error);
   }
+
+  const added = await storeImages(req.files);
+  if (!added) return formAgain(503, { field: "image", message: STORE_FAILED_MSG });
 
   // Only this camp's own images can be removed, whatever ids the form sent.
   const ids = new Set(req.body.deleteImages || []);
   const removed = camp.images.filter((img) => ids.has(String(img._id)));
   const removedIds = new Set(removed.map((img) => String(img._id)));
 
-  Object.assign(camp, pickCampFields(req.body.camp));
+  Object.assign(camp, fields);
+  if (geo) camp.geometry = { type: "Point", coordinates: [geo.coords.lng, geo.coords.lat] };
   camp.images = camp.images.filter((img) => !removedIds.has(String(img._id)));
   camp.images.push(...added);
   await camp.save();
@@ -120,7 +141,7 @@ module.exports.updateCamp = async (req, res) => {
     await destroyImage(img.filename);
   }
 
-  req.flash("success", "Camp updated.");
+  req.flash("success", geo ? `Camp updated. ${placedAt(geo.coords)}` : "Camp updated.");
   res.redirect(`/camps/${camp._id}`);
 };
 

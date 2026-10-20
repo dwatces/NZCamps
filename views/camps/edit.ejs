@@ -1,7 +1,8 @@
 <% layout('layouts/boilerplate')%>
+<% block('scripts', '<script src="/js/upload.js"></script>') %>
 <div class="row mt-5">
   <h1 class="text-center text-white">Edit camp</h1>
-  <div class="col-md-6 offset-md-3">
+  <div class="col-md-8 offset-md-2 col-lg-6 offset-lg-3">
     <%- include('../partials/formErrors') %>
     <form
       action="/camps/<%=camp._id%>?_method=PUT"
@@ -10,91 +11,34 @@
       class="validForm"
       enctype="multipart/form-data"
     >
-      <div class="mb-3">
-        <label class="form-label text-white" for="title">Camp name</label>
-        <input
-          class="form-control"
-          type="text"
-          id="title"
-          name="camp[title]"
-          value="<%= values.title %>"
-          maxlength="100"
-          required
-        />
-      </div>
-      <div class="mb-3">
-        <label class="form-label text-white" for="location">Location</label>
-        <input
-          class="form-control"
-          type="text"
-          id="location"
-          name="camp[location]"
-          value="<%= values.location %>"
-          maxlength="120"
-          required
-        />
-      </div>
-      <div class="mb-3">
-        <label class="form-label text-white" for="price">Price per night</label>
-        <div class="input-group mb-3">
-          <span class="input-group-text" id="price-addon">$</span>
-          <input
-            type="text"
-            id="price"
-            class="form-control"
-            placeholder="0.00"
-            name="camp[price]"
-            value="<%= values.price %>"
-            inputmode="decimal"
-            aria-describedby="price-addon"
-            required
-          />
-        </div>
-      </div>
-      <div class="mb-3">
-        <label class="form-label text-white" for="description">Description</label>
-        <textarea
-          class="form-control"
-          type="text"
-          id="description"
-          name="camp[description]"
-          maxlength="2000"
-          required
-        ><%= values.description %></textarea>
-      </div>
+      <%- include('../partials/campFields') %>
       <% if (camp.images.length) { %>
-      <fieldset class="mb-4">
-        <legend class="h5 text-center text-white">Tick to Delete</legend>
-        <% camp.images.forEach(function(img, i) { %>
-        <div class="form-check-inline mb-2">
-          <input
-            type="checkbox"
-            class="form-check-input"
-            id="delete-<%= img._id %>"
-            name="deleteImages[]"
-            value="<%= img._id %>"
-          />
-          <label class="form-check-label" for="delete-<%= img._id %>">
-            <img src="<%= imageUrl(camp, img, 200) %>" class="img-thumbnail" alt="Photo <%= i + 1 %>" />
-            <span class="visually-hidden">Delete photo <%= i + 1 %></span>
-          </label>
-        </div>
-        <% }); %>
+      <% const ticked = new Set(values.deleteImages || []); %>
+      <fieldset class="mb-4 photo-remove" id="remove-photos"<%- fieldAria('deleteImages', fieldErrors, 'remove-photos-help') %>>
+        <legend class="h6 text-white mb-1">Remove photos</legend>
+        <p class="form-help" id="remove-photos-help">Tick the photos to remove when you save.</p>
+        <ul class="list-unstyled photo-remove__list">
+          <% camp.images.forEach(function(img, i) { %>
+          <li>
+            <label class="photo-remove__label">
+              <img src="<%= imageUrl(camp, img, 200) %>" alt="" width="150" height="100" />
+              <span class="photo-remove__text">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  name="deleteImages[]"
+                  value="<%= img._id %>"<%= ticked.has(String(img._id)) ? " checked" : "" %>
+                />
+                Remove photo <%= i + 1 %> of <%= camp.images.length %>
+              </span>
+            </label>
+          </li>
+          <% }); %>
+        </ul>
+        <%- include('../partials/fieldError', { name: 'deleteImages' }) %>
       </fieldset>
       <% } %>
-      <%# The file input is the last field: if a photo is refused, every
-          other field has already been read and is shown again. %>
-      <div class="mb-3">
-        <label class="form-label text-white" for="image">Add photos</label>
-        <input
-          type="file"
-          class="form-control"
-          id="image"
-          name="image"
-          accept="image/jpeg,image/png,image/webp"
-          multiple
-        />
-      </div>
+      <%- include('../partials/photoInput') %>
       <div class="mb-3 d-flex justify-content-between">
         <button class="btn btn-success">Save changes</button>
         <a class="btn btn-light" href="/camps/<%= camp._id %>">Back to camp</a>
