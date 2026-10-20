@@ -209,8 +209,24 @@ test.describe("error summaries", () => {
       "Enter a description.",
     ]);
 
-    await page.getByLabel("Camp name").fill("Tussock Saddle");
-    await expect(page.getByLabel("Camp name")).toBeFocused();
+    // From the summary's link to the field, as a person would, with the
+    // page scrolled down to the summary (as on a phone with its keyboard
+    // open). The page scrolls by the line that goes, so the field being
+    // typed in stays put on screen.
+    const name = page.getByLabel("Camp name");
+    await summary.getByRole("link", { name: "Enter a camp name." }).click();
+    await expect(name).toBeFocused();
+    await summary.evaluate((el) =>
+      window.scrollTo({
+        top: el.getBoundingClientRect().top + window.scrollY,
+        behavior: "instant",
+      }),
+    );
+    await expect(name).toBeInViewport();
+    const before = (await name.boundingBox()).y;
+    await name.fill("Tussock Saddle");
+    await expect(name).toBeFocused();
+    expect(Math.abs((await name.boundingBox()).y - before)).toBeLessThan(1);
     await expect(page.locator("#title-error")).toBeHidden();
     await expect(summary.locator("li")).toHaveCount(3);
     await expect(summary).not.toContainText("Enter a camp name.");

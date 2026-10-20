@@ -116,9 +116,14 @@
 
   // Removes the summary's lines that link to a fixed control (for a radio,
   // to any radio of its group), and hides the summary once it lists nothing.
+  // The page scrolls by what the summary lost, so the field being typed in
+  // stays where it was on screen.
   function dropFromSummary(control) {
     var summary = document.getElementById("form-errors");
     if (!summary || summary.hidden) return;
+    var field = targetOf(control);
+    var top = field.getBoundingClientRect().top;
+    var removed = false;
     Array.prototype.forEach.call(summary.querySelectorAll('a[href^="#"]'), function (link) {
       var linked = document.getElementById(link.getAttribute("href").slice(1));
       var same =
@@ -130,9 +135,14 @@
           linked.name === control.name);
       if (!same) return;
       var item = link.closest("li");
-      if (item) item.remove();
+      if (!item) return;
+      item.remove();
+      removed = true;
     });
+    if (!removed) return;
     if (!summary.querySelector("li")) summary.hidden = true;
+    var moved = field.getBoundingClientRect().top - top;
+    if (moved) window.scrollBy({ top: moved, behavior: "instant" });
   }
 
   function check(form) {
