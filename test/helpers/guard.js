@@ -5,6 +5,7 @@
 //    and fail the file. On Express 4 these kill the server process.
 const dns = require("node:dns");
 const net = require("node:net");
+const path = require("node:path");
 
 const LOOPBACK = new Set(["localhost", "127.0.0.1", "::1", "::ffff:127.0.0.1", "[::1]"]);
 const isLoopback = (host) => LOOPBACK.has(String(host || "").toLowerCase());
@@ -63,5 +64,29 @@ process.on("uncaughtException", (err) => {
   process.exitCode = 1;
   console.error("Uncaught exception in test process:", err);
 });
+
+// Bundle check (scripts/check-bundle.js): app code must load only files that
+// were copied into the bundle folder. Test files may load test-only packages.
+if (process.env.BUNDLE_CHECK_ROOT) {
+  const Module = require("node:module");
+  const fsReal = require("node:fs").realpathSync;
+  const root = fsReal(process.env.BUNDLE_CHECK_ROOT) + path.sep;
+  const testDir = root + "test" + path.sep;
+  const realResolve = Module._resolveFilename;
+  Module._resolveFilename = function bundleResolve(request, parent, ...rest) {
+    const resolved = realResolve.call(this, request, parent, ...rest);
+    const from = parent && parent.filename;
+    if (
+      from &&
+      from.startsWith(root) &&
+      !from.startsWith(testDir) &&
+      path.isAbsolute(resolved) &&
+      !resolved.startsWith(root)
+    ) {
+      throw new Error(`Bundle check: ${request} (from ${from}) is not in the function bundle`);
+    }
+    return resolved;
+  };
+}
 
 module.exports = { crashes, isLoopback };
